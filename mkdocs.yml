@@ -1,0 +1,23 @@
+site_name: Data Replication in context of Kafka and Event Streams
+repo_url: https://github.com/jbcodeforce/kp-data-replication.git
+nav:
+  - Introduction: index.md
+  - Mirror Maker 2.0:
+    - Replication from local to Event Streams: local-to-es.md
+    - Replication from Event Streams to local : es-to-local.md
+    - Connector Provisioning: provisioning.md
+    - Kafka Connect: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect
+  - Apache Kafka practices:
+    - Summary: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme
+    - Consumer practices: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers
+    - Producer practices: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers
+  - Monitoring with Prometheus and Grafana: monitoring.md
+theme: 
+  name: material
+extra_css: ["extra.css"]
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
