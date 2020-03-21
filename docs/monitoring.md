@@ -164,3 +164,9 @@ curl -s https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/
 ```shell
 oc create secret generic alertmanager-alertmanager --from-file=alertmanager.yaml=alert-manager-config.yaml
 ```
+
+
+
+```shell
+oc create secret generic additional-scrape-configs --from-file=./local-cluster/prometheus-additional.yaml --dry-run -o yaml | kubectl apply -f -
+```

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+      app: mm2ocp
+    name: mm2ocp
+    namespace: jb-kafka-strimzi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mm2ocp
+  template:
+    metadata:
+      labels:
+        app: mm2ocp
+    spec:
+      volumes:
+      - name: properties-volume
+        secret:
+          secretName: mm2-std-properties
+      - name: jmx-exporter-volume
+        secret:
+          secretName: mm2-jmx-exporter
+      containers:
+      - image: 'ibmcase/mm2ocp:v0.0.4'
+        imagePullPolicy: IfNotPresent
+        name: mm2ocp
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 9400
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 9400
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        volumeMounts:
+          - name: properties-volume
+            readOnly: true
+            mountPath: "/home"
+          - name: jmx-exporter-volume
+            readOnly: true
+            mountPath: "/etc/jmx_exporter"
