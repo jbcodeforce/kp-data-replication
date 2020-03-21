@@ -1,0 +1,808 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.0.1">
+    
+    
+      
+        <title>Monitoring with Prometheus and Grafana - Data Replication in context of Kafka and Event Streams</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.982221ab.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1f0bcf2b.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="../extra.css">
+    
+    
+      
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="__github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#monitoring-mirror-maker-and-kafka-connect-cluster" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Data Replication in context of Kafka and Event Streams" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Data Replication in context of Kafka and Event Streams
+            </span>
+            <span class="md-header-nav__topic">
+              Monitoring with Prometheus and Grafana
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/jbcodeforce/kp-data-replication.git/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="Data Replication in context of Kafka and Event Streams" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Data Replication in context of Kafka and Event Streams
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/jbcodeforce/kp-data-replication.git/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      Mirror Maker 2.0
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        Mirror Maker 2.0
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../local-to-es/" title="Replication from local to Event Streams" class="md-nav__link">
+      Replication from local to Event Streams
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../es-to-local/" title="Replication from Event Streams to local" class="md-nav__link">
+      Replication from Event Streams to local
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../provisioning/" title="Connector Provisioning" class="md-nav__link">
+      Connector Provisioning
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
+      Kafka Connect
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Apache Kafka practices
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Apache Kafka practices
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme" title="Summary" class="md-nav__link">
+      Summary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers" title="Consumer practices" class="md-nav__link">
+      Consumer practices
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers" title="Producer practices" class="md-nav__link">
+      Producer practices
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Monitoring with Prometheus and Grafana
+      </label>
+    
+    <a href="./" title="Monitoring with Prometheus and Grafana" class="md-nav__link md-nav__link--active">
+      Monitoring with Prometheus and Grafana
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation-and-configuration" title="Installation and configuration" class="md-nav__link">
+    Installation and configuration
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-prometheus" title="Install Prometheus" class="md-nav__link">
+    Install Prometheus
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-prometheus" title="Deploy prometheus" class="md-nav__link">
+    Deploy prometheus
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-grafana" title="Install Grafana" class="md-nav__link">
+    Install Grafana
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kafka-explorer" title="Kafka Explorer" class="md-nav__link">
+    Kafka Explorer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mirror-maker-monitoring" title="Mirror maker monitoring" class="md-nav__link">
+    Mirror maker monitoring
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-grafana-dashboard" title="Configure Grafana dashboard" class="md-nav__link">
+    Configure Grafana dashboard
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alert-manager" title="Alert Manager" class="md-nav__link">
+    Alert Manager
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation-and-configuration" title="Installation and configuration" class="md-nav__link">
+    Installation and configuration
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-prometheus" title="Install Prometheus" class="md-nav__link">
+    Install Prometheus
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-prometheus" title="Deploy prometheus" class="md-nav__link">
+    Deploy prometheus
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-grafana" title="Install Grafana" class="md-nav__link">
+    Install Grafana
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kafka-explorer" title="Kafka Explorer" class="md-nav__link">
+    Kafka Explorer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mirror-maker-monitoring" title="Mirror maker monitoring" class="md-nav__link">
+    Mirror maker monitoring
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-grafana-dashboard" title="Configure Grafana dashboard" class="md-nav__link">
+    Configure Grafana dashboard
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alert-manager" title="Alert Manager" class="md-nav__link">
+    Alert Manager
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/jbcodeforce/kp-data-replication.git/edit/master/docs/monitoring.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="monitoring-mirror-maker-and-kafka-connect-cluster">Monitoring Mirror Maker and kafka connect cluster</h1>
+<p>The goal of this note is to go over some of the details on how to monitor Mirror Maker 2.0 metrics to Prometheus and how to use Grafana dashboard.</p>
+<p><a href="https://prometheus.io/docs/introduction/overview/">Prometheus</a> is an open source systems monitoring and alerting toolkit that, with Kubernetes, is part of the Cloud Native Computing Foundation. It can monitor multiple workloads but is normally used with container workloads. </p>
+<p>Here is simple diagram to explain prometheus generic architecture from their main website:</p>
+<p><img alt="" src="https://prometheus.io/assets/architecture.png" /></p>
+<p>In the context of data replication between kafka cluster, what we want to monitor the mirror maker 2.0 metrics:</p>
+<p><img alt="" src="../images/mm2-monitoring.png" /></p>
+<p>In order to run the example Grafana dashboards to monitor MM2, you must:</p>
+<ol>
+<li>Add metrics configuration to your Kafka cluster resources (Mirror Maker 2.0)</li>
+<li>Deploy Prometheus and optionally Prometheus Alertmanager</li>
+<li>Deploy Grafana</li>
+</ol>
+<p>For the interest of monitoring we can add Kafka Exporter to assess the consumer lag.</p>
+<h2 id="installation-and-configuration">Installation and configuration</h2>
+<p>Prometheus deployment inside Kubernetes uses operator as defined in <a href="https://github.com/coreos/prometheus-operator">the coreos github</a>. The CRDs define a set of resources. The ServiceMonitor, PodMonitor, PrometheusRule are used.</p>
+<p>Inside the <a href="https://github.com/strimzi/strimzi-kafka-operator">Strimzi github repository</a>, we can get a <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml">prometheus.yml</a> file to deploy prometheus server. This configuration defines, ClusterRole, ServiceAccount, ClusterRoleBinding, and the Prometheus resource instance. 
+<em>For your own deployment you have to change the target namespace, and the rules</em></p>
+<p>You need to deploy Prometheus and all the other elements inside the same namespace or OpenShift project as the Kafka Cluster or the KafkaConnect Cluster.</p>
+<p>To be able to monitor your own Kafka cluster you need to enable Prometheus metrics. An example of Kafka cluster Strimzi based deployment can be found <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/kafka-metrics.yaml">here</a></p>
+<h3 id="install-prometheus">Install Prometheus</h3>
+<ul>
+<li>
+<p>After creating a namespace or reusing the Kafka cluster namespace, you need to deploy the Prometheus operator by first downloading the different configuration yaml files:</p>
+<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-deployment.yaml <span class="p">|</span> sed -e <span class="s2">&quot;s/namespace: default/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus-operator-deployment.yaml
+</pre></div>
+
+<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role.yaml &gt; prometheus-operator-cluster-role.yaml
+</pre></div>
+
+<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role-binding.yaml <span class="p">|</span> sed -e <span class="s2">&quot;s/namespace: default/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus-operator-cluster-role-binding.yaml
+</pre></div>
+
+<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-service-account.yaml <span class="p">|</span> sed -e <span class="s2">&quot;s/namespace: default/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus-operator-service-account.yaml
+</pre></div>
+
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note<p>The prometheus-operator-deployment.yaml define security context the operator pod will use. It is set as a non root user (unprivileged). If you need to change that, or reference an existing user modify the file.  </p>
+</p>
+</div>
+<ul>
+<li>
+<p>Deploy the operator, cluster role, binding and service account (see files under <code>monitoring</code> folder):</p>
+<div class="codehilite"><pre><span></span>oc apply -f prometheus-operator-deployment.yaml
+oc apply -f prometheus-operator-cluster-role.yaml
+oc apply -f prometheus-operator-cluster-role-binding.yaml
+oc apply -f prometheus-operator-service-account.yaml
+</pre></div>
+
+</li>
+</ul>
+<p>When you apply those configuration, the following resources are managed by the Prometheus Operator:</p>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ClusterRole</td>
+<td>To grant permissions to Prometheus to read the health endpoints exposed by the Kafka and ZooKeeper pods, cAdvisor and the kubelet for container metrics.</td>
+</tr>
+<tr>
+<td>ServiceAccount</td>
+<td>For the Prometheus pods to run under.</td>
+</tr>
+<tr>
+<td>ClusterRoleBinding</td>
+<td>To bind the ClusterRole to the ServiceAccount.</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>To manage the Prometheus Operator pod.</td>
+</tr>
+<tr>
+<td>ServiceMonitor</td>
+<td>To manage the configuration of the Prometheus pod.</td>
+</tr>
+<tr>
+<td>Prometheus</td>
+<td>To manage the configuration of the Prometheus pod.</td>
+</tr>
+<tr>
+<td>PrometheusRule</td>
+<td>To manage alerting rules for the Prometheus pod.</td>
+</tr>
+<tr>
+<td>Secret</td>
+<td>To manage additional Prometheus settings.</td>
+</tr>
+<tr>
+<td>Service</td>
+<td>To allow applications running in the cluster to connect to Prometheus (for example, Grafana using Prometheus as datasource)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deploy-prometheus">Deploy prometheus</h3>
+<div class="admonition note">
+<p class="admonition-title">Note<p>The following section is including the configuration of a Prometheus server monitoring a full Kafka Cluster. For Mirror Maker or Kafka Connect only the configuration will have less rules, and configuration. See <a href="#mirror-maker-monitoring">next section</a>.</p>
+</p>
+</div>
+<p>Deploy the prometheus server by first changing the namespace and also by adapting <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml">the original file</a>.</p>
+<div class="codehilite"><pre><span></span>curl -s  https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/examples/metrics/prometheus-install/prometheus.yaml <span class="p">|</span> sed -e <span class="s2">&quot;s/namespace: myproject/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus.yml
+</pre></div>
+
+<p>If you are using AlertManager (see <a href="#alert-manager">section below</a>) Define the monitoring rules of the kafka run time: KafkaRunningOutOfSpace, UnderReplicatedPartitions, AbnormalControllerState, OfflinePartitions, UnderMinIsrPartitionCount, OfflineLogDirectoryCount, ScrapeProblem (Prometheus related alert), ClusterOperatorContainerDown, KafkaBrokerContainersDown, KafkaTlsSidecarContainersDown</p>
+<div class="codehilite"><pre><span></span>curl -s 
+https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/examples/metrics/prometheus-install/prometheus-rules.yaml sed -e <span class="s2">&quot;s/namespace: default/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus-rules.yaml
+</pre></div>
+
+<div class="codehilite"><pre><span></span>oc apply -f prometheus-rules.yaml
+oc apply -f prometheus.yaml
+</pre></div>
+
+<p>The Prometheus server configuration uses service discovery to discover the pods in the cluster from which it gets metrics.</p>
+<h3 id="install-grafana">Install Grafana</h3>
+<p><a href="https://grafana.com/">Grafana</a> provides visualizations of Prometheus metrics. Again we will use the Strimzi dashboard definition as starting point to monitor Kafka cluster but also mirror maker.</p>
+<ul>
+<li>Deploy Grafan to OpenShift and expose it via a service:</li>
+</ul>
+<div class="codehilite"><pre><span></span>oc apply -f grafana.yaml
+</pre></div>
+
+<p>In case you want to test grafana locally run: <code>docker run -d -p 3000:3000 grafana/grafana</code></p>
+<h2 id="kafka-explorer">Kafka Explorer</h2>
+<h2 id="mirror-maker-monitoring">Mirror maker monitoring</h2>
+<h2 id="configure-grafana-dashboard">Configure Grafana dashboard</h2>
+<p>To access the Grafana portal you can use port forwarding like below or expose a route on top of the grafana service.</p>
+<ul>
+<li>Use port forwarding:</li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">PODNAME</span><span class="o">=</span><span class="k">$(</span>oc get pods -l <span class="nv">name</span><span class="o">=</span>grafana <span class="p">|</span> grep grafana <span class="p">|</span> awk <span class="s1">&#39;{print $1}&#39;</span><span class="k">)</span>
+kubectl port-forward <span class="nv">$PODNAME</span> <span class="m">3000</span>:3000
+</pre></div>
+
+<p>Point your browser to http://localhost:3000.</p>
+<ul>
+<li>Expose the route via cli</li>
+</ul>
+<p>Add the Prometheus data source with the URL of the exposed routes. http://prometheus-operated:9090</p>
+<h2 id="alert-manager">Alert Manager</h2>
+<p>As seen in previous section, when deploying prometheus we can set some alerting rules on elements of the Kafka cluster. Those rule examples are in the file <code>The prometheus-rules.yaml</code>. Those rules are used by the AlertManager component.</p>
+<p><a href="https://prometheus.io/docs/alerting/alertmanager/">Prometheus Alertmanager</a> is a plugin for handling alerts and routing them to a notification service, like Slack. The Prometheus server is a client to the Alert Manager.</p>
+<ul>
+<li>Download an example of alert manager configuration file</li>
+</ul>
+<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/examples/metrics/prometheus-install/alert-manager.yaml &gt; alert-manager.yaml
+</pre></div>
+
+<ul>
+<li>Define a configuration for the channel to use, by starting from the following template</li>
+</ul>
+<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/examples/metrics/prometheus-alertmanager-config/alert-manager-config.yaml &gt; alert-manager-config.yaml
+</pre></div>
+
+<ul>
+<li>
+<p>Modify this file to reflect the remote access credential and URL to the channel server. </p>
+</li>
+<li>
+<p>Then deploy the secret that matches your config file .</p>
+</li>
+</ul>
+<div class="codehilite"><pre><span></span>oc create secret generic alertmanager-alertmanager --from-file<span class="o">=</span>alertmanager.yaml<span class="o">=</span>alert-manager-config.yaml
+</pre></div>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../provisioning/" title="Connector Provisioning" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Connector Provisioning
+              </span>
+            </div>
+          </a>
+        
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.b806dc00.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>

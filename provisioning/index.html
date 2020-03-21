@@ -1,0 +1,970 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.0.1">
+    
+    
+      
+        <title>Connector Provisioning - Data Replication in context of Kafka and Event Streams</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.982221ab.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1f0bcf2b.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="../extra.css">
+    
+    
+      
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="__github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#provisioning" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Data Replication in context of Kafka and Event Streams" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Data Replication in context of Kafka and Event Streams
+            </span>
+            <span class="md-header-nav__topic">
+              Connector Provisioning
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/jbcodeforce/kp-data-replication.git/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="Data Replication in context of Kafka and Event Streams" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Data Replication in context of Kafka and Event Streams
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/jbcodeforce/kp-data-replication.git/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
+    
+    <label class="md-nav__link" for="nav-2">
+      Mirror Maker 2.0
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        Mirror Maker 2.0
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../local-to-es/" title="Replication from local to Event Streams" class="md-nav__link">
+      Replication from local to Event Streams
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../es-to-local/" title="Replication from Event Streams to local" class="md-nav__link">
+      Replication from Event Streams to local
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Connector Provisioning
+      </label>
+    
+    <a href="./" title="Connector Provisioning" class="md-nav__link md-nav__link--active">
+      Connector Provisioning
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#concept-summary" title="Concept summary" class="md-nav__link">
+    Concept summary
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment" title="Deployment" class="md-nav__link">
+    Deployment
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-namespace-or-openshift-project" title="Create a namespace or openshift project" class="md-nav__link">
+    Create a namespace or openshift project
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-the-strimzi-artefacts" title="Download the strimzi artefacts" class="md-nav__link">
+    Download the strimzi artefacts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-the-custom-resource-definitions-for-kafka" title="Deploy the Custom Resource Definitions for kafka" class="md-nav__link">
+    Deploy the Custom Resource Definitions for kafka
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-instances" title="Deploy instances" class="md-nav__link">
+    Deploy instances
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deploy-kafka-cluster" title="Deploy Kafka cluster" class="md-nav__link">
+    Deploy Kafka cluster
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#topic-operator" title="Topic Operator" class="md-nav__link">
+    Topic Operator
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-topic" title="Create a topic" class="md-nav__link">
+    Create a topic
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-with-producer-and-consumer-pods" title="Test with producer and consumer pods" class="md-nav__link">
+    Test with producer and consumer pods
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deploying-kafka-connect-cluster" title="Deploying Kafka Connect cluster" class="md-nav__link">
+    Deploying Kafka Connect cluster
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-mirror-maker-20" title="Deploying Mirror Maker 2.0" class="md-nav__link">
+    Deploying Mirror Maker 2.0
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
+      Kafka Connect
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Apache Kafka practices
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Apache Kafka practices
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme" title="Summary" class="md-nav__link">
+      Summary
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers" title="Consumer practices" class="md-nav__link">
+      Consumer practices
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers" title="Producer practices" class="md-nav__link">
+      Producer practices
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../monitoring/" title="Monitoring with Prometheus and Grafana" class="md-nav__link">
+      Monitoring with Prometheus and Grafana
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#concept-summary" title="Concept summary" class="md-nav__link">
+    Concept summary
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment" title="Deployment" class="md-nav__link">
+    Deployment
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-namespace-or-openshift-project" title="Create a namespace or openshift project" class="md-nav__link">
+    Create a namespace or openshift project
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download-the-strimzi-artefacts" title="Download the strimzi artefacts" class="md-nav__link">
+    Download the strimzi artefacts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-the-custom-resource-definitions-for-kafka" title="Deploy the Custom Resource Definitions for kafka" class="md-nav__link">
+    Deploy the Custom Resource Definitions for kafka
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-instances" title="Deploy instances" class="md-nav__link">
+    Deploy instances
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deploy-kafka-cluster" title="Deploy Kafka cluster" class="md-nav__link">
+    Deploy Kafka cluster
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#topic-operator" title="Topic Operator" class="md-nav__link">
+    Topic Operator
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-topic" title="Create a topic" class="md-nav__link">
+    Create a topic
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-with-producer-and-consumer-pods" title="Test with producer and consumer pods" class="md-nav__link">
+    Test with producer and consumer pods
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deploying-kafka-connect-cluster" title="Deploying Kafka Connect cluster" class="md-nav__link">
+    Deploying Kafka Connect cluster
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-mirror-maker-20" title="Deploying Mirror Maker 2.0" class="md-nav__link">
+    Deploying Mirror Maker 2.0
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/jbcodeforce/kp-data-replication.git/edit/master/docs/provisioning.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="provisioning">Provisioning</h1>
+<p><a href="https://strimzi.io/">Strimzi</a> uses the Cluster Operator to deploy and manage Kafka (including Zookeeper) and Kafka Connect clusters. When the Strimzi Cluster Operator is up, it starts to watch for certain OpenShift or Kubernetes resources containing the desired Kafka and/or Kafka Connect cluster configuration. The base of strimzi is to define a set of kubernetes operators and custom resource definitions for the different elements of Kafka. </p>
+<p><img alt="" src="../images/strimzi.png" /></p>
+<p>We recommend to go over the product <a href="https://strimzi.io/docs/overview/master/">overview page</a>.</p>
+<p><em>The service account and role binding do not need to be re-installed if you did it previously.</em></p>
+<h2 id="concept-summary">Concept summary</h2>
+<p>The Cluster Operator is a pod used to deploys and manages Apache Kafka clusters, Kafka Connect, Kafka MirrorMaker (1 and 2), Kafka Bridge, Kafka Exporter, and the Entity Operator. When deployed the following commands goes to the Cluster operator:</p>
+<div class="codehilite"><pre><span></span><span class="c1"># Get the current cluster list</span>
+oc get kafka
+<span class="c1"># get the list of topic</span>
+oc get kafkatopics
+</pre></div>
+
+<p>Example of topic can be seen in <a href="#create-a-topic">section below</a>.</p>
+<p>Kafka User are not saved part of kafka cluster but they are managed in kubernetes. For example the user credentials are saved as secret.</p>
+<p>CRDs act as configuration instructions to describe the custom resources in a Kubernetes cluster, and are provided with Strimzi for each Kafka component used in a deployment. </p>
+<h2 id="deployment">Deployment</h2>
+<p>The deployment is done in two phases:</p>
+<ul>
+<li>Deploy the Custom Resource Definitions (CRDs), which act as specifications of the custom resource to deploy.</li>
+<li>Deploy one to many instance of those CRDs</li>
+</ul>
+<p>In CR yaml file the <code>kind</code> attribute specifies the CRD to conform to.</p>
+<p>Each CRD has a common configuration like bootstrap servers, CPU resources, logging, healthchecks...</p>
+<p>The next steps are defining how to deploy a Kafka Cluster.</p>
+<h3 id="create-a-namespace-or-openshift-project">Create a namespace or openshift project</h3>
+<div class="codehilite"><pre><span></span>kubectl create namespace jb-kafka-strimzi
+
+oc create project jb-kafka-strimzi
+</pre></div>
+
+<h3 id="download-the-strimzi-artefacts">Download the strimzi artefacts</h3>
+<p>For the last release see <a href="https://github.com/strimzi/strimzi-kafka-operator/releases">this github page</a>. Then modify the Role binding yaml files with the namespace set in previous step.</p>
+<div class="codehilite"><pre><span></span>sed -i <span class="s1">&#39;&#39;</span> <span class="s1">&#39;s/namespace: .*/namespace: kafka-strimzi/&#39;</span> install/cluster-operator/*RoleBinding*.yaml
+</pre></div>
+
+<h3 id="deploy-the-custom-resource-definitions-for-kafka">Deploy the Custom Resource Definitions for kafka</h3>
+<p>Custom resource definitions are defined within the kubernetes cluster. The following command  </p>
+<div class="codehilite"><pre><span></span>oc apply -f install/cluster-operator/ 
+</pre></div>
+
+<p>This should create the following resource definitions:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Names</th>
+<th align="center">Resource</th>
+<th align="center">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">strimzi-cluster-operator</td>
+<td align="center">Service account</td>
+<td align="center">oc get sa</td>
+</tr>
+<tr>
+<td align="center">strimzi-cluster-operator-entity-operator-delegation, strimzi-cluster-operator, strimzi-cluster-operator-topic-operator-delegation</td>
+<td align="center">Role binding</td>
+<td align="center">oc get rolebinding</td>
+</tr>
+<tr>
+<td align="center">strimzi-cluster-operator-global, strimzi-cluster-operator-namespaced, strimzi-entity-operator, strimzi-kafka-broker, strimzi-topic-operator</td>
+<td align="center">Cluster Role</td>
+<td align="center">oc get clusterrole</td>
+</tr>
+<tr>
+<td align="center">strimzi-cluster-operator, strimzi-cluster-operator-kafka-broker-delegation</td>
+<td align="center">Cluster Role Binding</td>
+<td align="center">oc get clusterrolebinding</td>
+</tr>
+<tr>
+<td align="center">kafkabridges, kafkaconnectors, kafkaconnects, kafkamirrormaker2s kafka, kafkatopics, kafkausers</td>
+<td align="center">Custom Resource Definition</td>
+<td align="center">oc get customresourcedefinition</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deploy-instances">Deploy instances</h2>
+<h3 id="deploy-kafka-cluster">Deploy Kafka cluster</h3>
+<p>The CRD for kafka cluster resource is <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/040-Crd-kafka.yaml">here</a>.</p>
+<p>Change the name of the cluster in one the yaml in the <code>examples/kafka</code> folder or use the <code>strimzi/kafka-cluster.yml</code> file in this project. For productionm we need to use persistence for the kafka log, ingress or load balancer external listener and rack awareness policies.</p>
+<p>Using non presistence:</p>
+<div class="codehilite"><pre><span></span>oc apply -f examples/kafka/kafka-ephemeral.yaml -n jb-kafka-strimzi
+oc get kafka
+<span class="c1"># NAME         DESIRED KAFKA REPLICAS   DESIRED ZK REPLICAS</span>
+<span class="c1"># my-cluster   3                        3</span>
+<span class="c1"># Or</span>
+kubectl  apply -f examples/kafka/kafka-ephemeral.yaml -n jb-kafka-strimzi
+</pre></div>
+
+<p>When looking at the pods running we can see the three kafka and zookeeper nodes as pods, and the entity operator pod.</p>
+<div class="codehilite"><pre><span></span>$ oc get pods
+my-cluster-entity-operator-645fdbc4cb-m29nk   <span class="m">3</span>/3       Running     <span class="m">0</span>          18d
+my-cluster-kafka-0                            <span class="m">2</span>/2       Running     <span class="m">0</span>          3d
+my-cluster-kafka-1                            <span class="m">2</span>/2       Running     <span class="m">0</span>          3d
+my-cluster-kafka-2                            <span class="m">2</span>/2       Running     <span class="m">0</span>          3d
+my-cluster-zookeeper-0                        <span class="m">2</span>/2       Running     <span class="m">0</span>          3d
+my-cluster-zookeeper-1                        <span class="m">2</span>/2       Running     <span class="m">0</span>          3d
+my-cluster-zookeeper-2                        <span class="m">2</span>/2       Running     <span class="m">0</span>          3d
+strimzi-cluster-operator-58cbbcb7d-bcqhm      <span class="m">1</span>/1       Running     <span class="m">2</span>         18d
+strimzi-topic-operator-564654cb86-nbt58       <span class="m">1</span>/1       Running     <span class="m">1</span>         18d
+</pre></div>
+
+<p>Using persistence:</p>
+<div class="codehilite"><pre><span></span>oc apply -f strimzi/kafka-cluster.yaml
+</pre></div>
+
+<h3 id="topic-operator">Topic Operator</h3>
+<p>The role of the <code>Topic Operator</code> is to keep a set of KafkaTopic OpenShift or Kubernetes resources describing Kafka topics in-sync with corresponding Kafka topics.</p>
+<div class="codehilite"><pre><span></span>oc apply -f install/topic-operator/ -n jb-kafka-strimzi
+</pre></div>
+
+<p>This will add the following:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Names</th>
+<th align="center">Resource</th>
+<th align="center">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">strimzi-topic-operator</td>
+<td align="center">Service account</td>
+<td align="center">oc get sa</td>
+</tr>
+<tr>
+<td align="center">strimzi-topic-operator</td>
+<td align="center">Role binding</td>
+<td align="center">oc get rolebinding</td>
+</tr>
+<tr>
+<td align="center">kafkatopics</td>
+<td align="center">Custom Resource Definition</td>
+<td align="center">oc get customresourcedefinition</td>
+</tr>
+</tbody>
+</table>
+<h3 id="create-a-topic">Create a topic</h3>
+<p>Edit a yaml file like the following:</p>
+<div class="codehilite"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.strimzi.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">KafkaTopic</span>
+<span class="nt">metadata</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test</span>
+  <span class="nt">labels</span><span class="p">:</span>
+    <span class="nt">strimzi.io/cluster</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-cluster</span>
+<span class="nt">spec</span><span class="p">:</span>
+  <span class="nt">partitions</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+  <span class="nt">replicas</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+  <span class="nt">config</span><span class="p">:</span>
+    <span class="nt">retention.ms</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">7200000</span>
+    <span class="nt">segment.bytes</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1073741824</span>
+</pre></div>
+
+<div class="codehilite"><pre><span></span>oc apply -f test.yaml -n jb-kafka-strimzi
+
+oc get kafkatopics
+</pre></div>
+
+<p>This creates a topic <code>test</code> in your kafka cluster.</p>
+<h2 id="test-with-producer-and-consumer-pods">Test with producer and consumer pods</h2>
+<p>Use kafka-consumer and producer tools from Kafka distribution. Verify within Dockerhub under the Strimzi account to get the lastest image tag (below we use -2.4.0 tag).</p>
+<div class="codehilite"><pre><span></span><span class="c1"># Start a consumer on test topic</span>
+
+oc run kafka-consumer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0 --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic <span class="nb">test</span> --from-beginning
+<span class="c1"># Start a text producer</span>
+oc run kafka-producer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0  --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap:9092 --topic <span class="nb">test</span>
+<span class="c1"># enter text</span>
+</pre></div>
+
+<p>If you want to use the strimzi kafka docker image to run the above scripts locally but remotely connect to a kafka cluster you need multiple things to happen:</p>
+<ul>
+<li>Be sure the kafka yaml file include the external route stamza:</li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="nt">spec</span><span class="p">:</span>
+  <span class="nt">kafka</span><span class="p">:</span>
+    <span class="nt">version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2.4.0</span>
+    <span class="nt">replicas</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+    <span class="nt">listeners</span><span class="p">:</span>
+      <span class="nt">plain</span><span class="p">:</span> <span class="p p-Indicator">{}</span>
+      <span class="nt">tls</span><span class="p">:</span> <span class="p p-Indicator">{}</span>
+      <span class="nt">external</span><span class="p">:</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">route</span>
+</pre></div>
+
+<ul>
+<li>Get the host ip address from the Route resource</li>
+</ul>
+<div class="codehilite"><pre><span></span>oc get routes my-cluster-kafka-bootstrap -o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.ingress[0].host}{&quot;\n&quot;}&#39;</span>
+</pre></div>
+
+<ul>
+<li>Get the TLS certificate from the broker</li>
+</ul>
+<div class="codehilite"><pre><span></span>oc get secrets
+oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
+<span class="c1"># transform it fo java truststore</span>
+keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
+</pre></div>
+
+<p><em>The alias is used to access keystore entries (key and trusted certificate entries).</em></p>
+<ul>
+<li>Start the docker container by mounting the local folder with the truststore.jks to the <code>/home</code></li>
+</ul>
+<div class="codehilite"><pre><span></span>docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home strimzi/kafka:latest-kafka-2.4.0  bash
+<span class="c1"># inside the container uses the consumer tool</span>
+bash-4.2$ <span class="nb">cd</span> /opt/kafka/bin
+bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --consumer-property security.protocol<span class="o">=</span>SSL --consumer-property ssl.truststore.password<span class="o">=</span>password --consumer-property ssl.truststore.location<span class="o">=</span>/home/truststore.jks --topic <span class="nb">test</span> --from-beginning
+</pre></div>
+
+<ul>
+<li>For a producer the approach is the same but using the producer properties:</li>
+</ul>
+<div class="codehilite"><pre><span></span>./kafka-console-producer.sh --broker-list  my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer-property security.protocol=SSL --producer-property ssl.truststore.password=password --producer-property ssl.truststore.location=/home/truststore.jks --topic test   
+</pre></div>
+
+<p>Those properties can be in file</p>
+<div class="codehilite"><pre><span></span>bootstrap.servers<span class="o">=</span>my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud
+security.protocol<span class="o">=</span>SSL
+ssl.truststore.password<span class="o">=</span>password
+ssl.truststore.location<span class="o">=</span>/home/truststore.jks
+</pre></div>
+
+<p>and then use the following parameters in the command line:</p>
+<div class="codehilite"><pre><span></span>./kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer.config /home/strimzi.properties --topic <span class="nb">test</span>
+
+./kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic <span class="nb">test</span>  --consumer.config /home/strimzi.properties --from-beginning 
+</pre></div>
+
+<h3 id="deploying-kafka-connect-cluster">Deploying Kafka Connect cluster</h3>
+<p>Adding a Kafka Connect cluster on top of an existing Kafka cluster using Strimzi operators is simple.</p>
+<h3 id="deploying-mirror-maker-20">Deploying Mirror Maker 2.0</h3>
+<p>In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The appraoch will be to use Event Streams on Cloud as backend Kafka cluster but use Mirror Maker for replication. The steps could </p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../es-to-local/" title="Replication from Event Streams to local" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Replication from Event Streams to local
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../monitoring/" title="Monitoring with Prometheus and Grafana" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Monitoring with Prometheus and Grafana
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.b806dc00.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>
