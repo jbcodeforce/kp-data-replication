@@ -416,6 +416,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#define-the-monitoring-rules" title="Define the monitoring rules" class="md-nav__link">
+    Define the monitoring rules
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deploy-the-application" title="Deploy the application" class="md-nav__link">
     Deploy the application
   </a>
@@ -452,7 +459,7 @@ oc describe svc my-cluster-kafka-bootstrap
 <span class="c1"># URL my-cluster-kafka-bootstrap:9092</span>
 </pre></div>
 The target cluster uses the bootstrap servers from the Event Streams Credentials, and the API KEY is defined with the manager role, so mirror maker can create topic dynamically.</p>
-<p>Properties file can be seen <a href="">here</a></p>
+<p>Properties template file can be seen <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/localkafka-to-es-mm2.properties">here</a></p>
 <div class="codehilite"><pre><span></span>clusters=source, target
 source.bootstrap.servers=my-cluster-kafka-bootstrap:9092
 source.ssl.endpoint.identification.algorithm=
@@ -478,23 +485,81 @@ tasks.max=10
 </pre></div>
 
 <h2 id="defining-a-custom-docker-image">Defining a custom docker image</h2>
-<p>Starting from the Kafka 2.4 image, we need to add Prometheus JMX exporter. The docker file is [here].</p>
-<div class="codehilite"><pre><span></span>
+<p>Starting from the Kafka 2.4 image, we need to add Prometheus JMX exporter and use the properties file as argument. The docker file is <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">here</a>.</p>
+<div class="codehilite"><pre><span></span><span class="k">FROM</span><span class="s"> strimzi/kafka:latest-kafka-2.4.0</span>
+<span class="c"># ...</span>
+<span class="k">ENV</span> <span class="nv">LOG_DIR</span><span class="o">=</span>/tmp/logs
+<span class="k">ENV</span> <span class="nv">EXTRA_ARGS</span><span class="o">=</span><span class="s2">&quot;-javaagent:/usr/local/share/jars/jmx_prometheus_javaagent-0.12.0.jar=9400:/etc/jmx_exporter/jmx_exporter.yaml &quot;</span>
+
+<span class="k">EXPOSE</span><span class="s"> 9400</span>
+
+<span class="k">CMD</span> /opt/kafka/bin/connect-mirror-maker.sh  /home/kafka-to-es.properties
 </pre></div>
 
+<p>The file could be copied inside the docker image or better mounted from secret when deployed to kubernetes.</p>
+<p>Build and push the image to a docker registry.</p>
 <div class="codehilite"><pre><span></span>docker build -t ibmcase/mm2ocp:v0.0.2 .
 docker push ibmcase/mm2ocp:v0.0.2
 </pre></div>
 
+<h2 id="define-the-monitoring-rules">Define the monitoring rules</h2>
+<p>As explained in the <a href="../monitoring/">monitoring note</a>, we need to define the Prometheus rules within a <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/mm2-jmx-exporter.yaml">yaml file</a>:</p>
+<div class="codehilite"><pre><span></span><span class="nt">lowercaseOutputName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">lowercaseOutputLabelNames</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">rules</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern </span><span class="p">:</span> <span class="s">&quot;kafka.connect&lt;type=connect-worker-metrics&gt;([^:]+):&quot;</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;kafka_connect_connect_worker_metrics_$1&quot;</span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern </span><span class="p">:</span> <span class="s">&quot;kafka.connect&lt;type=connect-metrics,</span><span class="nv"> </span><span class="s">client-id=([^:]+)&gt;&lt;&gt;([^:]+)&quot;</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;kafka_connect_connect_metrics_$1_$2&quot;</span>   
+  <span class="c1"># Rules below match the Kafka Connect/MirrorMaker MBeans in the jconsole order</span>
+  <span class="c1"># Worker task states</span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.connect&lt;type=connect-worker-metrics, connector=(\w+)&gt;&lt;&gt;(connector-destroyed-task-count|connector-failed-task-count|connector-paused-task-count|connector-running-task-count|connector-total-task-count|connector-unassigned-task-count)</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">connect_worker_metrics_$1_$2</span>
+  <span class="c1"># Task metrics</span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.connect&lt;type=connector-task-metrics, connector=(\w+), task=(\d+)&gt;&lt;&gt;(batch-size-avg|batch-size-max|offset-commit-avg-time-ms|offset-commit-failure-percentage|offset-commit-max-time-ms|offset-commit-success-percentage|running-ratio)</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">connect_connector_task_metrics_$1_$3</span>
+    <span class="nt">labels</span><span class="p">:</span>
+       <span class="nt">task</span><span class="p">:</span> <span class="s">&quot;$2&quot;</span>
+  <span class="c1"># Source task metrics</span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.connect&lt;type=source-task-metrics, connector=(\w+), task=(\d+)&gt;&lt;&gt;(source-record-active-count|source-record-poll-total|source-record-write-total)</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">connect_source_task_metrics_$1_$3</span>
+    <span class="nt">labels</span><span class="p">:</span>
+       <span class="nt">task</span><span class="p">:</span> <span class="s">&quot;$2&quot;</span>
+  <span class="c1"># Task errors</span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.connect&lt;type=task-error-metrics, connector=(\w+), task=(\d+)&gt;&lt;&gt;(total-record-errors|total-record-failures|total-records-skipped|total-retries)</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">connect_task_error_metrics_$1_$3</span>
+    <span class="nt">labels</span><span class="p">:</span>
+      <span class="nt">task</span><span class="p">:</span> <span class="s">&quot;$2&quot;</span>
+  <span class="c1"># CheckpointConnector metrics </span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.connect.mirror&lt;type=MirrorCheckpointConnector, source=(.+), target=(.+), group=(.+), topic=(.+), partition=(\d+)&gt;&lt;&gt;(checkpoint-latency-ms)</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">connect_mirror_mirrorcheckpointconnector_$6</span>
+    <span class="nt">labels</span><span class="p">:</span>
+       <span class="nt">source</span><span class="p">:</span> <span class="s">&quot;$1&quot;</span>
+       <span class="nt">target</span><span class="p">:</span> <span class="s">&quot;$2&quot;</span>
+       <span class="nt">group</span><span class="p">:</span> <span class="s">&quot;$3&quot;</span>
+       <span class="nt">topic</span><span class="p">:</span> <span class="s">&quot;$4&quot;</span>
+       <span class="nt">partition</span><span class="p">:</span> <span class="s">&quot;$5&quot;</span>
+  <span class="c1"># SourceConnector metrics</span>
+  <span class="p p-Indicator">-</span> <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.connect.mirror&lt;type=MirrorSourceConnector, target=(.+), topic=(.+), partition=(\d+)&gt;&lt;&gt;(byte-rate|byte-count|record-age-ms|record-rate|record-count|replication-latency-ms)</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">connect_mirror_mirrorsourceconnector_$4</span>
+    <span class="nt">labels</span><span class="p">:</span>
+       <span class="nt">target</span><span class="p">:</span> <span class="s">&quot;$1&quot;</span>
+       <span class="nt">topic</span><span class="p">:</span> <span class="s">&quot;$2&quot;</span>
+       <span class="nt">partition</span><span class="p">:</span> <span class="s">&quot;$3&quot;</span>
+</pre></div>
+
+<p>Then upload this properties file in a secret (the following command update an existing config as predefined by the Prometheus deployment)</p>
+<div class="codehilite"><pre><span></span>oc create secret generic mm2-jmx-exporter --from-file<span class="o">=</span>./mm2-jmx-exporter.yaml
+</pre></div>
+
 <h2 id="deploy-the-application">Deploy the application</h2>
-<div class="codehilite"><pre><span></span>oc new-app --docker-image ibmcase/mm2ocp:v0.0.2
+<p>As we are using secret to mount file we want to use a deployment.yml to define the Mirror Maker deployment</p>
+<div class="codehilite"><pre><span></span>oc apply -f mm2-deployment.yaml
 </pre></div>
 
 <p>To undeploy everything</p>
 <div class="codehilite"><pre><span></span>oc delete all -l <span class="nv">app</span><span class="o">=</span>mm2ocp
 </pre></div>
-
-<p>oc create secret generic additional-scrape-configs --from-file=./local-cluster/prometheus-additional.yaml --dry-run -o yaml | kubectl apply -f -</p>
                 
                   
                 

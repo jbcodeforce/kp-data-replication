@@ -744,6 +744,9 @@ kubectl port-forward <span class="nv">$PODNAME</span> <span class="m">3000</span
 </ul>
 <div class="codehilite"><pre><span></span>oc create secret generic alertmanager-alertmanager --from-file<span class="o">=</span>alertmanager.yaml<span class="o">=</span>alert-manager-config.yaml
 </pre></div>
+
+<div class="codehilite"><pre><span></span>oc create secret generic additional-scrape-configs --from-file<span class="o">=</span>./local-cluster/prometheus-additional.yaml --dry-run -o yaml <span class="p">|</span> kubectl apply -f -
+</pre></div>
                 
                   
                 
