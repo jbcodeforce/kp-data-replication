@@ -258,14 +258,6 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#requirements" title="Requirements" class="md-nav__link">
-    Requirements
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#mirror-maker-20" title="Mirror Maker 2.0" class="md-nav__link">
     Mirror Maker 2.0
   </a>
@@ -279,6 +271,19 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" title="Requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#local-cluster-to-event-streams-on-cloud" title="Local cluster to Event Streams on Cloud" class="md-nav__link">
@@ -298,11 +303,6 @@
   <a href="#version-to-version-migration" title="Version to version migration" class="md-nav__link">
     Version to version migration
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -515,14 +515,6 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#requirements" title="Requirements" class="md-nav__link">
-    Requirements
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#mirror-maker-20" title="Mirror Maker 2.0" class="md-nav__link">
     Mirror Maker 2.0
   </a>
@@ -536,6 +528,19 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" title="Requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#local-cluster-to-event-streams-on-cloud" title="Local cluster to Event Streams on Cloud" class="md-nav__link">
@@ -555,11 +560,6 @@
   <a href="#version-to-version-migration" title="Version to version migration" class="md-nav__link">
     Version to version migration
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -617,13 +617,12 @@
                 
                 <h1 id="introduction">Introduction</h1>
 <p>This repository includes a set of documents for best practices around data replication between two Kafka clusters.</p>
-<h2 id="requirements">Requirements</h2>
-<h3 id="mirror-maker-20">Mirror Maker 2.0</h3>
+<h2 id="mirror-maker-20">Mirror Maker 2.0</h2>
 <p>Mirror Maker 2.0 is the new replication feature of Kafka 2.4. It was defined as part of the <a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0">KIP 382</a>.</p>
-<h4 id="general-concepts">General concepts</h4>
+<h3 id="general-concepts">General concepts</h3>
 <p>As <a href="https://strimzi.io/docs/master/#con-configuring-mirror-maker-deployment-configuration-kafka-mirror-maker">Mirror maker 2.0</a> is using kafka Connect framework, we recommend to review our summary <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect/">in this note</a>.</p>
 <p>The figure below illustrates the mirror maker internal components running within Kafka Connect.</p>
-<p><img alt="" src="images/mm-k-connect.png" /></p>
+<p><img alt="Kafka Connect" src="images/mm-k-connect.png" /></p>
 <p>In distributed mode, Mirror Maker creates the following topics to the target cluster:</p>
 <ul>
 <li>mm2-configs.source.internal: This topic will store the connector and task configurations.</li>
@@ -657,44 +656,79 @@
 <p>but can be also specified with the properties: <code>topics.blacklist</code>. Comma-separated lists are also supported and Java regular expression.</p>
 <p>Internally <code>MirrorSourceConnector</code> and <code>MirrorCheckpointConnector</code> will create multiple tasks (up to <code>tasks.max</code> property), <code>MirrorHeartbeatConnector</code>
 creates only one single task. <code>MirrorSourceConnector</code> will have one task per topic-partition to replicate, while <code>MirrorCheckpointConnector</code> will have one task per consumer group. The Kafka connect framework uses the coordinator API, with the <code>assign()</code> API, so there is no consumer group while fetching data from source topic. There is no call to <code>commit()</code> neither: the rebalancing occurs only when there is a new topic created that matches the whitelist pattern.</p>
-<h4 id="local-cluster-to-event-streams-on-cloud">Local cluster to Event Streams on Cloud</h4>
-<p>The goal is to replicate data from local Kafka cluster to Event Streams on IBM Cloud as managed service. The two scenarios are presented in <a href="local-to-es/">this note</a>.</p>
-<h4 id="provisioning-connectors-mirror-maker-2">Provisioning Connectors (Mirror Maker 2)</h4>
-<ul>
-<li>How to handle secrets (ES credentials, CK keys and certificates).</li>
-<li>GUI tools </li>
-<li>Command line / REST API</li>
-</ul>
-<h4 id="version-to-version-migration">Version to version migration</h4>
-<p>How to address Roll out upgrades to MM2 cluster</p>
+<h2 id="requirements">Requirements</h2>
+<h3 id="local-cluster-to-event-streams-on-cloud">Local cluster to Event Streams on Cloud</h3>
+<p>The goal is to demonstrate the replicate data from local cluster to Event Streams on IBM Cloud running as managed service. The two scenarios and the step by step approach are presented in <a href="local-to-es/">this note</a>.</p>
+<p>We have also documented the replication approaches from Event Streams as a Service to local cluster in <a href="es-to-local/">this note</a>.</p>
+<h3 id="provisioning-connectors-mirror-maker-2">Provisioning Connectors (Mirror Maker 2)</h3>
+<p>This main epic is related to provisioning operation.</p>
+<ol>
+<li>
+<p>As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.</p>
+</li>
+<li>
+<p>As a SRE I want to understand the CLI commands used to assess how automation can be performed for replicating environment provisioning.</p>
+</li>
+<li>
+<p>As a SRE I want to understand the server sizing for the Mirror Maker environment.</p>
+</li>
+</ol>
+<p><em>Note that, there is no specific user interface for mirror maker connector.</em></p>
+<h3 id="version-to-version-migration">Version to version migration</h3>
+<ol>
+<li>
+<p>As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.</p>
+</li>
+<li>
+<p>As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.</p>
+</li>
+</ol>
 <h3 id="security">Security</h3>
-<ul>
-<li>Topic segregation (multi-tenant Kafka Connect cluster)</li>
-<li>ACLs</li>
-</ul>
+<ol>
+<li>
+<p>As a SRE, I want to understand how the security support to connect client applications to cluster and to replicated topic.</p>
+</li>
+<li>
+<p>As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.</p>
+</li>
+</ol>
 <h3 id="monitoring">Monitoring</h3>
-<ul>
-<li>Prometheus metrics (On same setup as CK monitoring)</li>
-<li>Dashboards</li>
-<li>Alerts</li>
-<li>Log formats, and logs going into Splunk</li>
-</ul>
+<ol>
+<li>
+<p>As a SRE, I want to get Mirror Maker 2 metrics for Prometheus so that it fits in my current metrics processing practices.
+    The explanation to setup Prometheus metris for mirror maker 2.0 is documented <a href="monitoring/">here</a>.</p>
+</li>
+<li>
+<p>As a SRE, I want to be able to add new dashboard into Grafana to visualize the Mirror Maker 2 metrics.</p>
+</li>
+<li>
+<p>As a SRE, I want to define rules for alert reporting and configure a Slack channel for alerting.</p>
+</li>
+<li>
+<p>As a SRE, I want to get the Mirror Maker 2 logs into our Splunk logging platform.</p>
+</li>
+</ol>
 <h3 id="best-practices">Best Practices</h3>
-<ul>
-<li>Correct configuration</li>
-<li>How to address scenarios with duplicates (no Exactly Once)?</li>
-<li>How many MM connectors per cluster?</li>
-<li>How many nodes per cluster?</li>
-<li>How do we scale the MM2 cluster?</li>
-<li>Other best practices</li>
-</ul>
+<ol>
+<li>
+<p>As a developer I want to understand how Mirror Maker 2 based replication address the record duplication.</p>
+</li>
+<li>
+<p>As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.</p>
+</li>
+<li>
+<p>As a developer I want to understand what are the condition for message loss.</p>
+</li>
+</ol>
 <h3 id="performance-tests">Performance  tests</h3>
-<ul>
-<li>How to measure latency (avg. time per message end-to-end)</li>
-<li>Ensure message affinity</li>
-<li>Message loss</li>
-<li>Duplicates (No Exactly Once)</li>
-</ul>
+<ol>
+<li>
+<p>As a developer I want to understand how to measure data latency and lag in data replication.</p>
+</li>
+<li>
+<p>As a SRE I want to understand current thoughput for the replication solution.</p>
+</li>
+</ol>
                 
                   
                 
