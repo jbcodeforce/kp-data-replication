@@ -2,19 +2,17 @@
 
 This repository includes a set of documents for best practices around data replication between two Kafka clusters.
 
-## Requirements
-
-### Mirror Maker 2.0
+## Mirror Maker 2.0
 
 Mirror Maker 2.0 is the new replication feature of Kafka 2.4. It was defined as part of the [KIP 382](https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0).
 
-#### General concepts
+### General concepts
 
 As [Mirror maker 2.0](https://strimzi.io/docs/master/#con-configuring-mirror-maker-deployment-configuration-kafka-mirror-maker) is using kafka Connect framework, we recommend to review our summary [in this note](https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect/).
 
 The figure below illustrates the mirror maker internal components running within Kafka Connect.
 
-![](images/mm-k-connect.png)
+![Kafka Connect](images/mm-k-connect.png)
 
 In distributed mode, Mirror Maker creates the following topics to the target cluster:
 
@@ -53,44 +51,59 @@ but can be also specified with the properties: `topics.blacklist`. Comma-separat
 Internally `MirrorSourceConnector` and `MirrorCheckpointConnector` will create multiple tasks (up to `tasks.max` property), `MirrorHeartbeatConnector`
 creates only one single task. `MirrorSourceConnector` will have one task per topic-partition to replicate, while `MirrorCheckpointConnector` will have one task per consumer group. The Kafka connect framework uses the coordinator API, with the `assign()` API, so there is no consumer group while fetching data from source topic. There is no call to `commit()` neither: the rebalancing occurs only when there is a new topic created that matches the whitelist pattern.
 
-#### Local cluster to Event Streams on Cloud
+## Requirements
 
-The goal is to replicate data from local Kafka cluster to Event Streams on IBM Cloud as managed service. The two scenarios are presented in [this note](local-to-es.md).
+### Local cluster to Event Streams on Cloud
 
-#### Provisioning Connectors (Mirror Maker 2)
+The goal is to demonstrate the replicate data from local cluster to Event Streams on IBM Cloud running as managed service. The two scenarios and the step by step approach are presented in [this note](local-to-es.md).
 
-* How to handle secrets (ES credentials, CK keys and certificates).
-* GUI tools 
-* Command line / REST API
+We have also documented the replication approaches from Event Streams as a Service to local cluster in [this note](es-to-local.md).
 
-#### Version to version migration
+### Provisioning Connectors (Mirror Maker 2)
 
-How to address Roll out upgrades to MM2 cluster
+This main epic is related to provisioning operation.
+
+1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.
+
+1. As a SRE I want to understand the CLI commands used to assess how automation can be performed for replicating environment provisioning.
+
+1. As a SRE I want to understand the server sizing for the Mirror Maker environment.
+
+*Note that, there is no specific user interface for mirror maker connector.*
+
+### Version to version migration
+
+1. As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.
+
+1. As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.
 
 ### Security
 
-* Topic segregation (multi-tenant Kafka Connect cluster)
-* ACLs
+1. As a SRE, I want to understand how the security support to connect client applications to cluster and to replicated topic.
+
+1. As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.
 
 ### Monitoring
 
-* Prometheus metrics (On same setup as CK monitoring)
-* Dashboards
-* Alerts
-* Log formats, and logs going into Splunk
+1. As a SRE, I want to get Mirror Maker 2 metrics for Prometheus so that it fits in my current metrics processing practices.
+    The explanation to setup Prometheus metris for mirror maker 2.0 is documented [here](monitoring.md).
+
+1. As a SRE, I want to be able to add new dashboard into Grafana to visualize the Mirror Maker 2 metrics.
+
+1. As a SRE, I want to define rules for alert reporting and configure a Slack channel for alerting.
+
+1. As a SRE, I want to get the Mirror Maker 2 logs into our Splunk logging platform.
 
 ### Best Practices
 
-* Correct configuration
-* How to address scenarios with duplicates (no Exactly Once)?
-* How many MM connectors per cluster?
-* How many nodes per cluster?
-* How do we scale the MM2 cluster?
-* Other best practices
+1. As a developer I want to understand how Mirror Maker 2 based replication address the record duplication.
+
+1. As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.
+
+1. As a developer I want to understand what are the condition for message loss.
 
 ### Performance  tests
 
-* How to measure latency (avg. time per message end-to-end)
-* Ensure message affinity
-* Message loss
-* Duplicates (No Exactly Once)
+1. As a developer I want to understand how to measure data latency and lag in data replication.
+
+1. As a SRE I want to understand current thoughput for the replication solution.
