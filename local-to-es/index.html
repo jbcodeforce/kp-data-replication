@@ -771,8 +771,7 @@ The config part can match the Kafka configuration for consumer or producer, exce
 </pre></div>
 
 <p>This commmand creates a kubernetes deployment as illustrated below, with one pod as the replicas is set to 1. If we need to add parallel processing because of the topics to replicate have multiple partitions, or there are a lot of topics to replicate, then adding pods will help to scale horizontally. The pods are in the same consumer group, so Kafka Brokers will do the partition rebalancing among those new added consumers.</p>
-<p><img alt="Mirror maker deployment" src="../images/mm2-deployment.png" />
-   s</p>
+<p><img alt="Mirror maker deployment" src="../images/mm2-deployment.png" /></p>
 <h3 id="validate-data-replication">Validate data replication</h3>
 <p>To validate the replication works, we will connect a consumer to the <code>source.products</code> topic on Event Streams. So we define a target cluster property file (<code>eventstreams.properties</code>) like:</p>
 <div class="codehilite"><pre><span></span><span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>

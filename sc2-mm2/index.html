@@ -416,6 +416,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#from-event-streams-on-cloud-to-local-cloud" title="From Event Streams on Cloud to Local Cloud" class="md-nav__link">
+    From Event Streams on Cloud to Local Cloud
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#define-the-monitoring-rules" title="Define the monitoring rules" class="md-nav__link">
     Define the monitoring rules
   </a>
@@ -450,7 +457,7 @@
                 
                 <h1 id="running-a-custom-mirror-maker-20">Running a custom Mirror Maker 2.0</h1>
 <p>In this approach we are using properties file to define the Mirror Maker 2.0 configuration, package JMX exporter with it inside a docker image and deploy the image to Openshift.
-The configuration approach supports the replication from local on-premise cluster running on kubernetes cluster to Event Streams on cloud.</p>
+The configuration approach supports the replication from local on-premise cluster running on kubernetes cluster to Event Streams on the Cloud.</p>
 <p><img alt="Local to ES" src="../images/mm2-local-to-es.png" /></p>
 <h2 id="define-the-mm-configuration">Define the MM configuration</h2>
 <p>The configuration define the source and target cluster and the security settings for both clusters. As the goal is to run within the same OpenShift cluster as Kafka, the broker list for the source matches the URL within the broker service:</p>
@@ -459,49 +466,70 @@ oc describe svc my-cluster-kafka-bootstrap
 <span class="c1"># URL my-cluster-kafka-bootstrap:9092</span>
 </pre></div>
 The target cluster uses the bootstrap servers from the Event Streams Credentials, and the API KEY is defined with the manager role, so mirror maker can create topic dynamically.</p>
-<p>Properties template file can be seen <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/localkafka-to-es-mm2.properties">here</a></p>
-<div class="codehilite"><pre><span></span>clusters=source, target
-source.bootstrap.servers=my-cluster-kafka-bootstrap:9092
-source.ssl.endpoint.identification.algorithm=
-target.bootstrap.servers=broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093
-target.security.protocol=SASL_SSL
-target.ssl.protocol=TLSv1.2
-target.ssl.endpoint.identification.algorithm=https
-target.sasl.mechanism=PLAIN
-target.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;&lt;Manager API KEY from Event Streams&gt;&quot;;
-# enable and configure individual replication flows
-source-&gt;target.enabled=true
-sync.topic.acls.enabled=false
-replication.factor=3
-internal.topic.replication.factor=3
-refresh.topics.interval.seconds=10
-refresh.groups.interval.seconds=10
-source-&gt;target.topics=products
-tasks.max=10
+<p>Properties template file can be seen <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/kafka-to-es-mm2.properties">here: kafka-to-es-mm2</a></p>
+<div class="codehilite"><pre><span></span><span class="na">clusters</span><span class="o">=</span><span class="s">source, target</span>
+<span class="na">source.bootstrap.servers</span><span class="o">=</span><span class="s">my-cluster-kafka-bootstrap:9092</span>
+<span class="na">source.ssl.endpoint.identification.algorithm</span><span class="o">=</span>
+<span class="na">target.bootstrap.servers</span><span class="o">=</span><span class="s">broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093</span>
+<span class="na">target.security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
+<span class="na">target.ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
+<span class="na">target.ssl.endpoint.identification.algorithm</span><span class="o">=</span><span class="s">https</span>
+<span class="na">target.sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
+<span class="na">target.sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required </span>
+<span class="na">username</span><span class="o">=</span><span class="s">&quot;token&quot; password=&quot;&lt;Manager API KEY from Event Streams&gt;&quot;;</span>
+<span class="c"># enable and configure individual replication flows</span>
+<span class="na">source-&gt;target.enabled</span><span class="o">=</span><span class="s">true</span>
+<span class="na">sync.topic.acls.enabled</span><span class="o">=</span><span class="s">false</span>
+<span class="na">replication.factor</span><span class="o">=</span><span class="s">3</span>
+<span class="na">internal.topic.replication.factor</span><span class="o">=</span><span class="s">3</span>
+<span class="na">refresh.topics.interval.seconds</span><span class="o">=</span><span class="s">10</span>
+<span class="na">refresh.groups.interval.seconds</span><span class="o">=</span><span class="s">10</span>
+<span class="na">source-&gt;target.topics</span><span class="o">=</span><span class="s">products</span>
+<span class="na">tasks.max</span><span class="o">=</span><span class="s">10</span>
 </pre></div>
 
 <p>Upload the properties as a secret</p>
-<div class="codehilite"><pre><span></span>oc create secret generic mm2-std-properties --from-file<span class="o">=</span>kafka-to-es.properties
+<div class="codehilite"><pre><span></span>oc create secret generic mm2-std-properties --from-file<span class="o">=</span>local-cluster/es-to-localkafka-mm2.properties
 </pre></div>
 
 <h2 id="defining-a-custom-docker-image">Defining a custom docker image</h2>
 <p>Starting from the Kafka 2.4 image, we need to add Prometheus JMX exporter and use the properties file as argument. The docker file is <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">here</a>.</p>
 <div class="codehilite"><pre><span></span><span class="k">FROM</span><span class="s"> strimzi/kafka:latest-kafka-2.4.0</span>
 <span class="c"># ...</span>
+<span class="k">ARG</span> <span class="nv">PROP_NAME</span><span class="o">=</span>local-cluster/es-to-localkafka-mm2.properties
 <span class="k">ENV</span> <span class="nv">LOG_DIR</span><span class="o">=</span>/tmp/logs
 <span class="k">ENV</span> <span class="nv">EXTRA_ARGS</span><span class="o">=</span><span class="s2">&quot;-javaagent:/usr/local/share/jars/jmx_prometheus_javaagent-0.12.0.jar=9400:/etc/jmx_exporter/jmx_exporter.yaml &quot;</span>
-
+<span class="k">COPY</span>  <span class="nv">$PROP_NAME</span> /home/mm2.properties
+<span class="c"># ....</span>
 <span class="k">EXPOSE</span><span class="s"> 9400</span>
 
-<span class="k">CMD</span> /opt/kafka/bin/connect-mirror-maker.sh  /home/kafka-to-es.properties
+<span class="k">CMD</span> /opt/kafka/bin/connect-mirror-maker.sh  /home/mm2.properties
 </pre></div>
 
 <p>The file could be copied inside the docker image or better mounted from secret when deployed to kubernetes.</p>
 <p>Build and push the image to a docker registry.</p>
-<div class="codehilite"><pre><span></span>docker build -t ibmcase/mm2ocp:v0.0.2 .
+<div class="codehilite"><pre><span></span>docker build -t ibmcase/mm2ocp:v0.0.2 --build-arg<span class="o">=</span>local-cluster/kafka-to-es-mm2.properties .
 docker push ibmcase/mm2ocp:v0.0.2
 </pre></div>
 
+<h2 id="from-event-streams-on-cloud-to-local-cloud">From Event Streams on Cloud to Local Cloud</h2>
+<p>The approach is similar to the above steps except we use another properties file:</p>
+<ul>
+<li>The properties to use is <code>es-to-kafka-mm2.properties</code></li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="na">clusters</span><span class="o">=</span><span class="s">source, target</span>
+<span class="na">target.bootstrap.servers</span><span class="o">=</span><span class="s">my-cluster-kafka-bootstrap:9092</span>
+<span class="na">target.ssl.endpoint.identification.algorithm</span><span class="o">=</span>
+<span class="na">source.bootstrap.servers</span><span class="o">=</span><span class="s">broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.event....</span>
+</pre></div>
+
+<ul>
+<li>The image to build is using this properties file:</li>
+</ul>
+<div class="codehilite"><pre><span></span>docker build -t ibmcase/mm2ocp:v0.0.3 --build-arg<span class="o">=</span>es-cluster/es-to-kafka-mm2.properties .
+</pre></div>
+
+<p>Once deployed to Openshift, use the producer and consumer to test the mirroring.</p>
 <h2 id="define-the-monitoring-rules">Define the monitoring rules</h2>
 <p>As explained in the <a href="../monitoring/">monitoring note</a>, we need to define the Prometheus rules within a <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/mm2-jmx-exporter.yaml">yaml file</a>:</p>
 <div class="codehilite"><pre><span></span><span class="nt">lowercaseOutputName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -554,7 +582,8 @@ docker push ibmcase/mm2ocp:v0.0.2
 
 <h2 id="deploy-the-application">Deploy the application</h2>
 <p>As we are using secret to mount file we want to use a deployment.yml to define the Mirror Maker deployment</p>
-<div class="codehilite"><pre><span></span>oc apply -f mm2-deployment.yaml
+<div class="codehilite"><pre><span></span><span class="c1"># Under mirror-maker-2 folder</span>
+oc apply -f mm2-deployment.yaml
 </pre></div>
 
 <p>To undeploy everything</p>

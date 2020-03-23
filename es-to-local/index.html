@@ -574,6 +574,19 @@ oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.cr
 <h2 id="scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift">Scenario 4: From Event Streams On Cloud to Strimzi Cluster on Openshift</h2>
 <p>We are reusing the Event Streams on Cloud cluster on Washington DC data center as source target and the vanilla Kafka 2.4 cluster as target, also running within Washington data center in a OpenShift Cluster. As both clusters are in the same data center, we deploy Mirror Maker 2.0 close to target kafka cluster.</p>
 <p><img alt="" src="../images/mm2-test1.png" /></p>
+<ul>
+<li>Produce some records to <code>products</code> topic on Event Streams:</li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="s2">&quot;event streams broker list&quot;</span>
+<span class="nb">export</span> <span class="nv">KAFKA_APIKEY</span><span class="o">=</span><span class="s2">&quot;event stream api key&quot;</span>
+docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home --rm -e <span class="nv">KAFKA_APIKEY</span><span class="o">=</span><span class="nv">$KAFKA_APIKEY</span> -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> strimzi/kafka:latest-kafka-2.4.0 bash -c <span class="s2">&quot;/opt/kafka/bin/kafka-console-producer.sh --broker-list </span><span class="nv">$KAFKA_BROKERS</span><span class="s2"> --producer.config /home/kafka-strimzi.properties --topic products&quot;</span>
+</pre></div>
+
+<ul>
+<li>To validate the target <code>source.products</code> topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.</li>
+</ul>
+<div class="codehilite"><pre><span></span>oc run kafka-consumer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0 --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
+</pre></div>
                 
                   
                 
