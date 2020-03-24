@@ -1,7 +1,7 @@
 # Running a custom Mirror Maker 2.0
 
 In this approach we are using properties file to define the Mirror Maker 2.0 configuration, package JMX exporter with it inside a docker image and deploy the image to Openshift.
-The configuration approach supports the replication from local on-premise cluster running on kubernetes cluster to Event Streams on cloud.
+The configuration approach supports the replication from local on-premise cluster running on kubernetes cluster to Event Streams on the Cloud.
 
 ![Local to ES](images/mm2-local-to-es.png)
 
@@ -16,18 +16,19 @@ oc describe svc my-cluster-kafka-bootstrap
 ```
 The target cluster uses the bootstrap servers from the Event Streams Credentials, and the API KEY is defined with the manager role, so mirror maker can create topic dynamically.
 
-Properties template file can be seen [here](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/localkafka-to-es-mm2.properties)
+Properties template file can be seen [here: kafka-to-es-mm2](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/kafka-to-es-mm2.properties)
 
-```
+```properties
 clusters=source, target
-source.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+source.bootstrap.servers=eda-demo-24-cluster-kafka-bootstrap:9092
 source.ssl.endpoint.identification.algorithm=
 target.bootstrap.servers=broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093
 target.security.protocol=SASL_SSL
 target.ssl.protocol=TLSv1.2
 target.ssl.endpoint.identification.algorithm=https
 target.sasl.mechanism=PLAIN
-target.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="<Manager API KEY from Event Streams>";
+target.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required 
+username="token" password="<Manager API KEY from Event Streams>";
 # enable and configure individual replication flows
 source->target.enabled=true
 sync.topic.acls.enabled=false
@@ -42,7 +43,7 @@ tasks.max=10
 Upload the properties as a secret
 
 ```shell
-oc create secret generic mm2-std-properties --from-file=kafka-to-es.properties
+oc create secret generic mm2-std-properties --from-file=es-cluster/mm2.properties
 ```
 
 ## Defining a custom docker image
@@ -55,9 +56,10 @@ FROM strimzi/kafka:latest-kafka-2.4.0
 ENV LOG_DIR=/tmp/logs
 ENV EXTRA_ARGS="-javaagent:/usr/local/share/jars/jmx_prometheus_javaagent-0.12.0.jar=9400:/etc/jmx_exporter/jmx_exporter.yaml "
 
+# ....
 EXPOSE 9400
 
-CMD /opt/kafka/bin/connect-mirror-maker.sh  /home/kafka-to-es.properties
+CMD /opt/kafka/bin/connect-mirror-maker.sh  /home/mm2.properties
 ```
 
 The file could be copied inside the docker image or better mounted from secret when deployed to kubernetes.
@@ -65,13 +67,13 @@ The file could be copied inside the docker image or better mounted from secret w
 Build and push the image to a docker registry.
 
 ```shell
-docker build -t ibmcase/mm2ocp:v0.0.2 .
+docker build -t ibmcase/mm2ocp:v0.0.2  .
 docker push ibmcase/mm2ocp:v0.0.2
 ```
 
 ## Define the monitoring rules
 
-As explained in the [monitoring note](monitoring.md), we need to define the Prometheus rules within a [yaml file](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/mm2-jmx-exporter.yaml):
+As explained in the [monitoring note](monitoring.md), we need to define the Prometheus rules within a [yaml file](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/mm2-jmx-exporter.yaml) so that Mirror Maker 2 can report metrics:
 
 ```yaml
 lowercaseOutputName: true
@@ -124,17 +126,46 @@ Then upload this properties file in a secret (the following command update an ex
 oc create secret generic mm2-jmx-exporter --from-file=./mm2-jmx-exporter.yaml
 ```
 
-## Deploy the application
 
-As we are using secret to mount file we want to use a deployment.yml to define the Mirror Maker deployment
+## From Event Streams on Cloud to Local Cloud
+
+The approach is similar to the above steps except we use another properties file:
+
+* The properties to use is `es-to-kafka-mm2.properties`
+
+```properties
+clusters=source, target
+target.bootstrap.servers=eda-demo-24-cluster-kafka-bootstrap:9092
+target.ssl.endpoint.identification.algorithm=
+source.bootstrap.servers=broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.event....
+```
+
+* The image to build is using this properties file:
 
 ```shell
+docker build -t ibmcase/mm2ocp:v0.0.3 --build-arg=es-cluster/es-to-kafka-mm2.properties .
+```
+
+As we are using the secret define in section above to mount file we want to use a deployment.yml to define the Mirror Maker deployment
+
+```shell
+# Under mirror-maker-2 folder
 oc apply -f mm2-deployment.yaml
 ```
 
+In case of error like "" you may need to create the Kafka Topic
+
+```
+/opt/kafka/bi/kafka-topic.sh --create --zookeeper eda-demo-24-cluster-zookeeper:2181 --replication-factor 3 --partitions 25 --topic mm2-offsets.target.internal
+```
+
+For the other topic:
+| Topic | Partition |
+| --- | --- |
+| mm2-configs.source.internal | 1 |
+} 
 To undeploy everything
 
 ```shell
 oc delete all -l app=mm2ocp
 ```
-

@@ -211,7 +211,7 @@ oc apply -f kafka-to-es-mm2.yaml
 This commmand creates a kubernetes deployment as illustrated below, with one pod as the replicas is set to 1. If we need to add parallel processing because of the topics to replicate have multiple partitions, or there are a lot of topics to replicate, then adding pods will help to scale horizontally. The pods are in the same consumer group, so Kafka Brokers will do the partition rebalancing among those new added consumers.
 
 ![Mirror maker deployment](images/mm2-deployment.png)
-   s
+   
 ### Validate data replication
 
 To validate the replication works, we will connect a consumer to the `source.products` topic on Event Streams. So we define a target cluster property file (`eventstreams.properties`) like:

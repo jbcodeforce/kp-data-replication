@@ -4,7 +4,7 @@ metadata:
     labels:
       app: mm2ocp
     name: mm2ocp
-    namespace: jb-kafka-strimzi
+    namespace: eda-strimzi-kafka24
 spec:
   replicas: 1
   selector:
@@ -23,7 +23,7 @@ spec:
         secret:
           secretName: mm2-jmx-exporter
       containers:
-      - image: 'ibmcase/mm2ocp:v0.0.4'
+      - image: 'ibmcase/mm2ocp:v0.0.5'
         imagePullPolicy: IfNotPresent
         name: mm2ocp
         livenessProbe:

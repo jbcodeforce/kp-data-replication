@@ -1,7 +1,7 @@
 apiVersion: kafka.strimzi.io/v1beta1
 kind: Kafka
 metadata:
-  name: production-cluster
+  name: eda-demo-24-cluster
 spec:
   kafka:
     version: 2.4.0
@@ -14,19 +14,22 @@ spec:
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
       log.message.format.version: "2.4"
+    # Add next for using kafka with persistence
     storage:
-      type: jbod
-      volumes:
-      - id: 0
-        type: persistent-claim
-        size: 100Gi
-        deleteClaim: false
+      type: ephemeral
+    #  type: jbod
+    #  volumes:
+    #  - id: 0
+    #    type: persistent-claim
+    #    size: 20Gi
+    #   deleteClaim: false
   zookeeper:
     replicas: 3
     storage:
-      type: persistent-claim
-      size: 100Gi
-      deleteClaim: false
+      type: ephemeral
+    #  type: persistent-claim
+    #  size: 20Gi
+    # deleteClaim: false
   entityOperator:
     topicOperator: {}
     userOperator: {}

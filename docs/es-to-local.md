@@ -102,3 +102,30 @@ source->target.topics=orders
 We are reusing the Event Streams on Cloud cluster on Washington DC data center as source target and the vanilla Kafka 2.4 cluster as target, also running within Washington data center in a OpenShift Cluster. As both clusters are in the same data center, we deploy Mirror Maker 2.0 close to target kafka cluster.
 
 ![](images/mm2-test1.png)
+
+* Produce some records to `products` topic on Event Streams. For that create a properties file (`eventstream.properties`) with the event streams API KEY and SASL_SSL properties:
+
+```properties
+security.protocol=SASL_SSL
+ssl.protocol=TLSv1.2
+sasl.mechanism=PLAIN
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="...."
+```
+
+```shell
+export KAFKA_BROKERS="event streams broker list"
+docker run -ti -v $(pwd):/home --rm -e KAFKA_BROKERS=$KAFKA_BROKERS strimzi/kafka:latest-kafka-2.4.0 bash -c "/opt/kafka/bin/kafka-console-producer.sh --broker-list $KAFKA_BROKERS --producer.config /home/eventstreams.properties --topic products"
+> 
+```
+
+* Start Mirror Maker 2.0: we use the properties setting one with custom docker image.
+
+```shell
+oc apply -f 
+```
+
+* To validate the target `source.products` topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.
+
+```shell
+oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
+```
