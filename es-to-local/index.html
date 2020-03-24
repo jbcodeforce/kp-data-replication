@@ -575,11 +575,23 @@ oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.cr
 <p>We are reusing the Event Streams on Cloud cluster on Washington DC data center as source target and the vanilla Kafka 2.4 cluster as target, also running within Washington data center in a OpenShift Cluster. As both clusters are in the same data center, we deploy Mirror Maker 2.0 close to target kafka cluster.</p>
 <p><img alt="" src="../images/mm2-test1.png" /></p>
 <ul>
-<li>Produce some records to <code>products</code> topic on Event Streams:</li>
+<li>Produce some records to <code>products</code> topic on Event Streams. For that create a properties file (<code>eventstream.properties</code>) with the event streams API KEY and SASL_SSL properties:</li>
 </ul>
+<div class="codehilite"><pre><span></span><span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
+<span class="na">ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
+<span class="na">sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
+<span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;....&quot;</span>
+</pre></div>
+
 <div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="s2">&quot;event streams broker list&quot;</span>
-<span class="nb">export</span> <span class="nv">KAFKA_APIKEY</span><span class="o">=</span><span class="s2">&quot;event stream api key&quot;</span>
-docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home --rm -e <span class="nv">KAFKA_APIKEY</span><span class="o">=</span><span class="nv">$KAFKA_APIKEY</span> -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> strimzi/kafka:latest-kafka-2.4.0 bash -c <span class="s2">&quot;/opt/kafka/bin/kafka-console-producer.sh --broker-list </span><span class="nv">$KAFKA_BROKERS</span><span class="s2"> --producer.config /home/kafka-strimzi.properties --topic products&quot;</span>
+docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home --rm -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> strimzi/kafka:latest-kafka-2.4.0 bash -c <span class="s2">&quot;/opt/kafka/bin/kafka-console-producer.sh --broker-list </span><span class="nv">$KAFKA_BROKERS</span><span class="s2"> --producer.config /home/eventstreams.properties --topic products&quot;</span>
+&gt; 
+</pre></div>
+
+<ul>
+<li>Start Mirror Maker 2.0: we use the properties setting one with custom docker image.</li>
+</ul>
+<div class="codehilite"><pre><span></span>oc apply -f 
 </pre></div>
 
 <ul>

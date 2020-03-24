@@ -350,6 +350,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#add-strimzi-admin-role" title="Add Strimzi Admin Role" class="md-nav__link">
+    Add Strimzi Admin Role
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -370,12 +377,18 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#topic-operator" title="Topic Operator" class="md-nav__link">
-    Topic Operator
-  </a>
+      </ul>
+    </nav>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#add-topic-crds-and-operator" title="Add Topic CRDs and operator" class="md-nav__link">
+    Add Topic CRDs and operator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#create-a-topic" title="Create a topic" class="md-nav__link">
@@ -390,19 +403,19 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#add-user-crds-and-operator" title="Add User CRDs and operator" class="md-nav__link">
+    Add User CRDs and operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#test-with-producer-and-consumer-pods" title="Test with producer and consumer pods" class="md-nav__link">
     Test with producer and consumer pods
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#deploying-kafka-connect-cluster" title="Deploying Kafka Connect cluster" class="md-nav__link">
-    Deploying Kafka Connect cluster
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#deploying-mirror-maker-20" title="Deploying Mirror Maker 2.0" class="md-nav__link">
@@ -572,6 +585,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#add-strimzi-admin-role" title="Add Strimzi Admin Role" class="md-nav__link">
+    Add Strimzi Admin Role
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -592,12 +612,18 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#topic-operator" title="Topic Operator" class="md-nav__link">
-    Topic Operator
-  </a>
+      </ul>
+    </nav>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#add-topic-crds-and-operator" title="Add Topic CRDs and operator" class="md-nav__link">
+    Add Topic CRDs and operator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#create-a-topic" title="Create a topic" class="md-nav__link">
@@ -612,19 +638,19 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#add-user-crds-and-operator" title="Add User CRDs and operator" class="md-nav__link">
+    Add User CRDs and operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#test-with-producer-and-consumer-pods" title="Test with producer and consumer pods" class="md-nav__link">
     Test with producer and consumer pods
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#deploying-kafka-connect-cluster" title="Deploying Kafka Connect cluster" class="md-nav__link">
-    Deploying Kafka Connect cluster
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#deploying-mirror-maker-20" title="Deploying Mirror Maker 2.0" class="md-nav__link">
@@ -684,21 +710,22 @@ oc get kafkatopics
 <p>The next steps are defining how to deploy a Kafka Cluster.</p>
 <h3 id="create-a-namespace-or-openshift-project">Create a namespace or openshift project</h3>
 <div class="codehilite"><pre><span></span>kubectl create namespace jb-kafka-strimzi
-
+<span class="c1"># Or using Openshift CLI</span>
 oc create project jb-kafka-strimzi
 </pre></div>
 
 <h3 id="download-the-strimzi-artefacts">Download the strimzi artefacts</h3>
 <p>For the last release see <a href="https://github.com/strimzi/strimzi-kafka-operator/releases">this github page</a>. Then modify the Role binding yaml files with the namespace set in previous step.</p>
-<div class="codehilite"><pre><span></span>sed -i <span class="s1">&#39;&#39;</span> <span class="s1">&#39;s/namespace: .*/namespace: kafka-strimzi/&#39;</span> install/cluster-operator/*RoleBinding*.yaml
+<div class="codehilite"><pre><span></span>sed -i <span class="s1">&#39;&#39;</span> <span class="s1">&#39;s/namespace: .*/namespace: jb-kafka-strimzi/&#39;</span> install/cluster-operator/*RoleBinding*.yaml
 </pre></div>
 
 <h3 id="deploy-the-custom-resource-definitions-for-kafka">Deploy the Custom Resource Definitions for kafka</h3>
 <p>Custom resource definitions are defined within the kubernetes cluster. The following command  </p>
-<div class="codehilite"><pre><span></span>oc apply -f install/cluster-operator/ 
+<div class="codehilite"><pre><span></span>oc apply -f openshift-strimzi/install/
+oc get crd
 </pre></div>
 
-<p>This should create the following resource definitions:</p>
+<p>This should create the following service account, resource definitions, roles, and role bindings:</p>
 <table>
 <thead>
 <tr>
@@ -730,17 +757,19 @@ oc create project jb-kafka-strimzi
 </tr>
 <tr>
 <td align="center">kafkabridges, kafkaconnectors, kafkaconnects, kafkamirrormaker2s kafka, kafkatopics, kafkausers</td>
-<td align="center">Custom Resource Definition</td>
+<td align="center">Custom Resource Definitions</td>
 <td align="center">oc get customresourcedefinition</td>
 </tr>
 </tbody>
 </table>
+<h3 id="add-strimzi-admin-role">Add Strimzi Admin Role</h3>
+<p>Using the folowing command: <code>oc apply -f openshift-strimzi/install/010-ClusterRole-strimzi-admin.yaml</code></p>
 <h2 id="deploy-instances">Deploy instances</h2>
 <h3 id="deploy-kafka-cluster">Deploy Kafka cluster</h3>
-<p>The CRD for kafka cluster resource is <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/040-Crd-kafka.yaml">here</a>.</p>
+<p>The CRD for kafka cluster resource is <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/040-Crd-kafka.yaml">here</a> and we recommend to study it before defining your own cluster.</p>
 <p>Change the name of the cluster in one the yaml in the <code>examples/kafka</code> folder or use the <code>strimzi/kafka-cluster.yml</code> file in this project. For productionm we need to use persistence for the kafka log, ingress or load balancer external listener and rack awareness policies.</p>
 <p>Using non presistence:</p>
-<div class="codehilite"><pre><span></span>oc apply -f examples/kafka/kafka-ephemeral.yaml -n jb-kafka-strimzi
+<div class="codehilite"><pre><span></span>oc apply -f openshift-strimzi/kafka-cluster.yaml
 oc get kafka
 <span class="c1"># NAME         DESIRED KAFKA REPLICAS   DESIRED ZK REPLICAS</span>
 <span class="c1"># my-cluster   3                        3</span>
@@ -761,13 +790,23 @@ strimzi-cluster-operator-58cbbcb7d-bcqhm      <span class="m">1</span>/1       R
 strimzi-topic-operator-564654cb86-nbt58       <span class="m">1</span>/1       Running     <span class="m">1</span>         18d
 </pre></div>
 
-<p>Using persistence:</p>
+<p>To use persistence add persistence volume and declare the PVC in the yaml file and then reapply:</p>
 <div class="codehilite"><pre><span></span>oc apply -f strimzi/kafka-cluster.yaml
 </pre></div>
 
-<h3 id="topic-operator">Topic Operator</h3>
-<p>The role of the <code>Topic Operator</code> is to keep a set of KafkaTopic OpenShift or Kubernetes resources describing Kafka topics in-sync with corresponding Kafka topics.</p>
-<div class="codehilite"><pre><span></span>oc apply -f install/topic-operator/ -n jb-kafka-strimzi
+<h2 id="add-topic-crds-and-operator">Add Topic CRDs and operator</h2>
+<p>To manage Kafka topics with operators, first modify the file <code>05-Deployment-strimzi-topic-operator.yaml</code> to reflect your cluster name </p>
+<div class="codehilite"><pre><span></span><span class="nt">env</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">STRIMZI_RESOURCE_LABELS</span>
+              <span class="nt">value</span><span class="p">:</span> <span class="s">&quot;strimzi.io/cluster=eda-demo-24-cluster&quot;</span>
+            <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">STRIMZI_KAFKA_BOOTSTRAP_SERVERS</span>
+              <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">eda-demo-24-cluster-kafka-bootstrap:9092</span>
+            <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">STRIMZI_ZOOKEEPER_CONNECT</span>
+              <span class="nt">value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">eda-demo-24-cluster-zookeeper-client:2181</span>
+</pre></div>
+
+<p>and then deploy the topic-operator. This operation will fail if there is no Kafka Boker and Zookeeper available:</p>
+<div class="codehilite"><pre><span></span>oc apply -f openshift-strimzi/install/topic-operator
 </pre></div>
 
 <p>This will add the following:</p>
@@ -804,7 +843,7 @@ strimzi-topic-operator-564654cb86-nbt58       <span class="m">1</span>/1       R
 <span class="nt">metadata</span><span class="p">:</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test</span>
   <span class="nt">labels</span><span class="p">:</span>
-    <span class="nt">strimzi.io/cluster</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-cluster</span>
+    <span class="nt">strimzi.io/cluster</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">eda-demo-24-cluster</span>
 <span class="nt">spec</span><span class="p">:</span>
   <span class="nt">partitions</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
   <span class="nt">replicas</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
@@ -813,12 +852,17 @@ strimzi-topic-operator-564654cb86-nbt58       <span class="m">1</span>/1       R
     <span class="nt">segment.bytes</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1073741824</span>
 </pre></div>
 
-<div class="codehilite"><pre><span></span>oc apply -f test.yaml -n jb-kafka-strimzi
+<div class="codehilite"><pre><span></span>oc apply -f test.yaml
 
 oc get kafkatopics
 </pre></div>
 
 <p>This creates a topic <code>test</code> in your kafka cluster.</p>
+<h2 id="add-user-crds-and-operator">Add User CRDs and operator</h2>
+<p>To manage Kafka user with operators modify the file <code>05-Deployment-strimzi-user-operator.yaml</code> to reflect your cluster name and then deploy the user-operator:</p>
+<div class="codehilite"><pre><span></span>oc apply -f openshift-strimzi/install/user-operator
+</pre></div>
+
 <h2 id="test-with-producer-and-consumer-pods">Test with producer and consumer pods</h2>
 <p>Use kafka-consumer and producer tools from Kafka distribution. Verify within Dockerhub under the Strimzi account to get the lastest image tag (below we use -2.4.0 tag).</p>
 <div class="codehilite"><pre><span></span><span class="c1"># Start a consumer on test topic</span>
@@ -888,10 +932,8 @@ ssl.truststore.location<span class="o">=</span>/home/truststore.jks
 ./kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic <span class="nb">test</span>  --consumer.config /home/strimzi.properties --from-beginning 
 </pre></div>
 
-<h3 id="deploying-kafka-connect-cluster">Deploying Kafka Connect cluster</h3>
-<p>Adding a Kafka Connect cluster on top of an existing Kafka cluster using Strimzi operators is simple.</p>
 <h3 id="deploying-mirror-maker-20">Deploying Mirror Maker 2.0</h3>
-<p>In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The appraoch will be to use Event Streams on Cloud as backend Kafka cluster but use Mirror Maker for replication. The steps could </p>
+<p>In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The appraoch will be to use Event Streams on Cloud as backend Kafka cluster but use Mirror Maker for replication.</p>
                 
                   
                 
