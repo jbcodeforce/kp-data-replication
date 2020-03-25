@@ -17,6 +17,7 @@ nav:
     - Kafka Connect: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect
   - Monitoring with Prometheus and Grafana: monitoring.md
   - Security: security.md
+  - Performance Tests: perf-tests.md
 theme: 
   name: material
 extra_css: ["extra.css"]

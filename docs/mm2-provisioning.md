@@ -261,9 +261,7 @@ To undeploy everything
 oc delete all -l app=mm2ocp
 ```
 
-
-
-## Deploying Mirror Maker 2
+## Deploying Mirror Maker 2 only on its own project
 
 In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The approach may be used with Event Streams on Cloud as backend Kafka cluster and Mirror Maker 2 for replication.
 
