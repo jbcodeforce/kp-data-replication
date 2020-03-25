@@ -1,12 +1,14 @@
 # To Event Streams to Kafka cluster on-premise
 
-## Scenario 3: From Event Streams to local cluster
+## Scenario 3: From Event Streams to local kafka cluster
 
-For this scenario the source is Event Streams on IBM Cloud and the target is a local server (may be on a laptop using vanilla Kafka image (Strimzi kafka 2.4 docker image) started with docker compose). This target cluster runs two zookeeper nodes, and three kafka nodes. We need 3 kafka brokers as mirror maker created topics with a replication factor set to 3.
+For this scenario the source is Event Streams on IBM Cloud and the target is a local Kafka cluster.
 
-![](images/mm2-scen3.png)
+![Scenario 3](images/mm2-scen3.png)
 
-This time the producer adds headers to the Records sent so we can validate headers replication. The file `es-cluster/es-mirror-maker.properties` declares the mirroring settings as below:
+As a prerequisite you need to run your local cluster, for example using docker compose as introduced in [this note](dc-local.md).
+
+This time the producer adds headers to the Records sent so we can validate headers replication. The file [es-cluster/es-mirror-maker.properties](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/es-cluster/es-mirror-maker.properties) declares the mirroring settings as below:
 
 ```properties
 clusters=source, target
@@ -21,13 +23,7 @@ source->target.enabled=true
 source->target.topics=orders
 ```
 
-* Start the target cluster runnning on your laptop using:
-
-    ```shell
-    docker-compose up
-    ```
-
-* Start [mirror maker2.0](https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0): 
+* Start [mirror maker2.0](https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0):
 
     By using a new container, start another kakfa 2.4+ docker container, connected to the  brokers via the `kafkanet` network, and mounting the configuration in the `/home`:
 
@@ -41,59 +37,7 @@ source->target.topics=orders
     /opt/kakfa/bin/connect-mirror-maker.sh /home/strimzi-mm2.properties
     ```
 
-    The `strimzi-mm2.properties` properties file given as argument defines the source and target clusters and the topics to replicate:
-
-    ```properties
-    clusters=source, target
-    source.bootstrap.servers=my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443
-    source.security.protocol=SSL
-    source.ssl.truststore.password=password
-    source.ssl.truststore.location=/home/truststore.jks
-    target.bootstrap.servers=kafka1:9092,kafka2:9093,kafka3:9094
-    # enable and configure individual replication flows
-    source->target.enabled=true
-    source->target.topics=orders
-    ```
-
-    As the source cluster is deployed on Openshift, the exposed route to access the brokers is using TLS connection. So we need the certificate and create a truststore to be used by those Java programs. All kafka tools are done in java or scala so running in a JVM, which needs truststore for keep trusted TLS certificates. 
-    When running from a remote system to get the certificate do the following steps:
-
-    1. Get the host ip address from the Route resource
-
-        ```shell
-        oc get routes my-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{"\n"}'
-        ```
-
-    1. Get the TLS certificate from the broker
-
-        ```shell
-        oc get secrets
-        oc extract secret/my-cluster-cluster-ca-cert --keys=ca.crt --to=- > ca.crt
-        ```
-
-    1. Transform the certificate fo java truststore
-
-        ```shell
-        keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
-        ```
-
-    For Openshift or Kubernetes deployment, the mirror maker descriptor needs to declare the TLS stamza:
-
-    ```yaml
-    mirrors:
-    - sourceCluster: "my-cluster-source"
-    targetCluster: "my-cluster-target"
-    sourceConnector:
-      config:
-        replication.factor: 1
-        offset-syncs.topic.replication.factor: 1
-        sync.topic.acls.enabled: "false"
-    targetConnector:
-      tls:
-        trustedCertificates:
-          - secretName: my-cluster-cluster-cert
-            certificate: ca.crt
-    ```
+    The `strimzi-mm2.properties` properties file given as argument defines the source and target clusters and the topics to replicate.
 
 * The consumer may be started in second or third step. To start it, you can use a new container or use one of the running kafka broker container. Using the `Docker perspective` in Visual Code, we can get into a bash shell within one of the Kafka broker container. The local folder is mounted to `/home`. Then the script, `consumeFromLocal.sh source.orders` will get messages from the replicated topic: `source.orders`
 
@@ -103,29 +47,87 @@ We are reusing the Event Streams on Cloud cluster on Washington DC data center a
 
 ![](images/mm2-test1.png)
 
-* Produce some records to `products` topic on Event Streams. For that create a properties file (`eventstream.properties`) with the event streams API KEY and SASL_SSL properties:
+1. Deploy mirror maker 2.0 with good configuration: As we use the properties file approach the Dockerfile helps us to build a custom MM2 with Prometheus JMX exporter and mm2.properties for configuration. The file specifies source and target cluster:
 
-```properties
-security.protocol=SASL_SSL
-ssl.protocol=TLSv1.2
-sasl.mechanism=PLAIN
-sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="...."
-```
+    ```properties
+    clusters=source, target
+    target.bootstrap.servers=eda-demo-24-cluster-kafka-bootstrap:9092
+    target.ssl.endpoint.identification.algorithm=
+    source.bootstrap.servers=<REPLACE-WITH-ES-BROKERSLIST>
+    source.security.protocol=SASL_SSL
+    source.ssl.protocol=TLSv1.2
+    source.ssl.endpoint.identification.algorithm=https
+    source.sasl.mechanism=PLAIN
+    source.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="<REPLACE-WITH-ES-APIKEY>";
+    # enable and configure individual replication flows
+    source->target.enabled=true
+    sync.topic.acls.enabled=false
+    replication.factor=3
+    internal.topic.replication.factor=3
+    refresh.topics.interval.seconds=10
+    refresh.groups.interval.seconds=10
+    source->target.topics=products
+    tasks.max=10
+    ```
 
-```shell
-export KAFKA_BROKERS="event streams broker list"
-docker run -ti -v $(pwd):/home --rm -e KAFKA_BROKERS=$KAFKA_BROKERS strimzi/kafka:latest-kafka-2.4.0 bash -c "/opt/kafka/bin/kafka-console-producer.sh --broker-list $KAFKA_BROKERS --producer.config /home/eventstreams.properties --topic products"
-> 
-```
+    Start Mirror Maker 2.0: we use the properties setting one with custom docker image.
 
-* Start Mirror Maker 2.0: we use the properties setting one with custom docker image.
+    ```shell
+    oc apply -f mirror-maker/mm2-deployment.yaml
+    ```
 
-```shell
-oc apply -f 
-```
+1. Produce some records to `products` topic on Event Streams. For that create a properties file (`eventstream.properties`) with the event streams API KEY and SASL_SSL properties:
 
-* To validate the target `source.products` topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.
+    ```properties
+    security.protocol=SASL_SSL
+    ssl.protocol=TLSv1.2
+    sasl.mechanism=PLAIN
+    sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="...."
+    ```
 
-```shell
-oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
-```
+    Then starts a local container with Kafka 2.4 and console producer:
+    
+    ```shell
+    export KAFKA_BROKERS="event streams broker list"
+    docker run -ti -v $(pwd):/home --rm -e KAFKA_BROKERS=$KAFKA_BROKERS strimzi/kafka:latest-kafka-2.4.0 bash -c "/opt/kafka/bin/kafka-console-producer.sh --broker-list $KAFKA_BROKERS --producer.config /home/eventstreams.properties --topic products"
+    > 
+    ```
+
+    For the data, you can use any text, or the products we have in the data folder.
+
+1. To validate the target `source.products` topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.
+
+  ```shell
+  oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
+
+  If you don't see a command prompt, try pressing enter.
+
+  { "product_id": "P01", "description": "Carrots", "target_temperature": 4,"target_humidity_level": 0.4,"content_type": 1}
+  { "product_id": "P02", "description": "Banana", "target_temperature": 6,"target_humidity_level": 0.6,"content_type": 2}
+  { "product_id": "P03", "description": "Salad", "target_temperature": 4,"target_humidity_level": 0.4,"content_type": 1}
+  ```
+
+## Considerations
+
+When the source or target cluster is deployed on Openshift, the exposed route to access the brokers is using TLS connection. So we need the certificate and create a truststore to be used by the consumer or producer Java programs. All kafka tools are done in java or scala so running in a JVM, which needs truststore for keep trusted TLS certificates.
+
+To get the certificate do the following steps:
+
+1. Get the host ip address from the Route resource
+
+    ```shell
+    oc get routes my-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{"\n"}'
+    ```
+
+1. Get the TLS CA root certificate from the broker
+
+    ```shell
+    oc get secrets
+    oc extract secret/my-cluster-cluster-ca-cert --keys=ca.crt --to=- > ca.crt
+    ```
+
+1. Transform the certificate for java truststore
+
+    ```shell
+    keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
+    ```

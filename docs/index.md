@@ -46,24 +46,44 @@ tasks.max=10
 blacklist = [follower\.replication\.throttled\.replicas, leader\.replication\.throttled\.replicas, message\.timestamp\.difference\.max\.ms, message\.timestamp\.type, unclean\.leader\.election\.enable, min\.insync\.replicas]
 ```
 
-but can be also specified with the properties: `topics.blacklist`. Comma-separated lists are also supported and Java regular expression.
+But we can also define the samethings with the properties: `topics.blacklist`. Comma-separated lists are also supported and Java regular expression.
 
 Internally `MirrorSourceConnector` and `MirrorCheckpointConnector` will create multiple tasks (up to `tasks.max` property), `MirrorHeartbeatConnector`
 creates only one single task. `MirrorSourceConnector` will have one task per topic-partition to replicate, while `MirrorCheckpointConnector` will have one task per consumer group. The Kafka connect framework uses the coordinator API, with the `assign()` API, so there is no consumer group while fetching data from source topic. There is no call to `commit()` neither: the rebalancing occurs only when there is a new topic created that matches the whitelist pattern.
 
-## Requirements
+## Requirements to address
+
+### Environments
+
+We propose two approaches to run the 'on-premise' Kafka cluster:
+
+* [Docker compose using vanilla Kafka 2.4](#scenario-1-from-kafka-local-as-source-to-event-streams-on-cloud-as-target): To run local cluster we use docker-compose and docker. The docker compose file to start a local 3 Kafka brokers and 2 Zookeepers cluster is in `mirror-maker-2/local-cluster` folder. This compose file uses a local docker network called `kafkanet`. The docker image used for Kafka is coming from Strimzi open source project and is for the Kafka 2.4 version. We are describing how to setup this simple cluster using [Docker compose in this article](dc-local.md).
+* [Kafka 2.4 cluster using Strimzi operator deployed on Openshift](#scenario-2-run-mirror-maker-2-cluster-close-to-target-cluster)
+
+For the Event Streams on Cloud cluster, we recommend to create your own using IBM Cloud Account. The product [documentation is here](https://cloud.ibm.com/registration?target=catalog/services/event-streams).
+
+The enviroments can be summarized in the table below:
+
+| Environment | Source                 | Target                 | Connect |
+|-------------|------------------------|------------------------|:-------:|
+| 1           | Local                  | Event Streams on Cloud | Local   |
+| 2           | Strimzi on OCP         | Event Streams on Cloud | OCP / Roks |
+| 3           | Event Streams on Cloud | Local                  | Local   |
+| 4           | Event Streams on Cloud | Strimzi on OCP         | OCP/ Roks |
+| 5           | Event Streams on OCP   | Event Streams on Cloud | OCP / Roks |
 
 ### Local cluster to Event Streams on Cloud
 
 The goal is to demonstrate the replicate data from local cluster to Event Streams on IBM Cloud running as managed service. The two scenarios and the step by step approach are presented in [this note](local-to-es.md).
 
-We have also documented the replication approaches from Event Streams as a Service to local cluster in [this note](es-to-local.md).
+We have documented the replication from Event Streams as a Service to local cluster in [this note](es-to-local.md) with two scenarios depending of the target Kafka cluster (running on OpenShift or on VM / containers).
 
 ### Provisioning Connectors (Mirror Maker 2)
 
 This main epic is related to provisioning operation.
 
-1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.
+1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters. 
+        * We are describing the MM2 provisioning in [this note](provisioning/#deploying-mirror-maker-2).
 
 1. As a SRE I want to understand the CLI commands used to assess how automation can be performed for replicating environment provisioning.
 

@@ -17,7 +17,7 @@ spec:
       serviceAccountName: strimzi-topic-operator
       containers:
         - name: strimzi-topic-operator
-          image: strimzi/operator:0.17.0-rc2
+          image: strimzi/operator:0.17.0-rc4
           args:
           - /opt/strimzi/bin/topic_operator_run.sh
           env:
@@ -26,7 +26,7 @@ spec:
             - name: STRIMZI_KAFKA_BOOTSTRAP_SERVERS
               value: eda-demo-24-cluster-kafka-bootstrap:9092
             - name: STRIMZI_ZOOKEEPER_CONNECT
-              value: eda-demo-24-cluster-zookeeper-client:2181
+              value: eda-demo-24-cluster-zookeeper:2181
             - name: STRIMZI_ZOOKEEPER_SESSION_TIMEOUT_MS
               value: "20000"
             - name: STRIMZI_FULL_RECONCILIATION_INTERVAL_MS

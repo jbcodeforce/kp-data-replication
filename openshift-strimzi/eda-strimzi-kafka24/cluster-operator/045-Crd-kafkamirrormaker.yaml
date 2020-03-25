@@ -4,6 +4,7 @@ metadata:
   name: kafkamirrormakers.kafka.strimzi.io
   labels:
     app: strimzi
+    strimzi.io/crd-install: "true"
 spec:
   group: kafka.strimzi.io
   versions:
@@ -26,7 +27,7 @@ spec:
     - strimzi
   additionalPrinterColumns:
   - name: Desired replicas
-    description: The desired number of Kafka Mirror Maker replicas
+    description: The desired number of Kafka MirrorMaker replicas
     JSONPath: .spec.replicas
     type: integer
   - name: Consumer Bootstrap Servers

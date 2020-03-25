@@ -1,8 +1,10 @@
-# Provisioning
+# Strimzi Operator and Kafka Cluster Provisioning
 
-[Strimzi](https://strimzi.io/) uses the Cluster Operator to deploy and manage Kafka (including Zookeeper) and Kafka Connect clusters. When the Strimzi Cluster Operator is up, it starts to watch for certain OpenShift or Kubernetes resources containing the desired Kafka and/or Kafka Connect cluster configuration. The base of strimzi is to define a set of kubernetes operators and custom resource definitions for the different elements of Kafka. 
+In this note we propose to describe the provisioning of a Kafka Cluster using Strimzi operators and how to provision Mirror Maker 2 on Kubernetes or on VM.
 
-![](images/strimzi.png)
+[Strimzi](https://strimzi.io/) uses the Cluster Operator to deploy and manage Kafka (including Zookeeper) and Kafka Connect clusters. When the Strimzi Cluster Operator is up, it starts to watch for certain OpenShift or Kubernetes resources containing the desired Kafka and/or Kafka Connect cluster configuration. The base of strimzi is to define a set of kubernetes operators and custom resource definitions for the different elements of Kafka.
+
+![Strimzi](images/strimzi.png)
 
 We recommend to go over the product [overview page](https://strimzi.io/docs/overview/master/).
 
@@ -23,9 +25,9 @@ Example of topic can be seen in [section below](#create-a-topic).
 
 Kafka User are not saved part of kafka cluster but they are managed in kubernetes. For example the user credentials are saved as secret.
 
-CRDs act as configuration instructions to describe the custom resources in a Kubernetes cluster, and are provided with Strimzi for each Kafka component used in a deployment. 
+CRDs act as configuration instructions to describe the custom resources in a Kubernetes cluster, and are provided with Strimzi for each Kafka component used in a deployment.
 
-## Deployment
+## Strimzi Operators Deployment
 
 The deployment is done in two phases:
 
@@ -43,7 +45,7 @@ The next steps are defining how to deploy a Kafka Cluster.
 ```shell
 kubectl create namespace jb-kafka-strimzi
 # Or using Openshift CLI
-oc create project jb-kafka-strimzi
+oc new-project jb-kafka-strimzi
 ```
 
 ### Download the strimzi artefacts
@@ -51,22 +53,29 @@ oc create project jb-kafka-strimzi
 For the last release see [this github page](https://github.com/strimzi/strimzi-kafka-operator/releases). Then modify the Role binding yaml files with the namespace set in previous step.
 
 ```shell
-sed -i '' 's/namespace: .*/namespace: jb-kafka-strimzi/' install/cluster-operator/*RoleBinding*.yaml
+sed -i '' 's/namespace: .*/namespace: jb-kafka-strimzi/' $strimzi-home/install/cluster-operator/*RoleBinding*.yaml
 ```
 
 ### Deploy the Custom Resource Definitions for kafka
 
-Custom resource definitions are defined within the kubernetes cluster. The following command  
+Custom resource definitions are defined within the kubernetes cluster. The following commands  
 
 ```shell
-oc apply -f openshift-strimzi/install/
+oc apply -f $strimzi-home/install/cluster-operator
 oc get crd
 ```
 
-This should create the following service account, resource definitions, roles, and role bindings:
+In case of Strimzi cluster operator fails with error like: " kafkas.kafka.strimzi.io is forbidden: User "system:serviceaccount:jb-kafka-strimzi:strimzi-cluster-operator" cannot watch resource "kafkas" in API group "kafka.strimzi.io" in the namespace "jb-kafka-strimzi", you need to add cluster role to the strimzi operator user by doing the following commands:
+
+```
+oc adm policy add-cluster-role-to-user strimzi-cluster-operator-namespaced --serviceaccount strimzi-cluster-operator -n jb-kafka-strimzi
+oc adm policy add-cluster-role-to-user strimzi-entity-operator --serviceaccount strimzi-cluster-operator -n jb-kafka-strimzi
+```
+
+The commands above, should create the following service account, resource definitions, roles, and role bindings:
 
 | Names | Resource | Command |
-| :---: | :---: | :---: |
+| --- | :---: | --- |
 | strimzi-cluster-operator | Service account | oc get sa |
 | strimzi-cluster-operator-entity-operator-delegation, strimzi-cluster-operator, strimzi-cluster-operator-topic-operator-delegation | Role binding | oc get rolebinding |
 | strimzi-cluster-operator-global, strimzi-cluster-operator-namespaced, strimzi-entity-operator, strimzi-kafka-broker, strimzi-topic-operator | Cluster Role | oc get clusterrole |
@@ -75,7 +84,13 @@ This should create the following service account, resource definitions, roles, a
 
 ### Add Strimzi Admin Role
 
-Using the folowing command: `oc apply -f openshift-strimzi/install/010-ClusterRole-strimzi-admin.yaml`
+If you want to allow non-kubernetes cluster administators to manage Strimzi resources, you must assign them the Strimzi Administrator role.
+
+First deploy the role definition using the folowing command: `oc apply -f $strimzi-home/install/010-ClusterRole-strimzi-admin.yaml`
+
+Then assign the strimzi-admin ClusterRole to one or more existing users in the Kubernetes cluster.
+
+`kubectl create clusterrolebinding strimzi-admin --clusterrole=strimzi-admin --user=<user-your-username-here>`
 
 ## Deploy instances
 
@@ -83,7 +98,12 @@ Using the folowing command: `oc apply -f openshift-strimzi/install/010-ClusterRo
 
 The CRD for kafka cluster resource is [here](https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/040-Crd-kafka.yaml) and we recommend to study it before defining your own cluster.
 
-Change the name of the cluster in one the yaml in the `examples/kafka` folder or use the `strimzi/kafka-cluster.yml` file in this project. For productionm we need to use persistence for the kafka log, ingress or load balancer external listener and rack awareness policies.
+Change the name of the cluster in one the yaml in the `examples/kafka` folder or use the `openshift-strimzi/kafka-cluster.yml` file in this project. This file defines the default replication factor of 3 and in-synch replicas of 2. For development purpose we will accept plain (unencrypted) listener on port 9092 without TLS authentication.
+For external to the kubernetes cluster access we need to have external listeners. For Openshift, as we use routes, we need to add the `external.type = route`. When exposing Kafka using OpenShift Routes and the HAProxy router, a dedicated Route is created for every Kafka broker pod. An additional Route is created to serve as a Kafka bootstrap address. Kafka clients can use these Routes to connect to Kafka on port 443.
+
+Even for development we added the metrics rules to expose kafka and zookeeper metrics for tool like Prometheus.
+
+For production we need to use persistence for the kafka log, ingress or load balancer external listener and rack awareness policies. It has to use Mutual TLS authentication, and with Strimzi we can use the User Operator to manage cluster users. Mutual authentication or two-way authentication is when both the server and the client present certificates.
 
 Using non presistence:
 
@@ -92,8 +112,6 @@ oc apply -f openshift-strimzi/kafka-cluster.yaml
 oc get kafka
 # NAME         DESIRED KAFKA REPLICAS   DESIRED ZK REPLICAS
 # my-cluster   3                        3
-# Or
-kubectl  apply -f examples/kafka/kafka-ephemeral.yaml -n jb-kafka-strimzi
 ```
 
 When looking at the pods running we can see the three kafka and zookeeper nodes as pods, and the entity operator pod.
@@ -119,7 +137,9 @@ oc apply -f strimzi/kafka-cluster.yaml
 
 ## Add Topic CRDs and operator
 
-To manage Kafka topics with operators, first modify the file `05-Deployment-strimzi-topic-operator.yaml` to reflect your cluster name 
+Topic operator helps to manage Kafka topics via yaml configuration and get map the topics as kubernetes resources so a command like `oc get kafkatopics` returns the list of topics. The operator keep the resources and the kafka topic in synch. This allows you to declare a KafkaTopic as part of your application’s deployment.
+
+To manage Kafka topics with operators, first modify the file `05-Deployment-strimzi-topic-operator.yaml` to reflect your cluster name
 
 ```yaml
 env:
@@ -135,6 +155,7 @@ and then deploy the topic-operator. This operation will fail if there is no Kafk
 
 ```shell
 oc apply -f openshift-strimzi/install/topic-operator
+oc adm policy add-cluster-role-to-user strimzi-topic-operator --serviceaccount strimzi-cluster-operator -n jb-kafka-strimzi
 ```
 
 This will add the following:
@@ -144,7 +165,6 @@ This will add the following:
 | strimzi-topic-operator | Service account | oc get sa |
 | strimzi-topic-operator| Role binding | oc get rolebinding |
 | kafkatopics | Custom Resource Definition | oc get customresourcedefinition |
-
 
 ### Create a topic
 
@@ -194,9 +214,9 @@ oc run kafka-producer -ti --image=strimzi/kafka:latest-kafka-2.4.0  --rm=true --
 # enter text
 ```
 
-If you want to use the strimzi kafka docker image to run the above scripts locally but remotely connect to a kafka cluster you need multiple things to happen:
+If you want to use the strimzi kafka docker image to run the above scripts on your local computer, remotely connect to a kafka cluster you need multiple things to happen:
 
-* Be sure the kafka yaml file include the external route stamza:
+* Be sure the kafka custer definition yaml file includes the `external` route stamza:
 
 ```yaml
 spec:
@@ -238,8 +258,8 @@ bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  my-cluster-kafka-boots
 
 * For a producer the approach is the same but using the producer properties:
 
-```
-./kafka-console-producer.sh --broker-list  my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer-property security.protocol=SSL --producer-property ssl.truststore.password=password --producer-property ssl.truststore.location=/home/truststore.jks --topic test   
+```shell
+./kafka-console-producer.sh --broker-list  my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer-property security.protocol=SSL --producer-property ssl.truststore.password=password --producer-property ssl.truststore.location=/home/truststore.jks --topic test
 ```
 
 Those properties can be in file
@@ -256,10 +276,5 @@ and then use the following parameters in the command line:
 ```shell
 ./kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer.config /home/strimzi.properties --topic test
 
-./kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic test  --consumer.config /home/strimzi.properties --from-beginning 
+./kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic test  --consumer.config /home/strimzi.properties --from-beginning
 ```
-
-### Deploying Mirror Maker 2.0
-
-In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The appraoch will be to use Event Streams on Cloud as backend Kafka cluster but use Mirror Maker for replication.
-

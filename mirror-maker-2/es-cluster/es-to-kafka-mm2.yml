@@ -2,7 +2,7 @@ apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaMirrorMaker2
 metadata:
   name: mm2-cluster
-  namespace: jb-kafka-strimzi
+  namespace: eda-strimzi-kafka24
 spec:
   version: 2.4.0
   replicas: 1
@@ -13,16 +13,9 @@ spec:
       connect.root.logger.level: "INFO"
   clusters:
   - alias: "kafka-on-premise-cluster-source"
-    bootstrapServers: my-cluster-kafka-bootstrap-route-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443
-    authentication:
-      type: tls
-      certificateAndKey:
-        secretName: my-cluster-clients-ca-cert
-        certificate: ca.crt
-        key: ca.crt
-
+    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:9092
   - alias: "event-streams-wdc-as-target"
-    bootstrapServers: broker-3-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093
+    bootstrapServers: broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093
     config:
       config.storage.replication.factor: 3
       offset.storage.replication.factor: 3

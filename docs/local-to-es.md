@@ -1,23 +1,5 @@
 # From Local cluster to Event Streams
 
-We propose two approaches to run the 'local' cluster:
-
-* [Docker compose vanilla Kafka 2.4](#scenario-1-from-kafka-local-as-source-to-event-streams-on-cloud-as-target): To run local cluster we use docker-compose and docker. The docker compose file to start a local 3 Kafka brokers and 2 Zookeepers cluster is in `mirror-maker-2/local-cluster` folder. This compose file uses a local docker network called `kafkanet`. The docker image used for Kafka is coming from Strimzi open source project and is for the Kafka 2.4 version.
-* [Openshift deployed Kafka 2.4 cluster using Strimzi operator](#scenario-2-run-mirror-maker-2-cluster-close-to-target-cluster)
-
-## Pre-requisites
-
-* You need to have one Event Streams service created on IBM Cloud.
-* You may need to use Event Streams CLI. So follow [those instructions](https://cloud.ibm.com/docs/services/EventStreams?topic=eventstreams-cli#cli) to get it.
-
-The following ibmcloud CLI command presents the Event Stream cluster's metadata, like the broker list and the cluster ID:
-
-```shell
-ibmcloud es cluster
-```
-
-For other CLI commands see [this summary](https://cloud.ibm.com/docs/services/EventStreams?topic=eventstreams-cli_reference).
-
 ## Scenario 1: From Kafka local as source to Event Streams on Cloud as Target
 
 The test scenario goal is to send the product definitions in the local `products` topic and then start mirror maker to see the data replicated to the `source.products` topic in Event Streams cluster.
@@ -33,25 +15,7 @@ export KAFKA_TARGET_BROKERS=broker-3-qnprtqnp7hnkssdz.kafka.svc01.us-east.events
 export KAFKA_TARGET_APIKEY="<password attribut in event streams credentials>"
 ```
 
-* It may be needed to create the topics in the target cluster. This depends if mirror maker 2.0 is able to access the AdminClient API. Normally we observed with Event streams APIKEY it is possible to create topic with AdminClient, so there is no need to do the following commands. For other configuration where Access Control policies do not authorize program to create topic dynamically, the commands performed by and admin user will create the needed topic. (the mm2 prefix is the one used by mirror maker, but the name of the topic could be defined in the mirror maker properties)
-
-  ```shell
-  ibmcloud es topic-create -n mm2-configs.source.internal -p 1  -c cleanup.policy=compact
-  ibmcloud es topic-create -n mm2-offsets.source.internal -p 25 -c cleanup.policy=compact
-  ibmcloud es topic-create -n mm2-status.source.internal -p 5 -c cleanup.policy=compact
-  ibmcloud es topic-create -n source.products -p 1
-  ibmcloud es topic-create -n source.heartbeats -p 1 -c cleanup.policy=compact
-  ibmcloud es topic-create -n source.checkpoints.internal -p 1 -c cleanup.policy=compact
-  ```
-
-* In one Terminal window, start the local cluster using `docker-compose` under the `mirror-maker-2/local-cluster` folder: `docker-compose up &`. The data are persisted on the local disk in this folder.
-* If this is the first time you started the source cluster, you need to create the `products` topic. Start a Kafka container to access the Kafka tools with the command:
-
-  ```shell
-  docker run -ti -v $(pwd):/home --network kafkanet strimzi/kafka:latest-kafka-2.4.0 bash
-  ```
-
-  Then in the bash shell, go to `/home/local-cluster` folder and execute the script: `./createProductsTopic.sh`. Verify topic is created with the command: `/opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --list`
+* It may be needed to create the topics in the target cluster. This depends if mirror maker 2.0 is able to access the AdminClient API. When defining APIKEy in Event streams you can have an admin, write or read access. So for Mirror Maker to create topics automatically it needs admin role.
 
 * Send some products data to this topic. For that we use a docker python image. The docker file to build this image is `python-kafka/Dockerfile-python` so the command to build this image (if you change the image name be sure to use the new name in future command) is: `docker build -f Dockerfile-python -t jbcodeforce/python37 .`
 
@@ -62,7 +26,7 @@ export KAFKA_TARGET_APIKEY="<password attribut in event streams credentials>"
   docker run -ti -v $(pwd):/home --rm -e KAFKA_BROKERS=$KAFKA_SOURCE_BROKERS --network kafkanet jbcodeforce/python37   bash
   ```
 
-  In this isolated python container bash shell do the following to send the 5 first products:
+  In this isolated python container bash shell, do the following command to send the first five products:
 
   ```shell
   $ echo $KAFKA_BROKERS
@@ -100,14 +64,14 @@ sasl.mechanism=PLAIN
 sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password=....;
 ```  
 
-* Restart the `kafka-console-consumer` with the bootstrap URL to access to Event Streams and with the replicated topic: `source.products`. Use the previously created properties file to get authentication properties so the command looks like:
+* Restart the `kafka-console-consumer` with the bootstrap URL to access to Event Streams and with the replicated topic name: `source.products`. Use the previously created properties file to get authentication properties so the command looks like:
 
   ```shell
   source /home/setenv.sh
   ./kafka-console-consumer.sh --bootstrap-server $KAFKA_TARGET_BROKERS --consumer.config /home/eventstream.properties --topic source.products --from-beginning
   ```
 
-* Now we are ready to start Mirror Maker 2.0, close to the local cluster, using, yet another docker image:
+* Now we are ready to start Mirror Maker 2.0, close to the local cluster, which is your laptop, using yet another docker image:
 
 ```shell
 docker run -ti -v $(pwd):/home --network kafkanet strimzi/kafka:latest-kafka-2.4.0 bash
@@ -147,72 +111,20 @@ This scenario is similar to the scenario 1 but Mirror Maker 2.0 now, runs within
 
 ![Local to ES](images/mm2-local-to-es.png)
 
-We have created an Event Streams cluster on Washington DC data center. We have Strimzi operators deployed in Washington data center OpenShift Cluster.
+We have created an Event Streams cluster on Washington DC data center. We have Strimzi operators deployed in Washington data center OpenShift Cluster (see [this note](provisioning.md) to provision such environment).
 
-Producers are running locally on the same OpenShift cluster, where vanilla Kafka 2.4 is running, or can run remotely using exposed Kafka brokers Openshift route. (The black rectangles in the figure above represent those producers.)
+Producers are running locally on the same OpenShift cluster, where vanilla Kafka 2.4 is running, or can run remotely using exposed Kafka brokers Openshift route. The black rectangles in the figure above represent those producers.
 
 The goal is to replicate the `products` topic from the left to the `source.products` to the right.
 
 What needs to be done:
 
-* Get a OpenShift cluster in the same data center as Event Streams service: See this [product introduction](https://cloud.ibm.com/kubernetes/catalog/about?platformType=openshift).
-* If not done yet, create a secret for the API KEY of the Event Streams cluster:
-`oc create secret generic es-api-secret --from-literal=password=<replace-with-event-streams-apikey>`
-* Create a project in OpenShift to deploy Mirror Maker cluster, for example: `oc new-project mirror-maker-2-to-es`.
-* At the minimum, to run Mirror Maker 2, we need to deploy the Strimzi Custom Resource Definitions, and the Mirror Maker 2.0 operator. See the detail in the section "" from the [provisioning note](provisioning.md).
-* As the vanilla Kafka source cluster is using TLS to communicate between clients and brokers, we need to use the k8s secret defined when deploying Kafka which includes the CAroot certificate. This secret is : `my-cluster-clients-ca-cert`.
+* Get a OpenShift cluster in the same data center as Event Streams service: See this [product introduction](https://cloud.ibm.com/kubernetes/catalog/about?platformType=openshift). It is used to deploy Mirror Maker 2, but for our test we use it as source cluster for replication too.
+* Run Mirror Maker 2. See the detail in this [provisioning note](mm2-provisioning.md).
+* Start consumer on `source.products` topic
+* Run a producer to source topic named `products`
 
-```shell
-# build a local CA crt file from the secret:
-oc extract secret/my-cluster-clients-ca-cert --keys=ca.crt --to=- > ca.crt
-# Verify the certificate:
-openssl x509 -in ca.crt -text
-# transform it for java truststore.jks:
-keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
-# create a secret from file the truststore so it can be mounted as needed
-oc create secret generic kafka-truststore --from-file=./truststore.jks
-# Verify the created secret
-oc describe secret kafka-truststore
-```
-
-!!! Attention
-    At this step, we have two options to deploy mirror maker, one using the Mirror Maker Operator and configur it via a yaml file, or use properties file and a special docker image that is deployed to Openshift. As of 3/20/2020 we have found an issue on Strimzi 0.17-rc2 Mirror Maker 2.0 operator, so we are proposing to use the properties approach as [documented in this separated note](sc2-mm2.md).
-
-### Deploy Mirror Maker as a custom image
-
-In this approach, [documented in a separate note](sc2-mm2.md),  we are using properties file to define the Mirror Maker 2.0 configuration, package JMX exporter with it inside a docker image and deploy the image to Openshift.
-
-### Deploy with Strimzi Mirror Maker 2.0 Operator
-
-* Define source and target cluster properties in mirror maker 2.0 `kafka-to-es-mm2.yml` descriptor file. We strongly recommend to study the schema definition of this [custom resource from this page](https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/048-Crd-kafkamirrormaker2.yaml#L648-L663). The [yaml file we used is here](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/kafka-to-es-mm2.yml).
-
-!!! note
-    connectCluster defined the cluster alias used for Kafka Connect, it must match a cluster in the list at `spec.clusters`.
-    The config part can match the Kafka configuration for consumer or producer, except properties starting by ssl, sasl, security, listeners, rest, bootstarp.servers which are declared at the cluster definition level. Also we have some challenges to make the connection to event streams working, as of Strimzi version 0.17 RC2, we need to add an empty `tls: {}` stanza to get connected. Also below, the declaration is using the previously defined secret for event streams API key.
-
-```yaml
-  alias: "event-streams-wdc-as-target"
-    bootstrapServers: broker-3...
-    tls: {}
-    authentication:
-      passwordSecret:
-          secretName: es-api-secret  
-          password: password
-      username: token
-      type: plain
-```
-
-* Deploy Mirror maker 2.0 within your project.
-
-```shell
-oc apply -f kafka-to-es-mm2.yaml
-```
-
-This commmand creates a kubernetes deployment as illustrated below, with one pod as the replicas is set to 1. If we need to add parallel processing because of the topics to replicate have multiple partitions, or there are a lot of topics to replicate, then adding pods will help to scale horizontally. The pods are in the same consumer group, so Kafka Brokers will do the partition rebalancing among those new added consumers.
-
-![Mirror maker deployment](images/mm2-deployment.png)
-   
-### Validate data replication
+### Run Consumer
 
 To validate the replication works, we will connect a consumer to the `source.products` topic on Event Streams. So we define a target cluster property file (`eventstreams.properties`) like:
 
@@ -230,6 +142,8 @@ docker run -ti -v $(pwd):/home strimzi/kafka:latest-kafka-2.4.0 bash
 bash-4.2$ source /home/setenv.sh
 bash-4.2$ ./bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TARGET_BROKERS --consumer.config /home/eventstream.properties --topic source.products --from-beginning
 ```
+
+### Produce records to local cluster
 
 * Start a producer to send product records to the source Kafka cluster. If you have done the scenario 1, the first product definitions may be already in the target cluster, so we can send a second batch of products using a second data file:
 
@@ -252,12 +166,11 @@ If you don t see a command prompt, try pressing enter.
 >{'product_id': 'P05', 'description': 'Tomato', 'target_temperature': 4, 'target_humidity_level': 0.4, 'content_type': 2}
 ```
 
-*There is other solution, like using an Kafka HTTP brigde and use curl post to send the records*
+!!! Note
+      There is other solution to send records, like using a Kafka HTTP brigde and use `curl post` commands.
 
 * To validate the source `products` topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.
 
 ```shell
 oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic products --from-beginning
 ```
-
-* In the terminal where kafka consumer runs to get message from `source.products` you should see the data replicated.

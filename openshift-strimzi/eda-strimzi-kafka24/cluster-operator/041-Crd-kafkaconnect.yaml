@@ -1,36 +1,35 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: kafkabridges.kafka.strimzi.io
+  name: kafkaconnects.kafka.strimzi.io
   labels:
     app: strimzi
+    strimzi.io/crd-install: "true"
 spec:
   group: kafka.strimzi.io
   versions:
-  - name: v1alpha1
+  - name: v1beta1
     served: true
     storage: true
-  version: v1alpha1
+  - name: v1alpha1
+    served: true
+    storage: false
+  version: v1beta1
   scope: Namespaced
   names:
-    kind: KafkaBridge
-    listKind: KafkaBridgeList
-    singular: kafkabridge
-    plural: kafkabridges
+    kind: KafkaConnect
+    listKind: KafkaConnectList
+    singular: kafkaconnect
+    plural: kafkaconnects
     shortNames:
-    - kb
+    - kc
     categories:
     - strimzi
   additionalPrinterColumns:
   - name: Desired replicas
-    description: The desired number of Kafka Bridge replicas
+    description: The desired number of Kafka Connect replicas
     JSONPath: .spec.replicas
     type: integer
-  - name: Bootstrap Servers
-    description: The boostrap servers
-    JSONPath: .spec.bootstrapServers
-    type: string
-    priority: 1
   subresources:
     status: {}
   validation:
@@ -41,7 +40,8 @@ spec:
           properties:
             replicas:
               type: integer
-              minimum: 0
+            version:
+              type: string
             image:
               type: string
             bootstrapServers:
@@ -150,22 +150,8 @@ spec:
                   type: string
               required:
               - type
-            http:
+            config:
               type: object
-              properties:
-                port:
-                  type: integer
-                  minimum: 1023
-            consumer:
-              type: object
-              properties:
-                config:
-                  type: object
-            producer:
-              type: object
-              properties:
-                config:
-                  type: object
             resources:
               type: object
               properties:
@@ -173,44 +159,6 @@ spec:
                   type: object
                 requests:
                   type: object
-            jvmOptions:
-              type: object
-              properties:
-                "-XX":
-                  type: object
-                "-Xms":
-                  type: string
-                  pattern: '[0-9]+[mMgG]?'
-                "-Xmx":
-                  type: string
-                  pattern: '[0-9]+[mMgG]?'
-                gcLoggingEnabled:
-                  type: boolean
-                javaSystemProperties:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      value:
-                        type: string
-            logging:
-              type: object
-              properties:
-                loggers:
-                  type: object
-                name:
-                  type: string
-                type:
-                  type: string
-                  enum:
-                  - inline
-                  - external
-              required:
-              - type
-            metrics:
-              type: object
             livenessProbe:
               type: object
               properties:
@@ -241,6 +189,276 @@ spec:
                 timeoutSeconds:
                   type: integer
                   minimum: 0
+            jvmOptions:
+              type: object
+              properties:
+                "-XX":
+                  type: object
+                "-Xms":
+                  type: string
+                  pattern: '[0-9]+[mMgG]?'
+                "-Xmx":
+                  type: string
+                  pattern: '[0-9]+[mMgG]?'
+                gcLoggingEnabled:
+                  type: boolean
+                javaSystemProperties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+            affinity:
+              type: object
+              properties:
+                nodeAffinity:
+                  type: object
+                  properties:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          preference:
+                            type: object
+                            properties:
+                              matchExpressions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    key:
+                                      type: string
+                                    operator:
+                                      type: string
+                                    values:
+                                      type: array
+                                      items:
+                                        type: string
+                              matchFields:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    key:
+                                      type: string
+                                    operator:
+                                      type: string
+                                    values:
+                                      type: array
+                                      items:
+                                        type: string
+                          weight:
+                            type: integer
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      type: object
+                      properties:
+                        nodeSelectorTerms:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              matchExpressions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    key:
+                                      type: string
+                                    operator:
+                                      type: string
+                                    values:
+                                      type: array
+                                      items:
+                                        type: string
+                              matchFields:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    key:
+                                      type: string
+                                    operator:
+                                      type: string
+                                    values:
+                                      type: array
+                                      items:
+                                        type: string
+                podAffinity:
+                  type: object
+                  properties:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          podAffinityTerm:
+                            type: object
+                            properties:
+                              labelSelector:
+                                type: object
+                                properties:
+                                  matchExpressions:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key:
+                                          type: string
+                                        operator:
+                                          type: string
+                                        values:
+                                          type: array
+                                          items:
+                                            type: string
+                                  matchLabels:
+                                    type: object
+                              namespaces:
+                                type: array
+                                items:
+                                  type: string
+                              topologyKey:
+                                type: string
+                          weight:
+                            type: integer
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          labelSelector:
+                            type: object
+                            properties:
+                              matchExpressions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    key:
+                                      type: string
+                                    operator:
+                                      type: string
+                                    values:
+                                      type: array
+                                      items:
+                                        type: string
+                              matchLabels:
+                                type: object
+                          namespaces:
+                            type: array
+                            items:
+                              type: string
+                          topologyKey:
+                            type: string
+                podAntiAffinity:
+                  type: object
+                  properties:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          podAffinityTerm:
+                            type: object
+                            properties:
+                              labelSelector:
+                                type: object
+                                properties:
+                                  matchExpressions:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key:
+                                          type: string
+                                        operator:
+                                          type: string
+                                        values:
+                                          type: array
+                                          items:
+                                            type: string
+                                  matchLabels:
+                                    type: object
+                              namespaces:
+                                type: array
+                                items:
+                                  type: string
+                              topologyKey:
+                                type: string
+                          weight:
+                            type: integer
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          labelSelector:
+                            type: object
+                            properties:
+                              matchExpressions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    key:
+                                      type: string
+                                    operator:
+                                      type: string
+                                    values:
+                                      type: array
+                                      items:
+                                        type: string
+                              matchLabels:
+                                type: object
+                          namespaces:
+                            type: array
+                            items:
+                              type: string
+                          topologyKey:
+                            type: string
+            tolerations:
+              type: array
+              items:
+                type: object
+                properties:
+                  effect:
+                    type: string
+                  key:
+                    type: string
+                  operator:
+                    type: string
+                  tolerationSeconds:
+                    type: integer
+                  value:
+                    type: string
+            logging:
+              type: object
+              properties:
+                loggers:
+                  type: object
+                name:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                  - inline
+                  - external
+              required:
+              - type
+            metrics:
+              type: object
+            tracing:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - jaeger
+              required:
+              - type
             template:
               type: object
               properties:
@@ -553,7 +771,7 @@ spec:
                           type: object
                         annotations:
                           type: object
-                bridgeContainer:
+                connectContainer:
                   type: object
                   properties:
                     env:
@@ -578,15 +796,89 @@ spec:
                     maxUnavailable:
                       type: integer
                       minimum: 0
-            tracing:
+            externalConfiguration:
               type: object
               properties:
-                type:
-                  type: string
-                  enum:
-                  - jaeger
-              required:
-              - type
+                env:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      valueFrom:
+                        type: object
+                        properties:
+                          configMapKeyRef:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                          secretKeyRef:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                              optional:
+                                type: boolean
+                    required:
+                    - name
+                    - valueFrom
+                volumes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      configMap:
+                        type: object
+                        properties:
+                          defaultMode:
+                            type: integer
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  type: integer
+                                path:
+                                  type: string
+                          name:
+                            type: string
+                          optional:
+                            type: boolean
+                      name:
+                        type: string
+                      secret:
+                        type: object
+                        properties:
+                          defaultMode:
+                            type: integer
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                mode:
+                                  type: integer
+                                path:
+                                  type: string
+                          optional:
+                            type: boolean
+                          secretName:
+                            type: string
+                    required:
+                    - name
           required:
           - bootstrapServers
         status:
@@ -611,3 +903,14 @@ spec:
               type: integer
             url:
               type: string
+            connectorPlugins:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  version:
+                    type: string
+                  class:
+                    type: string

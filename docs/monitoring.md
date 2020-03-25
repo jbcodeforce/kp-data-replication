@@ -106,7 +106,7 @@ The Prometheus server configuration uses service discovery to discover the pods 
 
 ## Mirror maker 2.0 monitoring
 
-To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be [found here](https://github.com/prometheus/jmx_exporter). We copied a version in the folder `mirror-maker-2/libs`. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this [Dockerfile](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile) in this [separate note](sc2-mm2.md). We have used this approach as we have found an issue with the Strimzi Mirror Maker operator, that blocks us to continue the monitoring. We expect that htis operator, when it sees metrics declaration in the Mirror Maker 2 configuration yaml file, with use the JMX exporter jar.
+To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be [found here](https://github.com/prometheus/jmx_exporter). We copied a version in the folder `mirror-maker-2/libs`. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this [Dockerfile](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile) in this [separate note](mm2-provisioning.md). We have used this approach as we have found an issue with the Strimzi Mirror Maker operator, that blocks us to continue the monitoring. We expect that htis operator, when it sees metrics declaration in the Mirror Maker 2 configuration yaml file, with use the JMX exporter jar.
 
 Once the Mirror Maker 2.0 is connected...
 
