@@ -384,8 +384,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deploying-mirror-maker-2" title="Deploying Mirror Maker 2" class="md-nav__link">
-    Deploying Mirror Maker 2
+  <a href="#deploying-mirror-maker-2-only-on-its-own-project" title="Deploying Mirror Maker 2 only on its own project" class="md-nav__link">
+    Deploying Mirror Maker 2 only on its own project
   </a>
   
 </li>
@@ -569,6 +569,18 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../perf-tests/" title="Performance Tests" class="md-nav__link">
+      Performance Tests
+    </a>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
@@ -659,8 +671,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deploying-mirror-maker-2" title="Deploying Mirror Maker 2" class="md-nav__link">
-    Deploying Mirror Maker 2
+  <a href="#deploying-mirror-maker-2-only-on-its-own-project" title="Deploying Mirror Maker 2 only on its own project" class="md-nav__link">
+    Deploying Mirror Maker 2 only on its own project
   </a>
   
 </li>
@@ -910,7 +922,7 @@ To undeploy everything</p>
 <div class="codehilite"><pre><span></span>oc delete all -l <span class="nv">app</span><span class="o">=</span>mm2ocp
 </pre></div>
 
-<h2 id="deploying-mirror-maker-2">Deploying Mirror Maker 2</h2>
+<h2 id="deploying-mirror-maker-2-only-on-its-own-project">Deploying Mirror Maker 2 only on its own project</h2>
 <p>In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The approach may be used with Event Streams on Cloud as backend Kafka cluster and Mirror Maker 2 for replication.</p>
 <p>Using the Strimzi operator we need to define a Yaml file for the connector and white and black lists for the topics to replicate. Here is an <a href="">example of such descriptor</a>.</p>
 <p>If we need to run a custom Mirror Maker 2, we have documented in <a href="./">this note</a> how to use Dockerfile and properties file and deployment descriptor to do the deployment on kubernetes or OpenShift cluster.</p>

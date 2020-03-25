@@ -36,7 +36,7 @@
     
     
       
-        <title>Run local kafka cluster with docker compose - Data Replication in context of Kafka and Event Streams</title>
+        <title>Performance Tests - Data Replication in context of Kafka and Event Streams</title>
       
     
     
@@ -96,7 +96,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#running-a-kafka-cluster-with-docker-compose" tabindex="1" class="md-skip">
+      <a href="#performance-tests" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -121,7 +121,7 @@
               Data Replication in context of Kafka and Event Streams
             </span>
             <span class="md-header-nav__topic">
-              Run local kafka cluster with docker compose
+              Performance Tests
             </span>
           
         </div>
@@ -241,12 +241,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
     
     <label class="md-nav__link" for="nav-2">
       Environment
@@ -262,20 +260,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-    <a href="./" title="Run local kafka cluster with docker compose" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../dc-local/" title="Run local kafka cluster with docker compose" class="md-nav__link">
       Run local kafka cluster with docker compose
     </a>
-    
   </li>
 
         
@@ -468,11 +457,63 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../perf-tests/" title="Performance Tests" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Performance Tests
+      </label>
+    
+    <a href="./" title="Performance Tests" class="md-nav__link md-nav__link--active">
       Performance Tests
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tools-used" title="Tools used" class="md-nav__link">
+    Tools used
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-approach" title="Test approach" class="md-nav__link">
+    Test approach
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measurements" title="Measurements" class="md-nav__link">
+    Measurements
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -493,6 +534,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tools-used" title="Tools used" class="md-nav__link">
+    Tools used
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-approach" title="Test approach" class="md-nav__link">
+    Test approach
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measurements" title="Measurements" class="md-nav__link">
+    Measurements
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -503,20 +574,13 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/jbcodeforce/kp-data-replication.git/edit/master/docs/dc-local.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/jbcodeforce/kp-data-replication.git/edit/master/docs/perf-tests.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="running-a-kafka-cluster-with-docker-compose">Running a Kafka Cluster with Docker Compose</h1>
-<p>We are providing a <a href="">docker compose file</a> to start a 3 broker cluster and 2 zookeeper nodes.</p>
-<ul>
-<li>In one Terminal window, start the local cluster using <code>docker-compose</code> under the <code>local-cluster</code> folder: <code>docker-compose up &amp;</code>. The data are persisted on the local disk within this folder.</li>
-<li>If this is the first time you start this local Kafka cluster, you need to create the <code>products</code> topic. Start a Kafka container to access the Kafka tools with the command:</li>
-</ul>
-<div class="codehilite"><pre><span></span>docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home --network kafkanet strimzi/kafka:latest-kafka-2.4.0 bash
-</pre></div>
-
-<p>Then in the bash shell, go to <code>/home/local-cluster</code> folder and execute the script: <code>./createProductsTopic.sh</code>. Verify topic is created with the command: <code>/opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:9092 --list</code></p>
-<p>Your environment is up and running.</p>
+                <h1 id="performance-tests">Performance tests</h1>
+<h2 id="tools-used">Tools used</h2>
+<h2 id="test-approach">Test approach</h2>
+<h2 id="measurements">Measurements</h2>
                 
                   
                 
@@ -537,7 +601,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href=".." title="Introduction" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../security/" title="Security" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -546,25 +610,11 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Introduction
+                Security
               </span>
             </div>
           </a>
         
-        
-          <a href="../provisioning/" title="Strimzi Kafka 2.4 Provisioning on Openshift" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Strimzi Kafka 2.4 Provisioning on Openshift
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
         
       </nav>
     </div>
