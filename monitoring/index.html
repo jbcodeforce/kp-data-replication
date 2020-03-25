@@ -247,11 +247,71 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
     
     <label class="md-nav__link" for="nav-2">
-      Mirror Maker 2.0
+      Environment
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-2">
-        Mirror Maker 2.0
+        Environment
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../dc-local/" title="Run local kafka cluster with docker compose" class="md-nav__link">
+      Run local kafka cluster with docker compose
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../provisioning/" title="Strimzi Kafka 2.4 Provisioning on Openshift" class="md-nav__link">
+      Strimzi Kafka 2.4 Provisioning on Openshift
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../mm2-provisioning/" title="Mirror Maker 2 Provisioning" class="md-nav__link">
+      Mirror Maker 2 Provisioning
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Replication Scenarios
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Replication Scenarios
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -286,20 +346,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../provisioning/" title="Connector Provisioning" class="md-nav__link">
-      Connector Provisioning
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
-      Kafka Connect
+    <a href="../es-prem-to-es/" title="From Event Streams on OpenShift to Event Streams on Cloud" class="md-nav__link">
+      From Event Streams on OpenShift to Event Streams on Cloud
     </a>
   </li>
 
@@ -316,13 +364,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
     
-    <label class="md-nav__link" for="nav-3">
+    <label class="md-nav__link" for="nav-4">
       Apache Kafka practices
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-3">
+      <label class="md-nav__title" for="nav-4">
         Apache Kafka practices
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -360,6 +408,18 @@
   <li class="md-nav__item">
     <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers" title="Producer practices" class="md-nav__link">
       Producer practices
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
+      Kafka Connect
     </a>
   </li>
 
@@ -471,6 +531,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../security/" title="Security" class="md-nav__link">
+      Security
+    </a>
   </li>
 
     
@@ -689,7 +761,7 @@ oc apply -f prometheus.yaml
 
 <p>The Prometheus server configuration uses service discovery to discover the pods (Mirror Maker 2.0 pod) in the cluster from which it gets metrics.</p>
 <h2 id="mirror-maker-20-monitoring">Mirror maker 2.0 monitoring</h2>
-<p>To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be <a href="https://github.com/prometheus/jmx_exporter">found here</a>. We copied a version in the folder <code>mirror-maker-2/libs</code>. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">Dockerfile</a> in this <a href="../sc2-mm2/">separate note</a>. We have used this approach as we have found an issue with the Strimzi Mirror Maker operator, that blocks us to continue the monitoring. We expect that htis operator, when it sees metrics declaration in the Mirror Maker 2 configuration yaml file, with use the JMX exporter jar.</p>
+<p>To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be <a href="https://github.com/prometheus/jmx_exporter">found here</a>. We copied a version in the folder <code>mirror-maker-2/libs</code>. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">Dockerfile</a> in this <a href="../mm2-provisioning/">separate note</a>. We have used this approach as we have found an issue with the Strimzi Mirror Maker operator, that blocks us to continue the monitoring. We expect that htis operator, when it sees metrics declaration in the Mirror Maker 2 configuration yaml file, with use the JMX exporter jar.</p>
 <p>Once the Mirror Maker 2.0 is connected...</p>
 <h2 id="install-grafana">Install Grafana</h2>
 <p><a href="https://grafana.com/">Grafana</a> provides visualizations of Prometheus metrics. Again we will use the Strimzi dashboard definition as starting point to monitor Kafka cluster but also mirror maker.</p>
@@ -763,7 +835,7 @@ kubectl port-forward <span class="nv">$PODNAME</span> <span class="m">3000</span
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../provisioning/" title="Connector Provisioning" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../es-prem-to-es/" title="From Event Streams on OpenShift to Event Streams on Cloud" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -772,11 +844,25 @@ kubectl port-forward <span class="nv">$PODNAME</span> <span class="m">3000</span
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Connector Provisioning
+                From Event Streams on OpenShift to Event Streams on Cloud
               </span>
             </div>
           </a>
         
+        
+          <a href="../security/" title="Security" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Security
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
         
       </nav>
     </div>

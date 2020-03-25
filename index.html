@@ -278,12 +278,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#requirements" title="Requirements" class="md-nav__link">
-    Requirements
+  <a href="#requirements-to-address" title="Requirements to address" class="md-nav__link">
+    Requirements to address
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environments" title="Environments" class="md-nav__link">
+    Environments
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#local-cluster-to-event-streams-on-cloud" title="Local cluster to Event Streams on Cloud" class="md-nav__link">
@@ -360,11 +367,71 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
     
     <label class="md-nav__link" for="nav-2">
-      Mirror Maker 2.0
+      Environment
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-2">
-        Mirror Maker 2.0
+        Environment
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="dc-local/" title="Run local kafka cluster with docker compose" class="md-nav__link">
+      Run local kafka cluster with docker compose
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="provisioning/" title="Strimzi Kafka 2.4 Provisioning on Openshift" class="md-nav__link">
+      Strimzi Kafka 2.4 Provisioning on Openshift
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="mm2-provisioning/" title="Mirror Maker 2 Provisioning" class="md-nav__link">
+      Mirror Maker 2 Provisioning
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Replication Scenarios
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Replication Scenarios
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -399,20 +466,8 @@
 
 
   <li class="md-nav__item">
-    <a href="provisioning/" title="Connector Provisioning" class="md-nav__link">
-      Connector Provisioning
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
-      Kafka Connect
+    <a href="es-prem-to-es/" title="From Event Streams on OpenShift to Event Streams on Cloud" class="md-nav__link">
+      From Event Streams on OpenShift to Event Streams on Cloud
     </a>
   </li>
 
@@ -429,13 +484,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
     
-    <label class="md-nav__link" for="nav-3">
+    <label class="md-nav__link" for="nav-4">
       Apache Kafka practices
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-3">
+      <label class="md-nav__title" for="nav-4">
         Apache Kafka practices
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -477,6 +532,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
+      Kafka Connect
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -490,6 +557,18 @@
   <li class="md-nav__item">
     <a href="monitoring/" title="Monitoring with Prometheus and Grafana" class="md-nav__link">
       Monitoring with Prometheus and Grafana
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="security/" title="Security" class="md-nav__link">
+      Security
     </a>
   </li>
 
@@ -535,12 +614,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#requirements" title="Requirements" class="md-nav__link">
-    Requirements
+  <a href="#requirements-to-address" title="Requirements to address" class="md-nav__link">
+    Requirements to address
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environments" title="Environments" class="md-nav__link">
+    Environments
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#local-cluster-to-event-streams-on-cloud" title="Local cluster to Event Streams on Cloud" class="md-nav__link">
@@ -653,18 +739,69 @@
 <div class="codehilite"><pre><span></span><span class="na">blacklist</span> <span class="o">=</span> <span class="s">[follower\.replication\.throttled\.replicas, leader\.replication\.throttled\.replicas, message\.timestamp\.difference\.max\.ms, message\.timestamp\.type, unclean\.leader\.election\.enable, min\.insync\.replicas]</span>
 </pre></div>
 
-<p>but can be also specified with the properties: <code>topics.blacklist</code>. Comma-separated lists are also supported and Java regular expression.</p>
+<p>But we can also define the samethings with the properties: <code>topics.blacklist</code>. Comma-separated lists are also supported and Java regular expression.</p>
 <p>Internally <code>MirrorSourceConnector</code> and <code>MirrorCheckpointConnector</code> will create multiple tasks (up to <code>tasks.max</code> property), <code>MirrorHeartbeatConnector</code>
 creates only one single task. <code>MirrorSourceConnector</code> will have one task per topic-partition to replicate, while <code>MirrorCheckpointConnector</code> will have one task per consumer group. The Kafka connect framework uses the coordinator API, with the <code>assign()</code> API, so there is no consumer group while fetching data from source topic. There is no call to <code>commit()</code> neither: the rebalancing occurs only when there is a new topic created that matches the whitelist pattern.</p>
-<h2 id="requirements">Requirements</h2>
+<h2 id="requirements-to-address">Requirements to address</h2>
+<h3 id="environments">Environments</h3>
+<p>We propose two approaches to run the 'on-premise' Kafka cluster:</p>
+<ul>
+<li><a href="#scenario-1-from-kafka-local-as-source-to-event-streams-on-cloud-as-target">Docker compose using vanilla Kafka 2.4</a>: To run local cluster we use docker-compose and docker. The docker compose file to start a local 3 Kafka brokers and 2 Zookeepers cluster is in <code>mirror-maker-2/local-cluster</code> folder. This compose file uses a local docker network called <code>kafkanet</code>. The docker image used for Kafka is coming from Strimzi open source project and is for the Kafka 2.4 version. We are describing how to setup this simple cluster using <a href="dc-local/">Docker compose in this article</a>.</li>
+<li><a href="#scenario-2-run-mirror-maker-2-cluster-close-to-target-cluster">Kafka 2.4 cluster using Strimzi operator deployed on Openshift</a></li>
+</ul>
+<p>For the Event Streams on Cloud cluster, we recommend to create your own using IBM Cloud Account. The product <a href="https://cloud.ibm.com/registration?target=catalog/services/event-streams">documentation is here</a>.</p>
+<p>The enviroments can be summarized in the table below:</p>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Source</th>
+<th>Target</th>
+<th align="center">Connect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Local</td>
+<td>Event Streams on Cloud</td>
+<td align="center">Local</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Strimzi on OCP</td>
+<td>Event Streams on Cloud</td>
+<td align="center">OCP / Roks</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Event Streams on Cloud</td>
+<td>Local</td>
+<td align="center">Local</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Event Streams on Cloud</td>
+<td>Strimzi on OCP</td>
+<td align="center">OCP/ Roks</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Event Streams on OCP</td>
+<td>Event Streams on Cloud</td>
+<td align="center">OCP / Roks</td>
+</tr>
+</tbody>
+</table>
 <h3 id="local-cluster-to-event-streams-on-cloud">Local cluster to Event Streams on Cloud</h3>
 <p>The goal is to demonstrate the replicate data from local cluster to Event Streams on IBM Cloud running as managed service. The two scenarios and the step by step approach are presented in <a href="local-to-es/">this note</a>.</p>
-<p>We have also documented the replication approaches from Event Streams as a Service to local cluster in <a href="es-to-local/">this note</a>.</p>
+<p>We have documented the replication from Event Streams as a Service to local cluster in <a href="es-to-local/">this note</a> with two scenarios depending of the target Kafka cluster (running on OpenShift or on VM / containers).</p>
 <h3 id="provisioning-connectors-mirror-maker-2">Provisioning Connectors (Mirror Maker 2)</h3>
 <p>This main epic is related to provisioning operation.</p>
 <ol>
 <li>
-<p>As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.</p>
+<p>As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters. 
+        * We are describing the MM2 provisioning in <a href="provisioning/#deploying-mirror-maker-2">this note</a>.</p>
 </li>
 <li>
 <p>As a SRE I want to understand the CLI commands used to assess how automation can be performed for replicating environment provisioning.</p>
@@ -750,13 +887,13 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
       <nav class="md-footer-nav__inner md-grid">
         
         
-          <a href="local-to-es/" title="Replication from local to Event Streams" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="dc-local/" title="Run local kafka cluster with docker compose" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Replication from local to Event Streams
+                Run local kafka cluster with docker compose
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

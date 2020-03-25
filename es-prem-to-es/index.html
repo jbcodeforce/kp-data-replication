@@ -36,7 +36,7 @@
     
     
       
-        <title>Es prem to es - Data Replication in context of Kafka and Event Streams</title>
+        <title>From Event Streams on OpenShift to Event Streams on Cloud - Data Replication in context of Kafka and Event Streams</title>
       
     
     
@@ -96,6 +96,10 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
+      <a href="#from-event-streams-on-ocp-to-event-streams-on-cloud" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -117,7 +121,7 @@
               Data Replication in context of Kafka and Event Streams
             </span>
             <span class="md-header-nav__topic">
-              Es prem to es
+              From Event Streams on OpenShift to Event Streams on Cloud
             </span>
           
         </div>
@@ -243,11 +247,73 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
     
     <label class="md-nav__link" for="nav-2">
-      Mirror Maker 2.0
+      Environment
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-2">
-        Mirror Maker 2.0
+        Environment
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../dc-local/" title="Run local kafka cluster with docker compose" class="md-nav__link">
+      Run local kafka cluster with docker compose
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../provisioning/" title="Strimzi Kafka 2.4 Provisioning on Openshift" class="md-nav__link">
+      Strimzi Kafka 2.4 Provisioning on Openshift
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../mm2-provisioning/" title="Mirror Maker 2 Provisioning" class="md-nav__link">
+      Mirror Maker 2 Provisioning
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      Replication Scenarios
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Replication Scenarios
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -280,23 +346,20 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../provisioning/" title="Connector Provisioning" class="md-nav__link">
-      Connector Provisioning
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+    <a href="./" title="From Event Streams on OpenShift to Event Streams on Cloud" class="md-nav__link md-nav__link--active">
+      From Event Streams on OpenShift to Event Streams on Cloud
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
-      Kafka Connect
-    </a>
+    
   </li>
 
         
@@ -312,13 +375,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
     
-    <label class="md-nav__link" for="nav-3">
+    <label class="md-nav__link" for="nav-4">
       Apache Kafka practices
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-3">
+      <label class="md-nav__title" for="nav-4">
         Apache Kafka practices
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -360,6 +423,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect" title="Kafka Connect" class="md-nav__link">
+      Kafka Connect
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -377,12 +452,39 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../security/" title="Security" class="md-nav__link">
+      Security
+    </a>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
                 </div>
               </div>
             
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
             
           
           <div class="md-content">
@@ -392,9 +494,10 @@
                   <a href="https://github.com/jbcodeforce/kp-data-replication.git/edit/master/docs/es-prem-to-es.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Es prem to es</h1>
-                
-                
+                <h1 id="from-event-streams-on-ocp-to-event-streams-on-cloud">From Event Streams on OCP to Event Streams on Cloud</h1>
+<p>The source cluster is a IBM Event Streams cluster running on Openshift on-premise servers. It was installed following the instructions <a href="https://ocp42.cloudpak8s.io/integration/deploy-eventstreams/">documented here</a>.</p>
+<p><img alt="" src="../images/mm2-a-a.png" /></p>
+<p>The target cluster is also IBM Event Streams on Cloud.</p>
                 
                   
                 
@@ -411,6 +514,41 @@
       
         
 <footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../es-to-local/" title="Replication from Event Streams to local" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Replication from Event Streams to local
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../monitoring/" title="Monitoring with Prometheus and Grafana" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Monitoring with Prometheus and Grafana
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
