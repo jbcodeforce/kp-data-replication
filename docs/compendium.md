@@ -4,6 +4,7 @@
 * [Kafka documentation](https://kafka.apache.org/081/documentation.html)
 * [Strimzi product documentation](https://strimzi.io/documentation/)
 * [Prometheus](https://prometheus.io/docs/introduction/overview/)
+* [Prometheus operator](https://github.com/coreos/prometheus-operator) product documentation
 * [Grafana](https://grafana.com/)
 * [Ansible](https://www.ansible.com/resources/videos/quick-start-video)
 * [Performance test considerations](https://engineering.linkedin.com/kafka/benchmarking-apache-kafka-2-million-writes-second-three-cheap-machines)

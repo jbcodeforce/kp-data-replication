@@ -5,11 +5,9 @@ In this article we are presenting different type of Mirror Maker 2 deployments. 
 * Using Strimzi operator to deploy on Kubernetes
 * To run in VM or docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.
 
-We are adding as part of the custom 
-we are using properties files to define the Mirror Maker 2.0 configuration, package JMX exporter with it inside a docker image and deploy the image to Openshift.
-The configuration approach supports the replication from local on-premise cluster running on kubernetes cluster to Event Streams on the Cloud.
+We are using the configuration to deploy from event streams on Cloud to a local Kafka cluster we deployed using Strimzi. 
 
-![Local to ES](images/mm2-local-to-es.png)
+![ES to local](images/mm2-test1.png)
 
 ## Common configuration
 
@@ -40,23 +38,9 @@ oc describe secret kafka-truststore
 
 We assume you have an existing namespace or project to deploy Mirror Maker. You also need to get the latest (0.17-rc4 at least) Strimzi configuration from the [download page](https://github.com/strimzi/strimzi-kafka-operator/releases/tag/0.17.0-rc4).
 
-If you have already installed Strimzi Cluster Roles, and CRDs and operator you do not need to do it again as those resources are at the kubernetes cluster level.
+If you have already installed Strimzi Operators, Cluster Roles, and CRDs, you do not need to do it again as those resources are defined at the kubernetes cluster level. See the [provisioning note.](provisioning.md)
 
-* As service accounts and role bindings are local to a project do the following
-
-  ```shell
-  export INSTALLDIR=$STRIMZI_HOME/install
-  export NSPACE="yourprojectname"
-  export TGTDIR=$(pwd)
-  cp $INSTALLDIR/cluster-operator/*RoleBinding*.yaml $TGTDIR
-  oc apply -f $INSTALLDIR/cluster-operator/*ServiceAccount*.yaml
-  sed -i '' "s/namespace: .*/namespace: "$NSPACE"/"  $TGTDIR/*RoleBinding*.yaml
-  oc apply -f $TGTDIR
-  ```
-
-  At this stage you should have CRDs, Operators, ClusterRoles, and service accounts:
-
-* Define source and target cluster properties in mirror maker 2.0 `mm2.yml` descriptor file. We strongly recommend to study the schema definition of this [custom resource from this page](https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/048-Crd-kafkamirrormaker2.yaml#L648-L663). The [yaml file we used is here](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/kafka-to-es-mm2.yml).
+* Define source and target cluster properties in mirror maker 2.0 `es-to-kafka-mm2.yml` descriptor file. Here is the file for the replication between Event Streams and local cluster [es-to-kafka-mm2.yml](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/es-cluster/es-to-kafka-mm2.yml). We strongly recommend to study the schema definition of this [custom resource from this page](https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/048-Crd-kafkamirrormaker2.yaml#L648-L663). 
 
 !!! note
     `connectCluster` attribute defines the cluster alias used for Kafka Connect, it must match a cluster in the list at `spec.clusters`.
@@ -77,12 +61,14 @@ If you have already installed Strimzi Cluster Roles, and CRDs and operator you d
 * Deploy Mirror maker 2.0 within your project.
 
 ```shell
-oc apply -f mm2.yaml
+oc apply -f es-to-kafka-mm2.yml
 ```
 
 This commmand creates a kubernetes deployment as illustrated below, with one pod as the replicas is set to 1. If we need to add parallel processing because of the topics to replicate have multiple partitions, or there are a lot of topics to replicate, then adding pods will help to scale horizontally. The pods are in the same consumer group, so Kafka Brokers will do the partition rebalancing among those new added consumers.
 
 ![Mirror maker deployment](images/mm2-deployment.png)
+
+Now with this deployment we can test consumer and producer as described [in the scenario 4](es-to-local/#scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift).
 
 ## Deploying a custom Mirror Maker docker image
 
@@ -247,16 +233,20 @@ If we need to run a custom Mirror Maker 2, we have documented in [the section ab
 
 ## Provisioning automation
 
-For IT operation automation we can use [Ansible](https://www.ansible.com/resources/videos/quick-start-video) to define a playbook to provision the Mirror Maker 2 environment. The [Strimzi Ansinle playbook](https://github.com/rmarting/strimzi-ansible-playbook) repository containts playbook examples for creating cluster roles and service accounts and deploy operators.
+For IT operation automation we can use [Ansible](https://www.ansible.com/resources/videos/quick-start-video) to define a playbook to provision the Mirror Maker 2 environment. The [Strimzi Ansible playbook](https://github.com/rmarting/strimzi-ansible-playbook) repository containts playbook examples for creating cluster roles and service accounts and deploy operators.
 
 ## Typical errors in Mirror Maker 2 traces
 
 * Plugin class loader for connector: 'org.apache.kafka.connect.mirror.MirrorCheckpointConnector' was not found. 
     * This error message is a light issue in kafka 2.4 and does not impact the replication. In Kafka 2.5 this message is for DEBUG logs.
 * Error while fetching metadata with correlation id 2314 : {source.heartbeats=UNKNOWN_TOPIC_OR_PARTITION}:
-    * Those messages may come from multiple reasons. One is the name topic is not created. In Event Streams topics needs to be created via CLI or User Interface. It can also being related to the fact the consumer polls on a topic that has just been created and the leader for this topic-partition is not yet available, you are in the middle of a leadership election.
+    * Those messages may come from multiple reasons. One is that the named topic is not created. In Event Streams is the target cluster the topics may need to be created via CLI or User Interface. It can also being related to the fact the consumer polls on a topic that has just been created and the leader for this topic-partition is not yet available, you are in the middle of a leadership election.
     * The advertised listener may not be set or found.
 * Exception on not being able to create Log directory: do the following: `export LOG_DIR=/tmp/logs`
 * ERROR WorkerSourceTask{id=MirrorSourceConnector-0} Failed to flush, timed out while waiting for producer to flush outstanding 1 messages
 * ERROR WorkerSourceTask{id=MirrorSourceConnector-0} Failed to commit offsets (org.apache.kafka.connect.runtime.SourceTaskOffsetCommitter:114)
 
+**Some usefule commands**
+
+* Connect to local cluster: `oc exec -ti eda-demo-24-cluster-kafka-0 bash`
+* list the topics: `./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --list`

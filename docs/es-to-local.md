@@ -47,6 +47,9 @@ We are reusing the Event Streams on Cloud cluster on Washington DC data center a
 
 ![](images/mm2-test1.png)
 
+!!! Notes
+        If you have provisioned a mirror maker from the documentation here, you do not need to do the next step, but go to produce and consumer messages.
+
 1. Deploy mirror maker 2.0 with good configuration: As we use the properties file approach the Dockerfile helps us to build a custom MM2 with Prometheus JMX exporter and mm2.properties for configuration. The file specifies source and target cluster:
 
     ```properties

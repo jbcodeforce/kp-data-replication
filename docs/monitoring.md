@@ -26,7 +26,7 @@ To support this monitoring we need to do the following steps:
 
 Prometheus deployment inside Kubernetes uses operator as defined in [the coreos github](https://github.com/coreos/prometheus-operator). The CRDs define a set of resources: the ServiceMonitor, PodMonitor, and PrometheusRule.
 
-Inside the [Strimzi github repository](https://github.com/strimzi/strimzi-kafka-operator), we can get a [prometheus.yml](https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml) file to deploy prometheus server. This configuration defines, ClusterRole, ServiceAccount, ClusterRoleBinding, and the Prometheus resource instance. We have defined our own configuration in [this file](https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/prometheus.yml).
+Inside the [Strimzi github repository](https://github.com/strimzi/strimzi-kafka-operator), we can get a [prometheus.yml](https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml) file to deploy prometheus server using the [Prometheus operator](https://github.com/coreos/prometheus-operator). This configuration defines, ClusterRole, ServiceAccount, ClusterRoleBinding, and the Prometheus resource instance. We have defined our own configuration in [this file](https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/prometheus.yml).
 
 *For your own deployment you have to change the target namespace, and the rules*
 
@@ -34,39 +34,23 @@ You need to deploy Prometheus and all the other elements inside the same namespa
 
 To be able to monitor your own on-premise Kafka cluster, you need to enable Prometheus metrics. An example of Kafka cluster Strimzi based deployment with Prometheus setting can be found [in our kafka cluster definition](https://github.com/jbcodeforce/kp-data-replication/blob/master/openshift-strimzi/kafka-cluster.yaml). The declarations are under the `metrics` stanza and define the rules for exposing Kafka core features.
 
-### Install Prometheus
+### Install Prometheus Operator
 
-After creating a namespace or reusing the Kafka cluster namespace, you need to deploy the Prometheus operator by first downloading the different configuration yaml files and update the namespace declaration to reflect your project name (e.g `jb-kafka-strimzi`):
+We recommend reading [Prometheus operator](https://github.com/coreos/prometheus-operator) product documentation. 
 
-```shell
-curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-deployment.yaml | sed -e "s/namespace: default/namespace: jb-kafka-strimzi/" > prometheus-operator-deployment.yaml
-```
+At a glance the Prometheus operator deploy and manage a prometheus server and watches new pods to monitor when they are scheduled within k8s. 
 
-```shell
-curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role.yaml > prometheus-operator-cluster-role.yaml
-```
+![prometheus-operator architecture](https://raw.githubusercontent.com/coreos/prometheus-operator/master/Documentation/user-guides/images/architecture.png)
 
-```shell
-curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role-binding.yaml | sed -e "s/namespace: default/namespace: jb-kafka-strimzi/" > prometheus-operator-cluster-role-binding.yaml
-```
+##### Source: prometheus-operator architecture
+
+After creating a namespace or reusing the Kafka cluster namespace, you need to deploy the Prometheus operator and related service account, cluster role, role binding... We have reuse the `monitoring/install/bundle.yaml` from Prometheus operator github, with a namespace sets for our project (e.g `jb-kafka-strimzi`):
 
 ```shell
-curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-service-account.yaml | sed -e "s/namespace: default/namespace: jb-kafka-strimzi/" > prometheus-operator-service-account.yaml
+oc apply -f bundle.yaml
 ```
 
-!!! Note
-        The `prometheus-operator-deployment.yaml` defines security context the operator pod will use. It is set as a non root user (unprivileged). If you need to change that, or reference an existing user modify this file.  
-
-Deploy the prometheus operator, cluster role, role binding and service account (see our files under `monitoring` folder):
-
-```shell
-oc apply -f prometheus-operator-deployment.yaml
-oc apply -f prometheus-operator-cluster-role.yaml
-oc apply -f prometheus-operator-cluster-role-binding.yaml
-oc apply -f prometheus-operator-service-account.yaml
-```
-
-When you apply those configurations, the following resources are managed by the Prometheus Operator:
+When you apply those configurations, the following resources are visibles:
 
 | Resource | Description |
 | --- | --- |
@@ -79,6 +63,8 @@ When you apply those configurations, the following resources are managed by the 
 | PrometheusRule | To manage alerting rules for the Prometheus pod. |
 |  Secret | To manage additional Prometheus settings. |
 | Service  | To allow applications running in the cluster to connect to Prometheus (for example, Grafana using Prometheus as datasource) |
+
+* To delete the operator do: `oc delete -f bundle.yaml`
 
 ### Deploy prometheus
 
@@ -101,9 +87,22 @@ https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/examples
 ```shell
 oc apply -f prometheus-rules.yaml
 oc apply -f prometheus.yaml
+# once deploye, get the state of the server with
+oc get prometheus
+NAME         VERSION   REPLICAS   AGE
+prometheus             1          52s
 ```
 
 The Prometheus server configuration uses service discovery to discover the pods (Mirror Maker 2.0 pod or kafka, zookeeper pods) in the cluster from which it gets metrics.
+
+## Configure monitoring
+
+To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitoring.
+
+```
+oc apply -f strimzi-service-monitor.yaml
+oc describe servicemonitor
+```
 
 ## Mirror maker 2.0 monitoring
 
@@ -171,3 +170,7 @@ oc create secret generic alertmanager-alertmanager --from-file=alertmanager.yaml
 ```shell
 oc create secret generic additional-scrape-configs --from-file=./local-cluster/prometheus-additional.yaml --dry-run -o yaml | kubectl apply -f -
 ```
+
+## Further Readings
+
+* [Monitoring Event Streams cluster health with Prometheus](https://ibm.github.io/event-streams/tutorials/monitor-with-prometheus/)
