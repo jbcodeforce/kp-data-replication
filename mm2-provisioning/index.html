@@ -249,11 +249,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
     
     <label class="md-nav__link" for="nav-2">
-      Environment
+      Environment provisioning
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-2">
-        Environment
+        Environment provisioning
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -363,29 +363,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mirror-maker-scaling-considerations" title="Mirror Maker Scaling considerations" class="md-nav__link">
-    Mirror Maker Scaling considerations
+  <a href="#deploying-mirror-maker-2-on-its-own-project" title="Deploying Mirror Maker 2 on its own project" class="md-nav__link">
+    Deploying Mirror Maker 2 on its own project
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#define-the-mm-configuration" title="Define the MM configuration" class="md-nav__link">
-    Define the MM configuration
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#from-event-streams-on-cloud-to-local-cloud" title="From Event Streams on Cloud to Local Cloud" class="md-nav__link">
-    From Event Streams on Cloud to Local Cloud
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deploying-mirror-maker-2-only-on-its-own-project" title="Deploying Mirror Maker 2 only on its own project" class="md-nav__link">
-    Deploying Mirror Maker 2 only on its own project
+  <a href="#provisioning-automation" title="Provisioning automation" class="md-nav__link">
+    Provisioning automation
   </a>
   
 </li>
@@ -581,6 +567,18 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../compendium/" title="Compendium" class="md-nav__link">
+      Compendium
+    </a>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
@@ -650,29 +648,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mirror-maker-scaling-considerations" title="Mirror Maker Scaling considerations" class="md-nav__link">
-    Mirror Maker Scaling considerations
+  <a href="#deploying-mirror-maker-2-on-its-own-project" title="Deploying Mirror Maker 2 on its own project" class="md-nav__link">
+    Deploying Mirror Maker 2 on its own project
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#define-the-mm-configuration" title="Define the MM configuration" class="md-nav__link">
-    Define the MM configuration
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#from-event-streams-on-cloud-to-local-cloud" title="From Event Streams on Cloud to Local Cloud" class="md-nav__link">
-    From Event Streams on Cloud to Local Cloud
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deploying-mirror-maker-2-only-on-its-own-project" title="Deploying Mirror Maker 2 only on its own project" class="md-nav__link">
-    Deploying Mirror Maker 2 only on its own project
+  <a href="#provisioning-automation" title="Provisioning automation" class="md-nav__link">
+    Provisioning automation
   </a>
   
 </li>
@@ -709,10 +693,8 @@
 <li>Using Strimzi operator to deploy on Kubernetes</li>
 <li>To run in VM or docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.</li>
 </ul>
-<p>We are adding as part of the custom 
-we are using properties files to define the Mirror Maker 2.0 configuration, package JMX exporter with it inside a docker image and deploy the image to Openshift.
-The configuration approach supports the replication from local on-premise cluster running on kubernetes cluster to Event Streams on the Cloud.</p>
-<p><img alt="Local to ES" src="../images/mm2-local-to-es.png" /></p>
+<p>We are using the configuration to deploy from event streams on Cloud to a local Kafka cluster we deployed using Strimzi. </p>
+<p><img alt="ES to local" src="../images/mm2-test1.png" /></p>
 <h2 id="common-configuration">Common configuration</h2>
 <p>When we need to create Kubernetes secrets to manage APIKEY to access Event Streams, and TLS certificate to access local Kafka brokers, we need to do the following steps:</p>
 <ul>
@@ -739,22 +721,9 @@ oc describe secret kafka-truststore
 </div>
 <h2 id="deploying-using-strimzi-mirror-maker-operator">Deploying using Strimzi Mirror Maker operator</h2>
 <p>We assume you have an existing namespace or project to deploy Mirror Maker. You also need to get the latest (0.17-rc4 at least) Strimzi configuration from the <a href="https://github.com/strimzi/strimzi-kafka-operator/releases/tag/0.17.0-rc4">download page</a>.</p>
-<p>If you have already installed Strimzi Cluster Roles, and CRDs and operator you do not need to do it again as those resources are at the kubernetes cluster level.</p>
+<p>If you have already installed Strimzi Operators, Cluster Roles, and CRDs, you do not need to do it again as those resources are defined at the kubernetes cluster level. See the <a href="../provisioning/">provisioning note.</a></p>
 <ul>
-<li>As service accounts and role bindings are local to a project do the following</li>
-</ul>
-<div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">INSTALLDIR</span><span class="o">=</span><span class="nv">$STRIMZI_HOME</span>/install
-<span class="nb">export</span> <span class="nv">NSPACE</span><span class="o">=</span><span class="s2">&quot;yourprojectname&quot;</span>
-<span class="nb">export</span> <span class="nv">TGTDIR</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>
-cp <span class="nv">$INSTALLDIR</span>/cluster-operator/*RoleBinding*.yaml <span class="nv">$TGTDIR</span>
-oc apply -f <span class="nv">$INSTALLDIR</span>/cluster-operator/*ServiceAccount*.yaml
-sed -i <span class="s1">&#39;&#39;</span> <span class="s2">&quot;s/namespace: .*/namespace: &quot;</span><span class="nv">$NSPACE</span><span class="s2">&quot;/&quot;</span>  <span class="nv">$TGTDIR</span>/*RoleBinding*.yaml
-oc apply -f <span class="nv">$TGTDIR</span>
-</pre></div>
-
-<p>At this stage you should have CRDs, Operators, ClusterRoles, and service accounts:</p>
-<ul>
-<li>Define source and target cluster properties in mirror maker 2.0 <code>mm2.yml</code> descriptor file. We strongly recommend to study the schema definition of this <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/048-Crd-kafkamirrormaker2.yaml#L648-L663">custom resource from this page</a>. The <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/kafka-to-es-mm2.yml">yaml file we used is here</a>.</li>
+<li>Define source and target cluster properties in mirror maker 2.0 <code>es-to-kafka-mm2.yml</code> descriptor file. Here is the file for the replication between Event Streams and local cluster <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/es-cluster/es-to-kafka-mm2.yml">es-to-kafka-mm2.yml</a>. We strongly recommend to study the schema definition of this <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/048-Crd-kafkamirrormaker2.yaml#L648-L663">custom resource from this page</a>. </li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -775,13 +744,14 @@ The config part can match the Kafka configuration for consumer or producer, exce
 <ul>
 <li>Deploy Mirror maker 2.0 within your project.</li>
 </ul>
-<div class="codehilite"><pre><span></span>oc apply -f mm2.yaml
+<div class="codehilite"><pre><span></span>oc apply -f es-to-kafka-mm2.yml
 </pre></div>
 
 <p>This commmand creates a kubernetes deployment as illustrated below, with one pod as the replicas is set to 1. If we need to add parallel processing because of the topics to replicate have multiple partitions, or there are a lot of topics to replicate, then adding pods will help to scale horizontally. The pods are in the same consumer group, so Kafka Brokers will do the partition rebalancing among those new added consumers.</p>
 <p><img alt="Mirror maker deployment" src="../images/mm2-deployment.png" /></p>
+<p>Now with this deployment we can test consumer and producer as described <a href="es-to-local/#scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift">in the scenario 4</a>.</p>
 <h2 id="deploying-a-custom-mirror-maker-docker-image">Deploying a custom Mirror Maker docker image</h2>
-<p>We want to use this approach to use properties file for defining the replication parameters and to add Prometheus JMX exporter as Java Agent so we can monitor MM2 with Prometheus. The proposed docker file is <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">in this folder</a> and may look like:</p>
+<p>We want to use custom docker image when we want to add Prometheus JMX exporter as Java Agent so we can monitor MM2 with Prometheus. The proposed docker file is <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">in this folder</a> and may look like:</p>
 <div class="codehilite"><pre><span></span><span class="k">FROM</span><span class="s"> strimzi/kafka:latest-kafka-2.4.0</span>
 <span class="c"># ...</span>
 <span class="k">ENV</span> <span class="nv">LOG_DIR</span><span class="o">=</span>/tmp/logs
@@ -793,10 +763,51 @@ The config part can match the Kafka configuration for consumer or producer, exce
 <span class="k">CMD</span> /opt/kafka/bin/connect-mirror-maker.sh  /home/mm2.properties
 </pre></div>
 
+<p>As the mirror maker 2 is using properties file, we want to define source and target cluster and the security settings for both clusters. As the goal is to run within the same OpenShift cluster as Kafka, the broker list for the source matches the URL within the broker service:</p>
+<div class="codehilite"><pre><span></span><span class="c1"># get the service URL</span>
+oc describe svc my-cluster-kafka-bootstrap
+<span class="c1"># URL my-cluster-kafka-bootstrap:9092</span>
+</pre></div>
+
+<p>The target cluster uses the bootstrap servers from the Event Streams Credentials, and the API KEY is defined with the manager role, so mirror maker can create topic dynamically.</p>
+<p>Properties template file can be seen <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/kafka-to-es-mm2.properties">here: kafka-to-es-mm2</a></p>
+<div class="codehilite"><pre><span></span><span class="na">clusters</span><span class="o">=</span><span class="s">source, target</span>
+<span class="na">source.bootstrap.servers</span><span class="o">=</span><span class="s">eda-demo-24-cluster-kafka-bootstrap:9092</span>
+<span class="na">source.ssl.endpoint.identification.algorithm</span><span class="o">=</span>
+<span class="na">target.bootstrap.servers</span><span class="o">=</span><span class="s">broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093</span>
+<span class="na">target.security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
+<span class="na">target.ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
+<span class="na">target.ssl.endpoint.identification.algorithm</span><span class="o">=</span><span class="s">https</span>
+<span class="na">target.sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
+<span class="na">target.sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required </span>
+<span class="na">username</span><span class="o">=</span><span class="s">&quot;token&quot; password=&quot;&lt;Manager API KEY from Event Streams&gt;&quot;;</span>
+<span class="c"># enable and configure individual replication flows</span>
+<span class="na">source-&gt;target.enabled</span><span class="o">=</span><span class="s">true</span>
+<span class="na">sync.topic.acls.enabled</span><span class="o">=</span><span class="s">false</span>
+<span class="na">replication.factor</span><span class="o">=</span><span class="s">3</span>
+<span class="na">internal.topic.replication.factor</span><span class="o">=</span><span class="s">3</span>
+<span class="na">refresh.topics.interval.seconds</span><span class="o">=</span><span class="s">10</span>
+<span class="na">refresh.groups.interval.seconds</span><span class="o">=</span><span class="s">10</span>
+<span class="na">source-&gt;target.topics</span><span class="o">=</span><span class="s">products</span>
+<span class="na">tasks.max</span><span class="o">=</span><span class="s">10</span>
+</pre></div>
+
+<p>Upload the properties as a secret</p>
+<div class="codehilite"><pre><span></span>oc create secret generic mm2-std-properties --from-file<span class="o">=</span>es-cluster/mm2.properties
+</pre></div>
+
 <p>The file could be copied inside the docker image or better mounted from a secret when deployed to kubernetes.</p>
 <p>Build and push the image to a docker registry.</p>
 <div class="codehilite"><pre><span></span>docker build -t ibmcase/mm2ocp:v0.0.2  .
 docker push ibmcase/mm2ocp:v0.0.2
+</pre></div>
+
+<p>Then using a deployment configuration like <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/mm2-deployment.yaml">this one</a>, we can deploy our custom mirror maker 2 with:</p>
+<div class="codehilite"><pre><span></span>oc apply -f mm2-deployment.yaml
+<span class="c1"># to assess the cluster </span>
+oc get kafkamirrormaker2
+NAME          DESIRED REPLICAS
+mm2-cluster   <span class="m">1</span>
 </pre></div>
 
 <h3 id="define-the-monitoring-rules">Define the monitoring rules</h3>
@@ -853,79 +864,46 @@ docker push ibmcase/mm2ocp:v0.0.2
 <p>On virtual machine, it is possible to deploy the Apache Kafka 2.4+ binary file and then use the command <code>/opt/kafka/bin/connect-mirror-maker.sh</code> with the good properties file as argument.</p>
 <p>Within a VM we can run multiple mirror maker instances. When needed we can add more VMs to scale horizontally. Each mirror makers workers are part of the same consumer groups, so it is possible to scale at the limit of the topic partition number.</p>
 <h2 id="capacity-planning">Capacity planning</h2>
-<h2 id="mirror-maker-scaling-considerations">Mirror Maker Scaling considerations</h2>
-<h2 id="define-the-mm-configuration">Define the MM configuration</h2>
-<p>The configuration define the source and target cluster and the security settings for both clusters. As the goal is to run within the same OpenShift cluster as Kafka, the broker list for the source matches the URL within the broker service:</p>
-<p><div class="codehilite"><pre><span></span><span class="c1"># get the service URL</span>
-oc describe svc my-cluster-kafka-bootstrap
-<span class="c1"># URL my-cluster-kafka-bootstrap:9092</span>
-</pre></div>
-The target cluster uses the bootstrap servers from the Event Streams Credentials, and the API KEY is defined with the manager role, so mirror maker can create topic dynamically.</p>
-<p>Properties template file can be seen <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/local-cluster/kafka-to-es-mm2.properties">here: kafka-to-es-mm2</a></p>
-<div class="codehilite"><pre><span></span><span class="na">clusters</span><span class="o">=</span><span class="s">source, target</span>
-<span class="na">source.bootstrap.servers</span><span class="o">=</span><span class="s">eda-demo-24-cluster-kafka-bootstrap:9092</span>
-<span class="na">source.ssl.endpoint.identification.algorithm</span><span class="o">=</span>
-<span class="na">target.bootstrap.servers</span><span class="o">=</span><span class="s">broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093</span>
-<span class="na">target.security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
-<span class="na">target.ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
-<span class="na">target.ssl.endpoint.identification.algorithm</span><span class="o">=</span><span class="s">https</span>
-<span class="na">target.sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
-<span class="na">target.sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required </span>
-<span class="na">username</span><span class="o">=</span><span class="s">&quot;token&quot; password=&quot;&lt;Manager API KEY from Event Streams&gt;&quot;;</span>
-<span class="c"># enable and configure individual replication flows</span>
-<span class="na">source-&gt;target.enabled</span><span class="o">=</span><span class="s">true</span>
-<span class="na">sync.topic.acls.enabled</span><span class="o">=</span><span class="s">false</span>
-<span class="na">replication.factor</span><span class="o">=</span><span class="s">3</span>
-<span class="na">internal.topic.replication.factor</span><span class="o">=</span><span class="s">3</span>
-<span class="na">refresh.topics.interval.seconds</span><span class="o">=</span><span class="s">10</span>
-<span class="na">refresh.groups.interval.seconds</span><span class="o">=</span><span class="s">10</span>
-<span class="na">source-&gt;target.topics</span><span class="o">=</span><span class="s">products</span>
-<span class="na">tasks.max</span><span class="o">=</span><span class="s">10</span>
-</pre></div>
-
-<p>Upload the properties as a secret</p>
-<div class="codehilite"><pre><span></span>oc create secret generic mm2-std-properties --from-file<span class="o">=</span>es-cluster/mm2.properties
-</pre></div>
-
-<h2 id="from-event-streams-on-cloud-to-local-cloud">From Event Streams on Cloud to Local Cloud</h2>
-<p>The approach is similar to the above steps except we use another properties file:</p>
-<ul>
-<li>The properties to use is <code>es-to-kafka-mm2.properties</code></li>
-</ul>
-<div class="codehilite"><pre><span></span><span class="na">clusters</span><span class="o">=</span><span class="s">source, target</span>
-<span class="na">target.bootstrap.servers</span><span class="o">=</span><span class="s">eda-demo-24-cluster-kafka-bootstrap:9092</span>
-<span class="na">target.ssl.endpoint.identification.algorithm</span><span class="o">=</span>
-<span class="na">source.bootstrap.servers</span><span class="o">=</span><span class="s">broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.event....</span>
-</pre></div>
-
-<ul>
-<li>The image to build is using this properties file:</li>
-</ul>
-<div class="codehilite"><pre><span></span>docker build -t ibmcase/mm2ocp:v0.0.3 --build-arg<span class="o">=</span>es-cluster/es-to-kafka-mm2.properties .
-</pre></div>
-
-<p>As we are using the secret define in section above to mount file we want to use a deployment.yml to define the Mirror Maker deployment</p>
-<div class="codehilite"><pre><span></span><span class="c1"># Under mirror-maker-2 folder</span>
-oc apply -f mm2-deployment.yaml
-</pre></div>
-
-<p>In case of error like "" you may need to create the Kafka Topic</p>
-<div class="codehilite"><pre><span></span>/opt/kafka/bi/kafka-topic.sh --create --zookeeper eda-demo-24-cluster-zookeeper:2181 --replication-factor 3 --partitions 25 --topic mm2-offsets.target.internal
-</pre></div>
-
-<p>For the other topic:
-| Topic | Partition |
-| --- | --- |
-| mm2-configs.source.internal | 1 |
-} 
-To undeploy everything</p>
-<div class="codehilite"><pre><span></span>oc delete all -l <span class="nv">app</span><span class="o">=</span>mm2ocp
-</pre></div>
-
-<h2 id="deploying-mirror-maker-2-only-on-its-own-project">Deploying Mirror Maker 2 only on its own project</h2>
+<p>We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters <code>max.tasks</code> specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions will be replicated. Each task is part of the same consumer group, so the load balancing will be transparent and is managed by the brokers.</p>
+<p>The task processing is stateless, consume - produce wait for acknowledge,  commit offet. In this case the CPU and network are key. For platform tuning activity we need to monitor operating system performance metrics. If the CPU becomes the bottleneck, we can allocate more CPU or start to scale horizontally by adding mirror maker 2 instance. If the network at the server level is the bottleneck, then adding more servers will help. Kafka will automatically balance the load among all the tasks running on all the machines. The size of the message impacts also the throughtput as with small message the throughput is CPU bounded. With 100 bytes messages or more we can observe network saturation. </p>
+<p>The parameters to consider for sizing are the following:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number of topic/ partition</td>
+<td>Each task processes one partition</td>
+<td>For pure parallel processing max.tasks is the number of CPU</td>
+</tr>
+<tr>
+<td>Record size</td>
+<td>Size of the message in each partition in average</td>
+<td>Memory usage and Throughput: the # of records/s descrease when size increase, while MB/s throughput increases in logarithmic</td>
+</tr>
+<tr>
+<td>Expected input throughput</td>
+<td>The producer writing to the source topic throughput</td>
+<td>Be sure the consumers inside MM2 absorb the demand</td>
+</tr>
+<tr>
+<td>Network latency</td>
+<td></td>
+<td>This is where positioning MM2 close to the target cluster may help improve latency</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deploying-mirror-maker-2-on-its-own-project">Deploying Mirror Maker 2 on its own project</h2>
 <p>In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The approach may be used with Event Streams on Cloud as backend Kafka cluster and Mirror Maker 2 for replication.</p>
 <p>Using the Strimzi operator we need to define a Yaml file for the connector and white and black lists for the topics to replicate. Here is an <a href="">example of such descriptor</a>.</p>
-<p>If we need to run a custom Mirror Maker 2, we have documented in <a href="./">this note</a> how to use Dockerfile and properties file and deployment descriptor to do the deployment on kubernetes or OpenShift cluster.</p>
+<p>If we need to run a custom Mirror Maker 2, we have documented in <a href="#">the section above</a> on how to use Dockerfile and properties file and deployment descriptor to do the deployment on kubernetes or OpenShift cluster.</p>
+<h2 id="provisioning-automation">Provisioning automation</h2>
+<p>For IT operation automation we can use <a href="https://www.ansible.com/resources/videos/quick-start-video">Ansible</a> to define a playbook to provision the Mirror Maker 2 environment. The <a href="https://github.com/rmarting/strimzi-ansible-playbook">Strimzi Ansible playbook</a> repository containts playbook examples for creating cluster roles and service accounts and deploy operators.</p>
 <h2 id="typical-errors-in-mirror-maker-2-traces">Typical errors in Mirror Maker 2 traces</h2>
 <ul>
 <li>Plugin class loader for connector: 'org.apache.kafka.connect.mirror.MirrorCheckpointConnector' was not found. <ul>
@@ -933,13 +911,18 @@ To undeploy everything</p>
 </ul>
 </li>
 <li>Error while fetching metadata with correlation id 2314 : {source.heartbeats=UNKNOWN_TOPIC_OR_PARTITION}:<ul>
-<li>Those messages may come from multiple reasons. One is the name topic is not created. In Event Streams topics needs to be created via CLI or User Interface. It can also being related to the fact the consumer polls on a topic that has just been created and the leader for this topic-partition is not yet available, you are in the middle of a leadership election.</li>
+<li>Those messages may come from multiple reasons. One is that the named topic is not created. In Event Streams is the target cluster the topics may need to be created via CLI or User Interface. It can also being related to the fact the consumer polls on a topic that has just been created and the leader for this topic-partition is not yet available, you are in the middle of a leadership election.</li>
 <li>The advertised listener may not be set or found.</li>
 </ul>
 </li>
 <li>Exception on not being able to create Log directory: do the following: <code>export LOG_DIR=/tmp/logs</code></li>
 <li>ERROR WorkerSourceTask{id=MirrorSourceConnector-0} Failed to flush, timed out while waiting for producer to flush outstanding 1 messages</li>
 <li>ERROR WorkerSourceTask{id=MirrorSourceConnector-0} Failed to commit offsets (org.apache.kafka.connect.runtime.SourceTaskOffsetCommitter:114)</li>
+</ul>
+<p><strong>Some usefule commands</strong></p>
+<ul>
+<li>Connect to local cluster: <code>oc exec -ti eda-demo-24-cluster-kafka-0 bash</code></li>
+<li>list the topics: <code>./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --list</code></li>
 </ul>
                 
                   

@@ -247,11 +247,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
     
     <label class="md-nav__link" for="nav-2">
-      Environment
+      Environment provisioning
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-2">
-        Environment
+        Environment provisioning
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -519,6 +519,18 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../compendium/" title="Compendium" class="md-nav__link">
+      Compendium
+    </a>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
@@ -617,6 +629,10 @@
 <h2 id="scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift">Scenario 4: From Event Streams On Cloud to Strimzi Cluster on Openshift</h2>
 <p>We are reusing the Event Streams on Cloud cluster on Washington DC data center as source target and the vanilla Kafka 2.4 cluster as target, also running within Washington data center in a OpenShift Cluster. As both clusters are in the same data center, we deploy Mirror Maker 2.0 close to target kafka cluster.</p>
 <p><img alt="" src="../images/mm2-test1.png" /></p>
+<div class="admonition notes">
+<p class="admonition-title">Notes<p>If you have provisioned a mirror maker from the documentation here, you do not need to do the next step, but go to produce and consumer messages.</p>
+</p>
+</div>
 <ol>
 <li>
 <p>Deploy mirror maker 2.0 with good configuration: As we use the properties file approach the Dockerfile helps us to build a custom MM2 with Prometheus JMX exporter and mm2.properties for configuration. The file specifies source and target cluster:</p>

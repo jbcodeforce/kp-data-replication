@@ -247,11 +247,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
     
     <label class="md-nav__link" for="nav-2">
-      Environment
+      Environment provisioning
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-2">
-        Environment
+        Environment provisioning
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -470,9 +470,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-prometheus" title="Install Prometheus" class="md-nav__link">
-    Install Prometheus
+  <a href="#install-prometheus-operator" title="Install Prometheus Operator" class="md-nav__link">
+    Install Prometheus Operator
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source-prometheus-operator-architecture" title="Source: prometheus-operator architecture" class="md-nav__link">
+    Source: prometheus-operator architecture
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -485,6 +498,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-monitoring" title="Configure monitoring" class="md-nav__link">
+    Configure monitoring
+  </a>
   
 </li>
       
@@ -519,6 +539,13 @@
         <li class="md-nav__item">
   <a href="#alert-manager" title="Alert Manager" class="md-nav__link">
     Alert Manager
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-readings" title="Further Readings" class="md-nav__link">
+    Further Readings
   </a>
   
 </li>
@@ -558,6 +585,18 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../compendium/" title="Compendium" class="md-nav__link">
+      Compendium
+    </a>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
@@ -587,9 +626,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-prometheus" title="Install Prometheus" class="md-nav__link">
-    Install Prometheus
+  <a href="#install-prometheus-operator" title="Install Prometheus Operator" class="md-nav__link">
+    Install Prometheus Operator
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source-prometheus-operator-architecture" title="Source: prometheus-operator architecture" class="md-nav__link">
+    Source: prometheus-operator architecture
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -602,6 +654,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-monitoring" title="Configure monitoring" class="md-nav__link">
+    Configure monitoring
+  </a>
   
 </li>
       
@@ -640,6 +699,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#further-readings" title="Further Readings" class="md-nav__link">
+    Further Readings
+  </a>
+  
+</li>
+      
       
       
       
@@ -660,9 +726,9 @@
                 
                 
                 <h1 id="monitoring-mirror-maker-and-kafka-connect-cluster">Monitoring Mirror Maker and kafka connect cluster</h1>
-<p>The goal of this note is to go over some of the details on how to monitor Mirror Maker 2.0 metrics to Prometheus and how to use Grafana dashboard.</p>
+<p>The goal of this note is to go over some of the details on how to monitor Mirror Maker 2.0 metrics using Prometheus and Grafana for the dashboard.</p>
 <p><a href="https://prometheus.io/docs/introduction/overview/">Prometheus</a> is an open source systems monitoring and alerting toolkit that, with Kubernetes, is part of the Cloud Native Computing Foundation. It can monitor multiple workloads but is normally used with container workloads.</p>
-<p>The following figure presents the prometheus generic architecture as described from their main website. Basically the Prometheus server hosts job to poll HTTP end points to get metrics from the components to monitor. It supports queries in the format of <code>PromQL</code>, that product like Grafana can use to present nice dashboards, and it can push alerts to different channels when some metrics behave unexpectedly.</p>
+<p>The following figure presents the prometheus generic architecture as described from the product main website. Basically the Prometheus server hosts job to poll HTTP end points to get metrics from the components to monitor. It supports queries in the format of <code>PromQL</code>, that product like Grafana can use to present nice dashboards, and it can push alerts to different channels when some metrics behave unexpectedly.</p>
 <p><img alt="Prometheus architecture" src="https://prometheus.io/assets/architecture.png" /></p>
 <p>In the context of data replication between kafka clusters, we want to monitor the mirror maker 2.0 metrics like the worker task states, source task metrics, task errors,... The following figure illustrates the components involved: The source Kafka cluster, the Mirror Maker 2.0 cluster, which is based on Kafka Connect, the Prometheus server and the Grafana.</p>
 <p><img alt="Mirror Maker 2 monitoring" src="../images/mm2-monitoring.png" /></p>
@@ -676,37 +742,21 @@
 <li>Deploy Grafana</li>
 </ol>
 <h2 id="installation-and-configuration">Installation and configuration</h2>
-<p>Prometheus deployment inside Kubernetes uses operator as defined in <a href="https://github.com/coreos/prometheus-operator">the coreos github</a>. The CRDs define a set of resources. The ServiceMonitor, PodMonitor, PrometheusRule are used.</p>
-<p>Inside the <a href="https://github.com/strimzi/strimzi-kafka-operator">Strimzi github repository</a>, we can get a <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml">prometheus.yml</a> file to deploy prometheus server. This configuration defines, ClusterRole, ServiceAccount, ClusterRoleBinding, and the Prometheus resource instance. We have defined our own configuration in <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/prometheus.yml">this file</a>.
-<em>For your own deployment you have to change the target namespace, and the rules</em></p>
+<p>Prometheus deployment inside Kubernetes uses operator as defined in <a href="https://github.com/coreos/prometheus-operator">the coreos github</a>. The CRDs define a set of resources: the ServiceMonitor, PodMonitor, and PrometheusRule.</p>
+<p>Inside the <a href="https://github.com/strimzi/strimzi-kafka-operator">Strimzi github repository</a>, we can get a <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml">prometheus.yml</a> file to deploy prometheus server using the <a href="https://github.com/coreos/prometheus-operator">Prometheus operator</a>. This configuration defines, ClusterRole, ServiceAccount, ClusterRoleBinding, and the Prometheus resource instance. We have defined our own configuration in <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/prometheus.yml">this file</a>.</p>
+<p><em>For your own deployment you have to change the target namespace, and the rules</em></p>
 <p>You need to deploy Prometheus and all the other elements inside the same namespace or OpenShift project as the Kafka Cluster or the Mirror Maker 2 Cluster.</p>
-<p>To be able to monitor your own on-premise Kafka cluster you need to enable Prometheus metrics. An example of Kafka cluster Strimzi based deployment with Prometheus setting can be found <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/kafka-metrics.yaml">in Strimzi examples</a>. The declarations are under the <code>metrics</code> stanza and define the rules to expose Kafka core features.</p>
-<h3 id="install-prometheus">Install Prometheus</h3>
-<p>After creating a namespace or reusing the Kafka cluster namespace, you need to deploy the Prometheus operator by first downloading the different configuration yaml files and update the namespace declaration to reflect your project name (e.g <code>jb-kafka-strimzi</code>):</p>
-<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-deployment.yaml <span class="p">|</span> sed -e <span class="s2">&quot;s/namespace: default/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus-operator-deployment.yaml
+<p>To be able to monitor your own on-premise Kafka cluster, you need to enable Prometheus metrics. An example of Kafka cluster Strimzi based deployment with Prometheus setting can be found <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/openshift-strimzi/kafka-cluster.yaml">in our kafka cluster definition</a>. The declarations are under the <code>metrics</code> stanza and define the rules for exposing Kafka core features.</p>
+<h3 id="install-prometheus-operator">Install Prometheus Operator</h3>
+<p>We recommend reading <a href="https://github.com/coreos/prometheus-operator">Prometheus operator</a> product documentation. </p>
+<p>At a glance the Prometheus operator deploy and manage a prometheus server and watches new pods to monitor when they are scheduled within k8s. </p>
+<p><img alt="prometheus-operator architecture" src="https://raw.githubusercontent.com/coreos/prometheus-operator/master/Documentation/user-guides/images/architecture.png" /></p>
+<h5 id="source-prometheus-operator-architecture">Source: prometheus-operator architecture</h5>
+<p>After creating a namespace or reusing the Kafka cluster namespace, you need to deploy the Prometheus operator and related service account, cluster role, role binding... We have reuse the <code>monitoring/install/bundle.yaml</code> from Prometheus operator github, with a namespace sets for our project (e.g <code>jb-kafka-strimzi</code>):</p>
+<div class="codehilite"><pre><span></span>oc apply -f bundle.yaml
 </pre></div>
 
-<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role.yaml &gt; prometheus-operator-cluster-role.yaml
-</pre></div>
-
-<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role-binding.yaml <span class="p">|</span> sed -e <span class="s2">&quot;s/namespace: default/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus-operator-cluster-role-binding.yaml
-</pre></div>
-
-<div class="codehilite"><pre><span></span>curl -s https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-service-account.yaml <span class="p">|</span> sed -e <span class="s2">&quot;s/namespace: default/namespace: jb-kafka-strimzi/&quot;</span> &gt; prometheus-operator-service-account.yaml
-</pre></div>
-
-<div class="admonition note">
-<p class="admonition-title">Note<p>The <code>prometheus-operator-deployment.yaml</code> defines security context the operator pod will use. It is set as a non root user (unprivileged). If you need to change that, or reference an existing user modify this file.  </p>
-</p>
-</div>
-<p>Deploy the prometheus operator, cluster role, role binding and service account (see our files under <code>monitoring</code> folder):</p>
-<div class="codehilite"><pre><span></span>oc apply -f prometheus-operator-deployment.yaml
-oc apply -f prometheus-operator-cluster-role.yaml
-oc apply -f prometheus-operator-cluster-role-binding.yaml
-oc apply -f prometheus-operator-service-account.yaml
-</pre></div>
-
-<p>When you apply those configurations, the following resources are managed by the Prometheus Operator:</p>
+<p>When you apply those configurations, the following resources are visibles:</p>
 <table>
 <thead>
 <tr>
@@ -753,9 +803,12 @@ oc apply -f prometheus-operator-service-account.yaml
 </tr>
 </tbody>
 </table>
+<ul>
+<li>To delete the operator do: <code>oc delete -f bundle.yaml</code></li>
+</ul>
 <h3 id="deploy-prometheus">Deploy prometheus</h3>
 <div class="admonition note">
-<p class="admonition-title">Note<p>The following section is including the configuration of a Prometheus server monitoring a full Kafka Cluster. For Mirror Maker or Kafka Connect monitoring, the configuration will have less rules, and parameters. See <a href="#mirror-maker-monitoring">next section</a>.</p>
+<p class="admonition-title">Note<p>The following section is including the configuration of a Prometheus server monitoring a full Kafka Cluster. For Mirror Maker 2 or Kafka Connect monitoring, the configuration will have less rules, and parameters. See <a href="#mirror-maker-monitoring">next section</a>.</p>
 </p>
 </div>
 <p>Deploy the prometheus server by first changing the namespace and also by adapting <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml">the original examples/metrics/prometheus-install/prometheus.yaml file</a>.</p>
@@ -769,9 +822,19 @@ https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/master/examples
 
 <div class="codehilite"><pre><span></span>oc apply -f prometheus-rules.yaml
 oc apply -f prometheus.yaml
+<span class="c1"># once deploye, get the state of the server with</span>
+oc get prometheus
+NAME         VERSION   REPLICAS   AGE
+prometheus             <span class="m">1</span>          52s
 </pre></div>
 
-<p>The Prometheus server configuration uses service discovery to discover the pods (Mirror Maker 2.0 pod) in the cluster from which it gets metrics.</p>
+<p>The Prometheus server configuration uses service discovery to discover the pods (Mirror Maker 2.0 pod or kafka, zookeeper pods) in the cluster from which it gets metrics.</p>
+<h2 id="configure-monitoring">Configure monitoring</h2>
+<p>To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitoring.</p>
+<div class="codehilite"><pre><span></span>oc apply -f strimzi-service-monitor.yaml
+oc describe servicemonitor
+</pre></div>
+
 <h2 id="mirror-maker-20-monitoring">Mirror maker 2.0 monitoring</h2>
 <p>To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be <a href="https://github.com/prometheus/jmx_exporter">found here</a>. We copied a version in the folder <code>mirror-maker-2/libs</code>. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">Dockerfile</a> in this <a href="../mm2-provisioning/">separate note</a>. We have used this approach as we have found an issue with the Strimzi Mirror Maker operator, that blocks us to continue the monitoring. We expect that htis operator, when it sees metrics declaration in the Mirror Maker 2 configuration yaml file, with use the JMX exporter jar.</p>
 <p>Once the Mirror Maker 2.0 is connected...</p>
@@ -827,6 +890,11 @@ kubectl port-forward <span class="nv">$PODNAME</span> <span class="m">3000</span
 
 <div class="codehilite"><pre><span></span>oc create secret generic additional-scrape-configs --from-file<span class="o">=</span>./local-cluster/prometheus-additional.yaml --dry-run -o yaml <span class="p">|</span> kubectl apply -f -
 </pre></div>
+
+<h2 id="further-readings">Further Readings</h2>
+<ul>
+<li><a href="https://ibm.github.io/event-streams/tutorials/monitor-with-prometheus/">Monitoring Event Streams cluster health with Prometheus</a></li>
+</ul>
                 
                   
                 

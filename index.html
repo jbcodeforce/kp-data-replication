@@ -367,11 +367,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
     
     <label class="md-nav__link" for="nav-2">
-      Environment
+      Environment provisioning
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-2">
-        Environment
+        Environment provisioning
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -581,6 +581,18 @@
   <li class="md-nav__item">
     <a href="perf-tests/" title="Performance Tests" class="md-nav__link">
       Performance Tests
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="compendium/" title="Compendium" class="md-nav__link">
+      Compendium
     </a>
   </li>
 
@@ -812,14 +824,22 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <p>This main epic is related to provisioning operation.</p>
 <ol>
 <li>
-<p>As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters. 
-        * We are describing the MM2 provisioning in <a href="provisioning/#deploying-mirror-maker-2">this note</a>.</p>
+<p>As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.</p>
+<ul>
+<li>We are describing the MM2 provisioning in <a href="mm2-provisioning">this note</a>.</li>
+</ul>
 </li>
 <li>
-<p>As a SRE I want to understand the CLI commands used to assess how automation can be performed for replicating environment provisioning.</p>
+<p>As a SRE I want to understand the CLI commands used to assess to assess how the provisioning process can be automated.</p>
+<ul>
+<li>We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could <a href="mm2-provisioning#provisioning-automation">consider using Ansible</a> for automation.</li>
+</ul>
 </li>
 <li>
-<p>As a SRE I want to understand the server sizing for the Mirror Maker environment.</p>
+<p>As a SRE I want to understand the server sizing for the Mirror Maker environment so that I can understand how to use leanest resources for minimal needs.</p>
+<ul>
+<li>We talk about capacity planning in <a href="mm2-provisioning#capacity-planning">this section</a> and performance tests <a href="perf-tests">here</a>.</li>
+</ul>
 </li>
 </ol>
 <p><em>Note that, there is no specific user interface for mirror maker connector.</em></p>
@@ -835,7 +855,7 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <h3 id="security">Security</h3>
 <ol>
 <li>
-<p>As a SRE, I want to understand how the security support to connect client applications to cluster and to replicated topic.</p>
+<p>As a SRE, I want to understand how client applications authenticate to source and target clusters.</p>
 </li>
 <li>
 <p>As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.</p>
@@ -844,8 +864,10 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <h3 id="monitoring">Monitoring</h3>
 <ol>
 <li>
-<p>As a SRE, I want to get Mirror Maker 2 metrics for Prometheus so that it fits in my current metrics processing practices.
-    The explanation to setup Prometheus metris for mirror maker 2.0 is documented <a href="monitoring/">here</a>.</p>
+<p>As a SRE, I want to get Mirror Maker 2 metrics for Prometheus so that it fits in my current metrics processing practices.</p>
+<ul>
+<li>The explanation to setup Prometheus metris for mirror maker 2.0 is documented <a href="monitoring/">here</a>.</li>
+</ul>
 </li>
 <li>
 <p>As a SRE, I want to be able to add new dashboard into Grafana to visualize the Mirror Maker 2 metrics.</p>
@@ -854,13 +876,13 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <p>As a SRE, I want to define rules for alert reporting and configure a Slack channel for alerting.</p>
 </li>
 <li>
-<p>As a SRE, I want to get the Mirror Maker 2 logs into our Splunk logging platform.</p>
+<p>[Removed] As a SRE, I want to get the Mirror Maker 2 logs into our Splunk logging platform.</p>
 </li>
 </ol>
 <h3 id="best-practices">Best Practices</h3>
 <ol>
 <li>
-<p>As a developer I want to understand how Mirror Maker 2 based replication address the record duplication.</p>
+<p>As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication.</p>
 </li>
 <li>
 <p>As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.</p>
