@@ -6,15 +6,15 @@ metadata:
 spec:
   version: 2.4.0
   replicas: 1
-  connectCluster: "event-streams-wdc-as-target"
+  connectCluster: "kafka-on-premise-cluster"
   logging:
     type: inline
     loggers:
       connect.root.logger.level: "INFO"
   clusters:
-  - alias: "kafka-on-premise-cluster-source"
+  - alias: "kafka-on-premise-cluster"
     bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:9092
-  - alias: "event-streams-wdc-as-target"
+  - alias: "event-streams-wdc"
     bootstrapServers: broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093
     config:
       config.storage.replication.factor: 3
@@ -29,8 +29,8 @@ spec:
       username: token
       type: plain
   mirrors:
-  - sourceCluster: "event-streams-wdc-as-target"
-    targetCluster: "kafka-on-premise-cluster-source"
+  - sourceCluster: "event-streams-wdc"
+    targetCluster: "kafka-on-premise-cluster"
     sourceConnector:
       config:
           replication.factor: 1

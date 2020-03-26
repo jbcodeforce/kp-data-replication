@@ -250,3 +250,40 @@ For IT operation automation we can use [Ansible](https://www.ansible.com/resourc
 
 * Connect to local cluster: `oc exec -ti eda-demo-24-cluster-kafka-0 bash`
 * list the topics: `./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --list`
+* Get the description of the topics from one cluster:
+
+```
+ for t in $(./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --list)
+ do 
+ ./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --describe --topic $t
+ done
+```
+
+## Create MM2 topics manually
+
+Here are some examples of command to create topic to the target cluster
+
+If you want to delete the topic on your local cluster
+```
+ for t in $(/opt/kafka/bin/kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --list)
+ do 
+ ./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --delete --topic $t
+ done
+```
+
+To create the topics manually on the target cluster:exit
+
+```
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --create --partitions 5 --topic mm2-offset-syncs.kafka-on-premise-cluster-source.internal
+
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --create  --partitions 5 --replication-factor 3 --topic mirrormaker2-cluster-status
+
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --create  --partitions 25 --replication-factor 3 --topic mirrormaker2-cluster-offsets
+
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --create  --partitions 1 --replication-factor 3  --topic mirrormaker2-cluster-configs
+
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --create  --partitions 1 --replication-factor 3  --topic heartbeats
+
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --create  --partitions 1 --replication-factor 1  --topic  event-streams-wdc.checkpoints.internal
+
+```
