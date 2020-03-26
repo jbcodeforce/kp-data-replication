@@ -131,3 +131,5 @@ To get the certificate do the following steps:
     ```shell
     keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
     ```
+
+

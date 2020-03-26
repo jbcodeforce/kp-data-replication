@@ -18,9 +18,9 @@ We have also documented the replication approaches from Event Streams as a Servi
 
 This main epic is related to provisioning operation.
 
-1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.
+1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters to avoid exposing sensitive data.
 
-1. As a SRE I want to understand the CLI commands used to assess how automation can be performed for replicating environment provisioning.
+1. As a SRE I want to understand the CLI commands used to assess how the provisioning process can be automated. See the [note here](https://jbcodeforce.github.io/kp-data-replication/mm2-provisioning)
 
 1. As a SRE I want to understand the server sizing for the Mirror Maker environment.
 

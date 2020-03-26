@@ -1,10 +1,10 @@
 # Monitoring Mirror Maker and kafka connect cluster
 
-The goal of this note is to go over some of the details on how to monitor Mirror Maker 2.0 metrics to Prometheus and how to use Grafana dashboard.
+The goal of this note is to go over some of the details on how to monitor Mirror Maker 2.0 metrics using Prometheus and Grafana for the dashboard.
 
 [Prometheus](https://prometheus.io/docs/introduction/overview/) is an open source systems monitoring and alerting toolkit that, with Kubernetes, is part of the Cloud Native Computing Foundation. It can monitor multiple workloads but is normally used with container workloads.
 
-The following figure presents the prometheus generic architecture as described from their main website. Basically the Prometheus server hosts job to poll HTTP end points to get metrics from the components to monitor. It supports queries in the format of `PromQL`, that product like Grafana can use to present nice dashboards, and it can push alerts to different channels when some metrics behave unexpectedly.
+The following figure presents the prometheus generic architecture as described from the product main website. Basically the Prometheus server hosts job to poll HTTP end points to get metrics from the components to monitor. It supports queries in the format of `PromQL`, that product like Grafana can use to present nice dashboards, and it can push alerts to different channels when some metrics behave unexpectedly.
 
 ![Prometheus architecture](https://prometheus.io/assets/architecture.png)
 
@@ -24,14 +24,15 @@ To support this monitoring we need to do the following steps:
 
 ## Installation and configuration
 
-Prometheus deployment inside Kubernetes uses operator as defined in [the coreos github](https://github.com/coreos/prometheus-operator). The CRDs define a set of resources. The ServiceMonitor, PodMonitor, PrometheusRule are used.
+Prometheus deployment inside Kubernetes uses operator as defined in [the coreos github](https://github.com/coreos/prometheus-operator). The CRDs define a set of resources: the ServiceMonitor, PodMonitor, and PrometheusRule.
 
 Inside the [Strimzi github repository](https://github.com/strimzi/strimzi-kafka-operator), we can get a [prometheus.yml](https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml) file to deploy prometheus server. This configuration defines, ClusterRole, ServiceAccount, ClusterRoleBinding, and the Prometheus resource instance. We have defined our own configuration in [this file](https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/prometheus.yml).
+
 *For your own deployment you have to change the target namespace, and the rules*
 
 You need to deploy Prometheus and all the other elements inside the same namespace or OpenShift project as the Kafka Cluster or the Mirror Maker 2 Cluster.
 
-To be able to monitor your own on-premise Kafka cluster you need to enable Prometheus metrics. An example of Kafka cluster Strimzi based deployment with Prometheus setting can be found [in Strimzi examples](https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/kafka-metrics.yaml). The declarations are under the `metrics` stanza and define the rules to expose Kafka core features.
+To be able to monitor your own on-premise Kafka cluster, you need to enable Prometheus metrics. An example of Kafka cluster Strimzi based deployment with Prometheus setting can be found [in our kafka cluster definition](https://github.com/jbcodeforce/kp-data-replication/blob/master/openshift-strimzi/kafka-cluster.yaml). The declarations are under the `metrics` stanza and define the rules for exposing Kafka core features.
 
 ### Install Prometheus
 
@@ -82,7 +83,7 @@ When you apply those configurations, the following resources are managed by the 
 ### Deploy prometheus
 
 !!! Note
-        The following section is including the configuration of a Prometheus server monitoring a full Kafka Cluster. For Mirror Maker or Kafka Connect monitoring, the configuration will have less rules, and parameters. See [next section](#mirror-maker-monitoring).
+        The following section is including the configuration of a Prometheus server monitoring a full Kafka Cluster. For Mirror Maker 2 or Kafka Connect monitoring, the configuration will have less rules, and parameters. See [next section](#mirror-maker-monitoring).
 
 Deploy the prometheus server by first changing the namespace and also by adapting [the original examples/metrics/prometheus-install/prometheus.yaml file](https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml).
 
@@ -102,7 +103,7 @@ oc apply -f prometheus-rules.yaml
 oc apply -f prometheus.yaml
 ```
 
-The Prometheus server configuration uses service discovery to discover the pods (Mirror Maker 2.0 pod) in the cluster from which it gets metrics.
+The Prometheus server configuration uses service discovery to discover the pods (Mirror Maker 2.0 pod or kafka, zookeeper pods) in the cluster from which it gets metrics.
 
 ## Mirror maker 2.0 monitoring
 

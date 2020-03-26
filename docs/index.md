@@ -82,12 +82,17 @@ We have documented the replication from Event Streams as a Service to local clus
 
 This main epic is related to provisioning operation.
 
-1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters. 
-        * We are describing the MM2 provisioning in [this note](provisioning/#deploying-mirror-maker-2).
+1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.
 
-1. As a SRE I want to understand the CLI commands used to assess how automation can be performed for replicating environment provisioning.
+    * We are describing the MM2 provisioning in [this note](mm2-provisioning).
 
-1. As a SRE I want to understand the server sizing for the Mirror Maker environment.
+1. As a SRE I want to understand the CLI commands used to assess to assess how the provisioning process can be automated.
+
+    * We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could [consider using Ansible](mm2-provisioning#provisioning-automation) for automation.
+
+1. As a SRE I want to understand the server sizing for the Mirror Maker environment so that I can understand how to use leanest resources for minimal needs.
+
+    * We talk about capacity planning in [this section](mm2-provisioning#capacity-planning) and performance tests [here](perf-tests).
 
 *Note that, there is no specific user interface for mirror maker connector.*
 
@@ -99,24 +104,25 @@ This main epic is related to provisioning operation.
 
 ### Security
 
-1. As a SRE, I want to understand how the security support to connect client applications to cluster and to replicated topic.
+1. As a SRE, I want to understand how client applications authenticate to source and target clusters.
 
 1. As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.
 
 ### Monitoring
 
 1. As a SRE, I want to get Mirror Maker 2 metrics for Prometheus so that it fits in my current metrics processing practices.
-    The explanation to setup Prometheus metris for mirror maker 2.0 is documented [here](monitoring.md).
+
+    * The explanation to setup Prometheus metris for mirror maker 2.0 is documented [here](monitoring.md).
 
 1. As a SRE, I want to be able to add new dashboard into Grafana to visualize the Mirror Maker 2 metrics.
 
 1. As a SRE, I want to define rules for alert reporting and configure a Slack channel for alerting.
 
-1. As a SRE, I want to get the Mirror Maker 2 logs into our Splunk logging platform.
+1. [Removed] As a SRE, I want to get the Mirror Maker 2 logs into our Splunk logging platform.
 
 ### Best Practices
 
-1. As a developer I want to understand how Mirror Maker 2 based replication address the record duplication.
+1. As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication.
 
 1. As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.
 

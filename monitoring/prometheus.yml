@@ -43,7 +43,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: prometheus-server
-    namespace: jb-kafka-strimzi
+    namespace: eda-strimzi-kafka24
 
 ---
 apiVersion: monitoring.coreos.com/v1

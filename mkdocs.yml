@@ -2,7 +2,7 @@ site_name: Data Replication in context of Kafka and Event Streams
 repo_url: https://github.com/jbcodeforce/kp-data-replication.git
 nav:
   - Introduction: index.md
-  - Environment:
+  - Environment provisioning:
       - Run local kafka cluster with docker compose: dc-local.md
       - Strimzi Kafka 2.4 Provisioning on Openshift: provisioning.md
       - Mirror Maker 2 Provisioning: mm2-provisioning.md
@@ -18,6 +18,7 @@ nav:
   - Monitoring with Prometheus and Grafana: monitoring.md
   - Security: security.md
   - Performance Tests: perf-tests.md
+  - Compendium: compendium.md
 theme: 
   name: material
 extra_css: ["extra.css"]
