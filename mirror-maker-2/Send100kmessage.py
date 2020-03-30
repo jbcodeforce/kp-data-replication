@@ -69,7 +69,7 @@ def signal_handler(sig,frame):
 
 def parseArguments():
     version="0"
-    fileName="./data/products.json"
+    fileName="./data/data.json"
     size = 'small'
     if len(sys.argv) == 1:
         print("Usage: Send100kmessage  --file datafilename --size [small, medium, large, very-large]")
