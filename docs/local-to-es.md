@@ -120,9 +120,21 @@ The goal is to replicate the `products` topic from the left to the `source.produ
 What needs to be done:
 
 * Get a OpenShift cluster in the same data center as Event Streams service: See this [product introduction](https://cloud.ibm.com/kubernetes/catalog/about?platformType=openshift). It is used to deploy Mirror Maker 2, but for our test we use it as source cluster for replication too.
-* Run Mirror Maker 2. See the detail in this [provisioning note](mm2-provisioning.md).
+* Get the API KEY with manager role for event streams cluster and define a kubernetes secret: 
+
+* Run Mirror Maker 2 with the configuration as define in the file: ``. See next section for starting the MME or, read also some mirror maker 2 deployment details in this [provisioning note](mm2-provisioning.md). 
 * Start consumer on `source.products` topic
 * Run a producer to source topic named `products`
+
+### Run mirror maker 2
+
+* Create a topic to the target cluster: `mm2-offset-syncs.kafka-on-premise-cluster.internal` 
+
+```
+oc apply -f local-cluster/kafka-to-es-mm2.yml 
+```
+
+A new pod is created or if you have an existing mirror maker 2 depoyed the new configuration is added to your cluster.
 
 ### Run Consumer
 
@@ -140,7 +152,7 @@ sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule require
 ```shell
 docker run -ti -v $(pwd):/home strimzi/kafka:latest-kafka-2.4.0 bash
 bash-4.2$ source /home/setenv.sh
-bash-4.2$ ./bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TARGET_BROKERS --consumer.config /home/eventstream.properties --topic source.products --from-beginning
+bash-4.2$ ./bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TARGET_BROKERS --consumer.config /home/mirror-maker-2/eventstream.properties --topic source.products --from-beginning
 ```
 
 ### Produce records to local cluster
@@ -148,7 +160,8 @@ bash-4.2$ ./bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TARGET_BROKE
 * Start a producer to send product records to the source Kafka cluster. If you have done the scenario 1, the first product definitions may be already in the target cluster, so we can send a second batch of products using a second data file:
 
 ```shell
-export KAFKA_BROKERS="my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443"
+# Under the mirror-maker-2 folder
+export KAFKA_BROKERS="eda-demo-24-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443"
 export KAFKA_CERT="/home/ca.crt"
 docker run -ti -v $(pwd):/home --rm -e KAFKA_CERT=$KAFKA_CERT -e KAFKA_BROKERS=$KAFKA_BROKERS strimzi/kafka:latest-kafka-2.4.0 bash -c "/opt/kafka/bin/kafka-console-producer.sh --broker-list $KAFKA_BROKERS --producer.config /home/kafka-strimzi.properties --topic products"
 ```
@@ -156,7 +169,7 @@ docker run -ti -v $(pwd):/home --rm -e KAFKA_CERT=$KAFKA_CERT -e KAFKA_BROKERS=$
 As an alternate solution you can run the producer as a pod inside of the source cluster then send the product one by one using the console:
 
 ```shell
-oc run kafka-producer -ti --image=strimzi/kafka:latest-kafka-2.4.0  --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap:9092 --topic products
+oc run kafka-producer -ti --image=strimzi/kafka:latest-kafka-2.4.0  --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list eda-demo-24-cluster-kafka-bootstrap:9092 --topic products
 If you don t see a command prompt, try pressing enter.
 
 >{'product_id': 'P01', 'description': 'Carrots', 'target_temperature': 4, 'target_humidity_level': 0.4, 'content_type': 1}

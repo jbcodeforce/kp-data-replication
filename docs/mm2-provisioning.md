@@ -58,6 +58,8 @@ If you have already installed Strimzi Operators, Cluster Roles, and CRDs, you do
       type: plain
 ```
 
+The example above use a secret to get the Event Streams API KEY, which as create with a command like: `oc create secret generic es-api-secret --from-literal=password=<replace with ES key>`
+
 * Deploy Mirror maker 2.0 within your project.
 
 ```shell

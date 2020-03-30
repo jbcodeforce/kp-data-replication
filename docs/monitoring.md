@@ -48,6 +48,8 @@ After creating a namespace or reusing the Kafka cluster namespace, you need to d
 
 ```shell
 oc apply -f bundle.yaml
+# Authorise the prometheus-operator to do cluster work
+oc adm policy add-cluster-role-to-user prometheus-operator --serviceaccount prometheus-operator -n eda-strimzi-kafka24
 ```
 
 When you apply those configurations, the following resources are visibles:

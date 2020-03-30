@@ -101,7 +101,7 @@ We are reusing the Event Streams on Cloud cluster on Washington DC data center a
 1. To validate the target `source.products` topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.
 
   ```shell
-  oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
+  oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
 
   If you don't see a command prompt, try pressing enter.
 

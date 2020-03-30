@@ -242,7 +242,7 @@ oc get routes my-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{
 
 ```shell
 oc get secrets
-oc extract secret/my-cluster-cluster-ca-cert --keys=ca.crt --to=- > ca.crt
+oc extract secret/eda-demo-24-cluster-cluster-ca-cert --keys=ca.crt --to=- > ca.crt
 # transform it fo java truststore
 keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
 ```
@@ -255,7 +255,7 @@ keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks 
 docker run -ti -v $(pwd):/home strimzi/kafka:latest-kafka-2.4.0  bash
 # inside the container uses the consumer tool
 bash-4.2$ cd /opt/kafka/bin
-bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --consumer-property security.protocol=SSL --consumer-property ssl.truststore.password=password --consumer-property ssl.truststore.location=/home/truststore.jks --topic test --from-beginning
+bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --consumer-property security.protocol=SSL --consumer-property ssl.truststore.password=password --consumer-property ssl.truststore.location=/home/truststore.jks --topic test --from-beginning
 ```
 
 * For a producer the approach is the same but using the producer properties:
@@ -267,7 +267,7 @@ bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  my-cluster-kafka-boots
 Those properties can be in file
 
 ```shell
-bootstrap.servers=my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud
+bootstrap.servers=eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud
 security.protocol=SSL
 ssl.truststore.password=password
 ssl.truststore.location=/home/truststore.jks
@@ -276,7 +276,7 @@ ssl.truststore.location=/home/truststore.jks
 and then use the following parameters in the command line:
 
 ```shell
-./kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer.config /home/strimzi.properties --topic test
+./kafka-console-producer.sh --broker-list eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer.config /home/strimzi.properties --topic test
 
-./kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic test  --consumer.config /home/strimzi.properties --from-beginning
+./kafka-console-consumer.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic test  --consumer.config /home/strimzi.properties --from-beginning
 ```

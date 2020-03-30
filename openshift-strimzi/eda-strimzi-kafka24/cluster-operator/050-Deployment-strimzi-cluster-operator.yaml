@@ -19,7 +19,7 @@ spec:
       serviceAccountName: strimzi-cluster-operator
       containers:
       - name: strimzi-cluster-operator
-        image: strimzi/operator:0.17.0-rc4
+        image: strimzi/operator:0.17.0
         args:
         - /opt/strimzi/bin/cluster_operator_run.sh
         env:
