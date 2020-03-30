@@ -981,7 +981,7 @@ oc run kafka-producer -ti --image<span class="o">=</span>strimzi/kafka:latest-ka
 <li>Get the TLS certificate from the broker</li>
 </ul>
 <div class="codehilite"><pre><span></span>oc get secrets
-oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
+oc extract secret/eda-demo-24-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
 <span class="c1"># transform it fo java truststore</span>
 keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
 </pre></div>
@@ -993,7 +993,7 @@ keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks 
 <div class="codehilite"><pre><span></span>docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home strimzi/kafka:latest-kafka-2.4.0  bash
 <span class="c1"># inside the container uses the consumer tool</span>
 bash-4.2$ <span class="nb">cd</span> /opt/kafka/bin
-bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --consumer-property security.protocol<span class="o">=</span>SSL --consumer-property ssl.truststore.password<span class="o">=</span>password --consumer-property ssl.truststore.location<span class="o">=</span>/home/truststore.jks --topic <span class="nb">test</span> --from-beginning
+bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --consumer-property security.protocol<span class="o">=</span>SSL --consumer-property ssl.truststore.password<span class="o">=</span>password --consumer-property ssl.truststore.location<span class="o">=</span>/home/truststore.jks --topic <span class="nb">test</span> --from-beginning
 </pre></div>
 
 <ul>
@@ -1003,16 +1003,16 @@ bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  my-cluster-kafka-boots
 </pre></div>
 
 <p>Those properties can be in file</p>
-<div class="codehilite"><pre><span></span>bootstrap.servers<span class="o">=</span>my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud
+<div class="codehilite"><pre><span></span>bootstrap.servers<span class="o">=</span>eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud
 security.protocol<span class="o">=</span>SSL
 ssl.truststore.password<span class="o">=</span>password
 ssl.truststore.location<span class="o">=</span>/home/truststore.jks
 </pre></div>
 
 <p>and then use the following parameters in the command line:</p>
-<div class="codehilite"><pre><span></span>./kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer.config /home/strimzi.properties --topic <span class="nb">test</span>
+<div class="codehilite"><pre><span></span>./kafka-console-producer.sh --broker-list eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer.config /home/strimzi.properties --topic <span class="nb">test</span>
 
-./kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic <span class="nb">test</span>  --consumer.config /home/strimzi.properties --from-beginning
+./kafka-console-consumer.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443  --topic <span class="nb">test</span>  --consumer.config /home/strimzi.properties --from-beginning
 </pre></div>
                 
                   

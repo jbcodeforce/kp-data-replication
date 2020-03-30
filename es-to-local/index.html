@@ -681,7 +681,7 @@ docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span clas
 <p>To validate the target <code>source.products</code> topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.</p>
 </li>
 </ol>
-<div class="codehilite"><pre><span></span>oc run kafka-consumer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0 --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
+<div class="codehilite"><pre><span></span>oc run kafka-consumer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0 --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-consumer.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
 
 If you don<span class="err">&#39;</span>t see a <span class="nb">command</span> prompt, try pressing enter.
 

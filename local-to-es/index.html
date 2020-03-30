@@ -366,6 +366,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#run-mirror-maker-2" title="Run mirror maker 2" class="md-nav__link">
+    Run mirror maker 2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#run-consumer" title="Run Consumer" class="md-nav__link">
     Run Consumer
   </a>
@@ -580,6 +587,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#run-mirror-maker-2" title="Run mirror maker 2" class="md-nav__link">
+    Run mirror maker 2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#run-consumer" title="Run Consumer" class="md-nav__link">
     Run Consumer
   </a>
@@ -759,10 +773,23 @@ $ /home/local-cluster/launchMM2.sh
 <p>What needs to be done:</p>
 <ul>
 <li>Get a OpenShift cluster in the same data center as Event Streams service: See this <a href="https://cloud.ibm.com/kubernetes/catalog/about?platformType=openshift">product introduction</a>. It is used to deploy Mirror Maker 2, but for our test we use it as source cluster for replication too.</li>
-<li>Run Mirror Maker 2. See the detail in this <a href="../mm2-provisioning/">provisioning note</a>.</li>
+<li>
+<p>Get the API KEY with manager role for event streams cluster and define a kubernetes secret: </p>
+</li>
+<li>
+<p>Run Mirror Maker 2 with the configuration as define in the file: ``. See next section for starting the MME or, read also some mirror maker 2 deployment details in this <a href="../mm2-provisioning/">provisioning note</a>. </p>
+</li>
 <li>Start consumer on <code>source.products</code> topic</li>
 <li>Run a producer to source topic named <code>products</code></li>
 </ul>
+<h3 id="run-mirror-maker-2">Run mirror maker 2</h3>
+<ul>
+<li>Create a topic to the target cluster: <code>mm2-offset-syncs.kafka-on-premise-cluster.internal</code> </li>
+</ul>
+<div class="codehilite"><pre><span></span>oc apply -f local-cluster/kafka-to-es-mm2.yml 
+</pre></div>
+
+<p>A new pod is created or if you have an existing mirror maker 2 depoyed the new configuration is added to your cluster.</p>
 <h3 id="run-consumer">Run Consumer</h3>
 <p>To validate the replication works, we will connect a consumer to the <code>source.products</code> topic on Event Streams. So we define a target cluster property file (<code>eventstreams.properties</code>) like:</p>
 <div class="codehilite"><pre><span></span><span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
@@ -776,20 +803,21 @@ $ /home/local-cluster/launchMM2.sh
 </ul>
 <div class="codehilite"><pre><span></span>docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home strimzi/kafka:latest-kafka-2.4.0 bash
 bash-4.2$ <span class="nb">source</span> /home/setenv.sh
-bash-4.2$ ./bin/kafka-console-consumer.sh --bootstrap-server <span class="nv">$KAFKA_TARGET_BROKERS</span> --consumer.config /home/eventstream.properties --topic source.products --from-beginning
+bash-4.2$ ./bin/kafka-console-consumer.sh --bootstrap-server <span class="nv">$KAFKA_TARGET_BROKERS</span> --consumer.config /home/mirror-maker-2/eventstream.properties --topic source.products --from-beginning
 </pre></div>
 
 <h3 id="produce-records-to-local-cluster">Produce records to local cluster</h3>
 <ul>
 <li>Start a producer to send product records to the source Kafka cluster. If you have done the scenario 1, the first product definitions may be already in the target cluster, so we can send a second batch of products using a second data file:</li>
 </ul>
-<div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="s2">&quot;my-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443&quot;</span>
+<div class="codehilite"><pre><span></span><span class="c1"># Under the mirror-maker-2 folder</span>
+<span class="nb">export</span> <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="s2">&quot;eda-demo-24-cluster-kafka-bootstrap-jb-kafka-strimzi.gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443&quot;</span>
 <span class="nb">export</span> <span class="nv">KAFKA_CERT</span><span class="o">=</span><span class="s2">&quot;/home/ca.crt&quot;</span>
 docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home --rm -e <span class="nv">KAFKA_CERT</span><span class="o">=</span><span class="nv">$KAFKA_CERT</span> -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> strimzi/kafka:latest-kafka-2.4.0 bash -c <span class="s2">&quot;/opt/kafka/bin/kafka-console-producer.sh --broker-list </span><span class="nv">$KAFKA_BROKERS</span><span class="s2"> --producer.config /home/kafka-strimzi.properties --topic products&quot;</span>
 </pre></div>
 
 <p>As an alternate solution you can run the producer as a pod inside of the source cluster then send the product one by one using the console:</p>
-<div class="codehilite"><pre><span></span>oc run kafka-producer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0  --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap:9092 --topic products
+<div class="codehilite"><pre><span></span>oc run kafka-producer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0  --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-producer.sh --broker-list eda-demo-24-cluster-kafka-bootstrap:9092 --topic products
 If you don t see a <span class="nb">command</span> prompt, try pressing enter.
 
 &gt;<span class="o">{</span><span class="s1">&#39;product_id&#39;</span>: <span class="s1">&#39;P01&#39;</span>, <span class="s1">&#39;description&#39;</span>: <span class="s1">&#39;Carrots&#39;</span>, <span class="s1">&#39;target_temperature&#39;</span>: <span class="m">4</span>, <span class="s1">&#39;target_humidity_level&#39;</span>: <span class="m">0</span>.4, <span class="s1">&#39;content_type&#39;</span>: <span class="m">1</span><span class="o">}</span>

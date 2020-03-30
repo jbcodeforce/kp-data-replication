@@ -754,6 +754,8 @@
 <h5 id="source-prometheus-operator-architecture">Source: prometheus-operator architecture</h5>
 <p>After creating a namespace or reusing the Kafka cluster namespace, you need to deploy the Prometheus operator and related service account, cluster role, role binding... We have reuse the <code>monitoring/install/bundle.yaml</code> from Prometheus operator github, with a namespace sets for our project (e.g <code>jb-kafka-strimzi</code>):</p>
 <div class="codehilite"><pre><span></span>oc apply -f bundle.yaml
+<span class="c1"># Authorise the prometheus-operator to do cluster work</span>
+oc adm policy add-cluster-role-to-user prometheus-operator --serviceaccount prometheus-operator -n eda-strimzi-kafka24
 </pre></div>
 
 <p>When you apply those configurations, the following resources are visibles:</p>
