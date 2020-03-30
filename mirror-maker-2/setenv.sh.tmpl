@@ -1,8 +1,12 @@
-# SCENARIO 1 & 2 local to event streams
-# localhost kafka cluster as source
-export KAFKA_SOURCE_BROKERS=kafka1:9092,kafka2:9093,kafka3:9094
-# event streams as target cluster
-export KAFKA_TARGET_BROKERS=broker-3-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093
-export KAFKA_TARGET_APIKEY=...
-
-# SCENARIO 3
+export KAFKA_TARGET_BROKERS=XXXXX
+export KAFKA_SOURCE_BROKERS=XXXXX
+export KAFKA_SOURCE_APIKEY="XXXXX"
+# same as KAFKA_TARGET_BROKERS
+export KAFKA_BROKERS=XXXXX
+export KAFKA_APIKEY="XXXXX"
+export KAFKA_USER="token"
+export KAFKA_PWD="XXXXX"
+# where are you getting data from for mirror maker
+export KAFKA_SOURCE_TOPIC="orders"
+# where are you storing data
+export KAFKA_TARGET_TOPIC="source.orders"
