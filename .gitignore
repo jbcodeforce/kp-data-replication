@@ -19,3 +19,4 @@ mirror-maker-2/str.crt
 mirror-maker-2/ca.pem
 mirror-maker-2/setenv.sh
 mirror-maker-2/truststore.jks
+perf-tests/kafka/__pycache__/
