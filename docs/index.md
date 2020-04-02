@@ -84,15 +84,15 @@ This main epic is related to provisioning operation.
 
 1. As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.
 
-    * We are describing the MM2 provisioning in [this note](mm2-provisioning).
+    * We are describing the MM2 deployment with secrets in [this section](mm2-provisioning/#deploying-using-strimzi-mirror-maker-operator).
 
 1. As a SRE I want to understand the CLI commands used to assess to assess how the provisioning process can be automated.
 
-    * We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could [consider using Ansible](mm2-provisioning#provisioning-automation) for automation.
+    * We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could [consider using Ansible](mm2-provisioning#provisioning-automation) for automation. 
 
 1. As a SRE I want to understand the server sizing for the Mirror Maker environment so that I can understand how to use leanest resources for minimal needs.
 
-    * We talk about capacity planning in [this section](mm2-provisioning#capacity-planning) and performance tests [here](perf-tests).
+    * We talk about capacity planning in [this section](mm2-provisioning#capacity-planning) and performance tests [in a separate note](perf-tests).
 
 *Note that, there is no specific user interface for mirror maker connector.*
 

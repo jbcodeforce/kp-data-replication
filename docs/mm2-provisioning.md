@@ -237,6 +237,13 @@ If we need to run a custom Mirror Maker 2, we have documented in [the section ab
 
 For IT operation automation we can use [Ansible](https://www.ansible.com/resources/videos/quick-start-video) to define a playbook to provision the Mirror Maker 2 environment. The [Strimzi Ansible playbook](https://github.com/rmarting/strimzi-ansible-playbook) repository containts playbook examples for creating cluster roles and service accounts and deploy operators.
 
+The automation approach will include:
+
+* Deploy all cluster objects needed into a OpenShift cluster: Cluster Roles, Strimzi CRDs: Kafka, KafkaTopic, KafkaUser, Kafka connect, mirror maker(s).
+* Deploy all namespaced objects needed into an OpenShift namespace: Service Accounts, Cluster Role Bindings and Role Bindings, Cluster Operator deployment.
+* Deploy the kafka cluster if needed.
+* Deploy the different mirror maker 2 instances.
+
 ## Typical errors in Mirror Maker 2 traces
 
 * Plugin class loader for connector: 'org.apache.kafka.connect.mirror.MirrorCheckpointConnector' was not found. 
