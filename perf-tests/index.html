@@ -626,23 +626,27 @@ java -jar target/es-producer.jar -t <span class="nb">test</span> -s large
 
 <p>To build the jar, we have cloned the repository under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">event-streams-sample-producer-1.1.0</a> and build the jar with <code>mvn package</code>.</p>
 <p>Here is an example of call to this performance producer</p>
-<p><div class="codehilite"><pre><span></span> java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
+<div class="codehilite"><pre><span></span> java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
  <span class="sb">```</span>
 
 <span class="c1">## Measurements</span>
 
 This is the <span class="nb">type</span> of traces reported.
+
+<span class="sb">```</span>shell
+<span class="m">1261</span> records sent, <span class="m">251</span>.8 records/sec <span class="o">(</span><span class="m">0</span>.97 MB/sec<span class="o">)</span>, <span class="m">2233</span>.3 ms avg latency, <span class="m">3320</span>.0 max latency.
+<span class="m">2848</span> records sent, <span class="m">569</span>.5 records/sec <span class="o">(</span><span class="m">2</span>.19 MB/sec<span class="o">)</span>, <span class="m">5797</span>.0 ms avg latency, <span class="m">8294</span>.0 max latency.
+<span class="m">2840</span> records sent, <span class="m">567</span>.8 records/sec <span class="o">(</span><span class="m">2</span>.19 MB/sec<span class="o">)</span>, <span class="m">10760</span>.9 ms avg latency, <span class="m">13288</span>.0 max latency.
+
+..
+
+<span class="m">60000</span> records sent, <span class="m">490</span>.869821 records/sec <span class="o">(</span><span class="m">1</span>.89 MB/sec<span class="o">)</span>, <span class="m">14698</span>.93 ms avg latency, <span class="m">24949</span>.00 ms max latency, <span class="m">14490</span> ms 50th, <span class="m">22298</span> ms 95th, <span class="m">23413</span> ms 99th, <span class="m">24805</span> ms <span class="m">99</span>.9th.
 </pre></div>
-1261 records sent, 251.8 records/sec (0.97 MB/sec), 2233.3 ms avg latency, 3320.0 max latency.
-2848 records sent, 569.5 records/sec (2.19 MB/sec), 5797.0 ms avg latency, 8294.0 max latency.
-2840 records sent, 567.8 records/sec (2.19 MB/sec), 10760.9 ms avg latency, 13288.0 max latency.</p>
-<p>....</p>
-<p>60000 records sent, 490.869821 records/sec (1.89 MB/sec), 14698.93 ms avg latency, 24949.00 ms max latency, 14490 ms 50<sup>th</sup>, 22298 ms 95<sup>th</sup>, 23413 ms 99<sup>th</sup>, 24805 ms 99.9<sup>th</sup>.
-<div class="codehilite"><pre><span></span>Adding the consumer is simple, start a python environment using docker image
+
+<p>Adding the consumer is simple, start a python environment using docker image</p>
+<div class="codehilite"><pre><span></span>docker run -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> --rm -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home -it  ibmcase/python37 bash
+$ python consumer/PerfConsumer.py
 </pre></div>
-docker run -e KAFKA_BROKERS=$KAFKA_BROKERS --rm -v $(pwd):/home -it  ibmcase/python37 bash
-$ python 
-```</p>
                 
                   
                 
