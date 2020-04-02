@@ -486,22 +486,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#tools-used" title="Tools used" class="md-nav__link">
-    Tools used
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#test-approach" title="Test approach" class="md-nav__link">
     Test approach
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#measurements" title="Measurements" class="md-nav__link">
-    Measurements
   </a>
   
 </li>
@@ -550,22 +536,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#tools-used" title="Tools used" class="md-nav__link">
-    Tools used
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#test-approach" title="Test approach" class="md-nav__link">
     Test approach
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#measurements" title="Measurements" class="md-nav__link">
-    Measurements
   </a>
   
 </li>
@@ -590,10 +562,87 @@
                 
                 
                 <h1 id="performance-tests">Performance tests</h1>
+<p>The mirroring performance test is based on the following architecture: </p>
 <p><img alt="" src="../images/perf-test-env.png" /></p>
-<h2 id="tools-used">Tools used</h2>
+<p>A producer code based on the <a href="https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java">Kafka producer performance tool</a> which can read data from a file and generate n records to the source topic. It reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.</p>
+<p>This tool can also use transaction. The arguments supported are:</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>--record-size <code>value</code>&gt; or --payload-file <code>filename</code></td>
+<td>one is mandatory but not both. Work only for UTF-8 encoded text files</td>
+</tr>
+<tr>
+<td>--topic <code>name</code></td>
+<td>mandatory</td>
+</tr>
+<tr>
+<td>--num-records <code>value</code></td>
+<td>mandatory</td>
+</tr>
+<tr>
+<td>--payload-delimiter <code>char</code></td>
+<td>delimiter to be used when --payload-file is provided. Default is \n</td>
+</tr>
+<tr>
+<td>--throughput <code>value</code></td>
+<td>Throttle to value messages/sec. -1 to disable throtlling</td>
+</tr>
+<tr>
+<td>--producer.config <code>filename</code></td>
+<td>producer config properties file</td>
+</tr>
+<tr>
+<td>--producer-props <code>prop_name=value</code></td>
+<td>producer configuration properties</td>
+</tr>
+<tr>
+<td>--print-metrics <code>true|false</code></td>
+<td>Default to true</td>
+</tr>
+<tr>
+<td>--transactional-id <code>value</code></td>
+<td>Test with transaction</td>
+</tr>
+<tr>
+<td>--transaction-duration-ms <code>value</code></td>
+<td>The max age of each transaction. Test with transaction if v&gt;0</td>
+</tr>
+</tbody>
+</table>
+<p>IBM Event Stream provides a wrapper on top of this tool to communicate with Event streams. <a href="https://ibm.github.io/event-streams/getting-started/testing-loads/">This article</a> explains how to use the tool.</p>
 <h2 id="test-approach">Test approach</h2>
-<h2 id="measurements">Measurements</h2>
+<p>Using IBM event streams producer tool we can run 3 different workload size, the payload is generated with random bytes or with records read from a data file.</p>
+<div class="codehilite"><pre><span></span>java -jar target/es-producer.jar -t <span class="nb">test</span> -s small
+java -jar target/es-producer.jar -t <span class="nb">test</span> -s medium
+java -jar target/es-producer.jar -t <span class="nb">test</span> -s large
+</pre></div>
+
+<p>To build the jar, we have cloned the repository under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">event-streams-sample-producer-1.1.0</a> and build the jar with <code>mvn package</code>.</p>
+<p>Here is an example of call to this performance producer</p>
+<p><div class="codehilite"><pre><span></span> java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
+ <span class="sb">```</span>
+
+<span class="c1">## Measurements</span>
+
+This is the <span class="nb">type</span> of traces reported.
+</pre></div>
+1261 records sent, 251.8 records/sec (0.97 MB/sec), 2233.3 ms avg latency, 3320.0 max latency.
+2848 records sent, 569.5 records/sec (2.19 MB/sec), 5797.0 ms avg latency, 8294.0 max latency.
+2840 records sent, 567.8 records/sec (2.19 MB/sec), 10760.9 ms avg latency, 13288.0 max latency.</p>
+<p>....</p>
+<p>60000 records sent, 490.869821 records/sec (1.89 MB/sec), 14698.93 ms avg latency, 24949.00 ms max latency, 14490 ms 50<sup>th</sup>, 22298 ms 95<sup>th</sup>, 23413 ms 99<sup>th</sup>, 24805 ms 99.9<sup>th</sup>.
+<div class="codehilite"><pre><span></span>Adding the consumer is simple, start a python environment using docker image
+</pre></div>
+docker run -e KAFKA_BROKERS=$KAFKA_BROKERS --rm -v $(pwd):/home -it  ibmcase/python37 bash
+$ python 
+```</p>
                 
                   
                 

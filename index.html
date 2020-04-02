@@ -826,19 +826,19 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <li>
 <p>As a SRE I want to provision and deploy Mirror Maker 2 connector to existing Openshift cluster without exposing password and keys so replication can start working. This will use Kubernetes secrets for configuration parameters.</p>
 <ul>
-<li>We are describing the MM2 provisioning in <a href="mm2-provisioning">this note</a>.</li>
+<li>We are describing the MM2 deployment with secrets in <a href="mm2-provisioning/#deploying-using-strimzi-mirror-maker-operator">this section</a>.</li>
 </ul>
 </li>
 <li>
 <p>As a SRE I want to understand the CLI commands used to assess to assess how the provisioning process can be automated.</p>
 <ul>
-<li>We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could <a href="mm2-provisioning#provisioning-automation">consider using Ansible</a> for automation.</li>
+<li>We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could <a href="mm2-provisioning#provisioning-automation">consider using Ansible</a> for automation. </li>
 </ul>
 </li>
 <li>
 <p>As a SRE I want to understand the server sizing for the Mirror Maker environment so that I can understand how to use leanest resources for minimal needs.</p>
 <ul>
-<li>We talk about capacity planning in <a href="mm2-provisioning#capacity-planning">this section</a> and performance tests <a href="perf-tests">here</a>.</li>
+<li>We talk about capacity planning in <a href="mm2-provisioning#capacity-planning">this section</a> and performance tests <a href="perf-tests">in a separate note</a>.</li>
 </ul>
 </li>
 </ol>

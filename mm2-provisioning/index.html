@@ -919,6 +919,13 @@ mm2-cluster   <span class="m">1</span>
 <p>If we need to run a custom Mirror Maker 2, we have documented in <a href="#">the section above</a> on how to use Dockerfile and properties file and deployment descriptor to do the deployment on kubernetes or OpenShift cluster.</p>
 <h2 id="provisioning-automation">Provisioning automation</h2>
 <p>For IT operation automation we can use <a href="https://www.ansible.com/resources/videos/quick-start-video">Ansible</a> to define a playbook to provision the Mirror Maker 2 environment. The <a href="https://github.com/rmarting/strimzi-ansible-playbook">Strimzi Ansible playbook</a> repository containts playbook examples for creating cluster roles and service accounts and deploy operators.</p>
+<p>The automation approach will include:</p>
+<ul>
+<li>Deploy all cluster objects needed into a OpenShift cluster: Cluster Roles, Strimzi CRDs: Kafka, KafkaTopic, KafkaUser, Kafka connect, mirror maker(s).</li>
+<li>Deploy all namespaced objects needed into an OpenShift namespace: Service Accounts, Cluster Role Bindings and Role Bindings, Cluster Operator deployment.</li>
+<li>Deploy the kafka cluster if needed.</li>
+<li>Deploy the different mirror maker 2 instances.</li>
+</ul>
 <h2 id="typical-errors-in-mirror-maker-2-traces">Typical errors in Mirror Maker 2 traces</h2>
 <ul>
 <li>Plugin class loader for connector: 'org.apache.kafka.connect.mirror.MirrorCheckpointConnector' was not found. <ul>
