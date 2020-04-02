@@ -46,19 +46,20 @@ Here is an example of call to this performance producer
 
 This is the type of traces reported.
 
-```
+```shell
 1261 records sent, 251.8 records/sec (0.97 MB/sec), 2233.3 ms avg latency, 3320.0 max latency.
 2848 records sent, 569.5 records/sec (2.19 MB/sec), 5797.0 ms avg latency, 8294.0 max latency.
 2840 records sent, 567.8 records/sec (2.19 MB/sec), 10760.9 ms avg latency, 13288.0 max latency.
 
-....
+..
 
 60000 records sent, 490.869821 records/sec (1.89 MB/sec), 14698.93 ms avg latency, 24949.00 ms max latency, 14490 ms 50th, 22298 ms 95th, 23413 ms 99th, 24805 ms 99.9th.
 ```
 
 Adding the consumer is simple, start a python environment using docker image
 
-```
+```shell
 docker run -e KAFKA_BROKERS=$KAFKA_BROKERS --rm -v $(pwd):/home -it  ibmcase/python37 bash
-$ python 
+$ python consumer/PerfConsumer.py
 ```
+

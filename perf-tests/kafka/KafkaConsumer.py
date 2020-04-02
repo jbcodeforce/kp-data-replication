@@ -42,6 +42,7 @@ class KafkaConsumer:
     # Prints out and returns the decoded events received by the consumer
     def traceResponse(self, msg):
         msgStr = msg.value().decode('utf-8')
+        print(msgStr)
         print('[KafkaConsumer] - @@@ pollNextRecord {} partition: [{}] at offset {} with key {}:\n\tvalue: {}'
                     .format(msg.topic(), msg.partition(), msg.offset(), str(msg.key()), msgStr ))
         return msgStr
