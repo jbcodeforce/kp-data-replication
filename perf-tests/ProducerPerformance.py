@@ -1,5 +1,6 @@
 import time 
 import json, os, sys
+
 from kafka.KafkaProducer import KafkaProducer
 import kafka.EventBackboneConfiguration as ebc
 
@@ -59,9 +60,11 @@ def processRecords(nb_records, topicname, keyname,docsToSend):
         b =  nb_records % len(docsToSend)
         for i in range(0,int(a)):
             for doc in docsToSend:
+                doc['timestamp'] = time.time()
                 print("sending -> " + str(doc))
                 producer.publishEvent(doc,keyname)
         for i in range(0,int(b)):
+            docsToSend['timestamp'] = time.time()
             print("sending -> " + str(docsToSend[i]))
             producer.publishEvent(docsToSend[i],keyname)
     except KeyboardInterrupt:
