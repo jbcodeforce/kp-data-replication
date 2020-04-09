@@ -41,7 +41,7 @@ class KafkaProducer:
     def publishEvent(self, eventToSend, keyName):
         dataStr = json.dumps(eventToSend)
         self.producer.produce(self.topic_name,
-                            key=str(eventToSend[keyName]),
+                            key=str(eventToSend[keyName]).encode('utf-8'),
                             value=dataStr.encode('utf-8'), 
                             callback=self.delivery_report)
         self.producer.flush()

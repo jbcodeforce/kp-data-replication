@@ -51,9 +51,9 @@ The checkpoint and offset_synch topics enable replication to be fully restored f
 
 ## Record duplication
 
-Exactly-once delivery is difficult to achieve in distributed system. In the case of Kafka producer, brokers, and consumers are working together to ensure only one message is processed end to end. With coding practice and configuration, within a unique cluster, Kafka can guaranty exactly once processing. No duplication between producer and broker, and committed read on consumer side is not reprocessed in case of consumer restarts.
+Exactly-once delivery is difficult to achieve in distributed system. In the case of Kafka producer, brokers, and consumers are working together to ensure only one message is processed end to end. With coding practice and configuration, within a unique cluster, Kafka can guarantee exactly once processing. No duplication between producer and broker, and committed read on consumer side is not reprocessed in case of consumer restarts.
 
-Cross cluster replications are traditionally based on at least once approach. Duplicate can happen when consumer task stop before committing its offset to the source topic. A restart will load records from the last committed offset which can generate duplicate. The following diagram illustrate this case:
+Cross cluster replications are traditionally based on at least once approach. Duplicate can happen when consumer task stops before committing its offset to the source topic. A restart will load records from the last committed offset which can generate duplicate. The following diagram illustrate this case:
 
 ![]()
 

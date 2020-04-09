@@ -23,12 +23,14 @@ def parseArguments():
 
 if __name__ == "__main__":
     TOPICNAME = parseArguments()
-    CONSUMERGROUP = "OperatorConsumer-group-1"
+    CONSUMERGROUP = "PerfConsumer-group-1"
     print("Consumer from the topic " + TOPICNAME)
     try:
         consumer = KafkaConsumer(kafka_brokers = ebc.getBrokerEndPoints(), 
                 kafka_apikey = ebc.getEndPointAPIKey(), 
                 kafka_cacert = ebc.getKafkaCertificate(),
+                autocommit = False,
+                fromWhere = 'earliest',
                 topic_name = TOPICNAME)
         consumer.prepare(CONSUMERGROUP)
         delta = 0
