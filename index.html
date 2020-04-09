@@ -931,14 +931,18 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <h3 id="best-practices">Best Practices</h3>
 <ol>
 <li>
-<p>As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication.</p>
+<p>As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication. </p>
+<ul>
+<li>Here is <a href="consideration#record-duplication">a note on records duplication</a>.</li>
+</ul>
 </li>
 <li>
 <p>As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.</p>
+<ul>
+<li>Lag will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally. </li>
+</ul>
 </li>
-<li>
-<p>As a developer I want to understand what are the condition for message loss.</p>
-</li>
+<li>As a developer I want to understand what are the condition for message loss.</li>
 </ol>
 <h3 id="performance-tests">Performance  tests</h3>
 <ol>
