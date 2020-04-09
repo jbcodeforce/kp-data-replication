@@ -476,11 +476,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
     
     <label class="md-nav__link" for="nav-4">
-      Apache Kafka practices
+      Best practices
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-4">
-        Apache Kafka practices
+        Best practices
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -491,8 +491,8 @@
 
 
   <li class="md-nav__item">
-    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme" title="Summary" class="md-nav__link">
-      Summary
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme" title="Kafka Summary" class="md-nav__link">
+      Kafka Summary
     </a>
   </li>
 
@@ -533,6 +533,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../consideration/" title="Replicaton considerations" class="md-nav__link">
+      Replicaton considerations
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -543,10 +555,46 @@
       
 
 
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Operations
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Operations
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
   <li class="md-nav__item">
     <a href="../monitoring/" title="Monitoring with Prometheus and Grafana" class="md-nav__link">
       Monitoring with Prometheus and Grafana
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../upgrade/" title="Rolling upgrade" class="md-nav__link">
+      Rolling upgrade
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -568,8 +616,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../perf-tests/" title="Performance Tests" class="md-nav__link">
-      Performance Tests
+    <a href="../perf-tests/" title="Tests" class="md-nav__link">
+      Tests
     </a>
   </li>
 
@@ -702,7 +750,7 @@
                 
                 
                 <h1 id="mirror-maker-2-deployment">Mirror Maker 2 Deployment</h1>
-<p>In this article we are presenting different type of Mirror Maker 2 deployments. Updated 3/24 on Strimzi 017 rc4.</p>
+<p>In this article we are presenting different type of Mirror Maker 2 deployments. Updated 4/4 on Strimzi 017.</p>
 <ul>
 <li>Using Strimzi operator to deploy on Kubernetes</li>
 <li>To run in VM or docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.</li>
@@ -879,7 +927,7 @@ mm2-cluster   <span class="m">1</span>
 <p>On virtual machine, it is possible to deploy the Apache Kafka 2.4+ binary file and then use the command <code>/opt/kafka/bin/connect-mirror-maker.sh</code> with the good properties file as argument.</p>
 <p>Within a VM we can run multiple mirror maker instances. When needed we can add more VMs to scale horizontally. Each mirror makers workers are part of the same consumer groups, so it is possible to scale at the limit of the topic partition number.</p>
 <h2 id="capacity-planning">Capacity planning</h2>
-<p>We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters <code>max.tasks</code> specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions will be replicated. Each task is part of the same consumer group, so the load balancing will be transparent and is managed by the brokers.</p>
+<p>We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters <code>max.tasks</code> specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.</p>
 <p>The task processing is stateless, consume - produce wait for acknowledge,  commit offet. In this case the CPU and network are key. For platform tuning activity we need to monitor operating system performance metrics. If the CPU becomes the bottleneck, we can allocate more CPU or start to scale horizontally by adding mirror maker 2 instance. If the network at the server level is the bottleneck, then adding more servers will help. Kafka will automatically balance the load among all the tasks running on all the machines. The size of the message impacts also the throughtput as with small message the throughput is CPU bounded. With 100 bytes messages or more we can observe network saturation. </p>
 <p>The parameters to consider for sizing are the following:</p>
 <table>

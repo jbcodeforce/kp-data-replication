@@ -36,7 +36,7 @@
     
     
       
-        <title>Replication from Event Streams to local - Data Replication in context of Kafka and Event Streams</title>
+        <title>Replicaton considerations - Data Replication in context of Kafka and Event Streams</title>
       
     
     
@@ -96,7 +96,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#to-event-streams-to-kafka-cluster-on-premise" tabindex="1" class="md-skip">
+      <a href="#replication-considerations" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -121,7 +121,7 @@
               Data Replication in context of Kafka and Event Streams
             </span>
             <span class="md-header-nav__topic">
-              Replication from Event Streams to local
+              Replicaton considerations
             </span>
           
         </div>
@@ -301,12 +301,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
     
     <label class="md-nav__link" for="nav-3">
       Replication Scenarios
@@ -334,63 +332,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Replication from Event Streams to local
-      </label>
-    
-    <a href="./" title="Replication from Event Streams to local" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../es-to-local/" title="Replication from Event Streams to local" class="md-nav__link">
       Replication from Event Streams to local
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#scenario-3-from-event-streams-to-local-kafka-cluster" title="Scenario 3: From Event Streams to local kafka cluster" class="md-nav__link">
-    Scenario 3: From Event Streams to local kafka cluster
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift" title="Scenario 4: From Event Streams On Cloud to Strimzi Cluster on Openshift" class="md-nav__link">
-    Scenario 4: From Event Streams On Cloud to Strimzi Cluster on Openshift
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#considerations" title="Considerations" class="md-nav__link">
-    Considerations
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -415,10 +361,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
     
     <label class="md-nav__link" for="nav-4">
       Best practices
@@ -482,11 +430,84 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../consideration/" title="Replicaton considerations" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Replicaton considerations
+      </label>
+    
+    <a href="./" title="Replicaton considerations" class="md-nav__link md-nav__link--active">
       Replicaton considerations
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-replicating" title="Why replicating" class="md-nav__link">
+    Why replicating
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#topic-metadata-replication" title="Topic metadata replication" class="md-nav__link">
+    Topic metadata replication
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#naming-convention" title="Naming convention" class="md-nav__link">
+    Naming convention
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offset-management" title="Offset management" class="md-nav__link">
+    Offset management
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#record-duplication" title="Record duplication" class="md-nav__link">
+    Record duplication
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#for-consumer-coding" title="For consumer coding" class="md-nav__link">
+    For consumer coding
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -600,22 +621,43 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#scenario-3-from-event-streams-to-local-kafka-cluster" title="Scenario 3: From Event Streams to local kafka cluster" class="md-nav__link">
-    Scenario 3: From Event Streams to local kafka cluster
+  <a href="#why-replicating" title="Why replicating" class="md-nav__link">
+    Why replicating
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift" title="Scenario 4: From Event Streams On Cloud to Strimzi Cluster on Openshift" class="md-nav__link">
-    Scenario 4: From Event Streams On Cloud to Strimzi Cluster on Openshift
+  <a href="#topic-metadata-replication" title="Topic metadata replication" class="md-nav__link">
+    Topic metadata replication
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#considerations" title="Considerations" class="md-nav__link">
-    Considerations
+  <a href="#naming-convention" title="Naming convention" class="md-nav__link">
+    Naming convention
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offset-management" title="Offset management" class="md-nav__link">
+    Offset management
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#record-duplication" title="Record duplication" class="md-nav__link">
+    Record duplication
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#for-consumer-coding" title="For consumer coding" class="md-nav__link">
+    For consumer coding
   </a>
   
 </li>
@@ -636,132 +678,49 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/jbcodeforce/kp-data-replication.git/edit/master/docs/es-to-local.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/jbcodeforce/kp-data-replication.git/edit/master/docs/consideration.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="to-event-streams-to-kafka-cluster-on-premise">To Event Streams to Kafka cluster on-premise</h1>
-<h2 id="scenario-3-from-event-streams-to-local-kafka-cluster">Scenario 3: From Event Streams to local kafka cluster</h2>
-<p>For this scenario the source is Event Streams on IBM Cloud and the target is a local Kafka cluster.</p>
-<p><img alt="Scenario 3" src="../images/mm2-scen3.png" /></p>
-<p>As a prerequisite you need to run your local cluster, for example using docker compose as introduced in <a href="../dc-local/">this note</a>.</p>
-<p>This time the producer adds headers to the Records sent so we can validate headers replication. The file <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/es-cluster/es-mirror-maker.properties">es-cluster/es-mirror-maker.properties</a> declares the mirroring settings as below:</p>
-<div class="codehilite"><pre><span></span><span class="na">clusters</span><span class="o">=</span><span class="s">source, target</span>
-<span class="na">source.bootstrap.servers</span><span class="o">=</span><span class="s">broker-3-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093</span>
-<span class="na">source.security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
-<span class="na">source.ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
-<span class="na">source.sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
-<span class="na">source.sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;985...&quot;;</span>
-<span class="na">target.bootstrap.servers</span><span class="o">=</span><span class="s">kafka1:9092,kafka2:9093,kafka3:9094</span>
-<span class="c"># enable and configure individual replication flows</span>
-<span class="na">source-&gt;target.enabled</span><span class="o">=</span><span class="s">true</span>
-<span class="na">source-&gt;target.topics</span><span class="o">=</span><span class="s">orders</span>
-</pre></div>
-
+                <h1 id="replication-considerations">Replication considerations</h1>
+<h2 id="why-replicating">Why replicating</h2>
+<p>The classical needs for replication between clusters can be bullet listed as:</p>
 <ul>
-<li>
-<p>Start <a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0">mirror maker2.0</a>:</p>
-<p>By using a new container, start another kakfa 2.4+ docker container, connected to the  brokers via the <code>kafkanet</code> network, and mounting the configuration in the <code>/home</code>:</p>
-<div class="codehilite"><pre><span></span>docker run -ti --network kafkanet -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home strimzi/kafka:latest-kafka-2.4.0 bash
-</pre></div>
-
-<p>Inside this container starts mirror maker 2.0 using the script: <code>/opt/kakfa/bin/connect-mirror-maker.sh</code></p>
-<div class="codehilite"><pre><span></span>/opt/kakfa/bin/connect-mirror-maker.sh /home/strimzi-mm2.properties
-</pre></div>
-
-<p>The <code>strimzi-mm2.properties</code> properties file given as argument defines the source and target clusters and the topics to replicate.</p>
-</li>
-<li>
-<p>The consumer may be started in second or third step. To start it, you can use a new container or use one of the running kafka broker container. Using the <code>Docker perspective</code> in Visual Code, we can get into a bash shell within one of the Kafka broker container. The local folder is mounted to <code>/home</code>. Then the script, <code>consumeFromLocal.sh source.orders</code> will get messages from the replicated topic: <code>source.orders</code></p>
-</li>
+<li>Disaster recovery when one secondary cluster is passive while the producer and consumers are on the active cluster in the primary data center: The following article goes over those principals.</li>
+<li>Active active cluster mirroring for inter services communication: consumers and producers are on both side and consumer or produce to their local cluster.</li>
+<li>Moving data to read only cluster as a front door to data lake, or to do cross data centers aggregation on the different event streams: Fan-in to get holistic data view.</li>
+<li>GDPR compliance to isolate data in country and geography</li>
+<li>Hybrid cloud operations to share data between on-premise cluster and managed service clusters.</li>
 </ul>
-<h2 id="scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift">Scenario 4: From Event Streams On Cloud to Strimzi Cluster on Openshift</h2>
-<p>We are reusing the Event Streams on Cloud cluster on Washington DC data center as source target and the vanilla Kafka 2.4 cluster as target, also running within Washington data center in a OpenShift Cluster. As both clusters are in the same data center, we deploy Mirror Maker 2.0 close to target kafka cluster.</p>
-<p><img alt="" src="../images/mm2-test1.png" /></p>
-<div class="admonition notes">
-<p class="admonition-title">Notes<p>If you have provisioned a mirror maker from the documentation here, you do not need to do the next step, but go to produce and consumer messages.</p>
-</p>
-</div>
-<ol>
-<li>
-<p>Deploy mirror maker 2.0 with good configuration: As we use the properties file approach the Dockerfile helps us to build a custom MM2 with Prometheus JMX exporter and mm2.properties for configuration. The file specifies source and target cluster:</p>
-<div class="codehilite"><pre><span></span><span class="na">clusters</span><span class="o">=</span><span class="s">source, target</span>
-<span class="na">target.bootstrap.servers</span><span class="o">=</span><span class="s">eda-demo-24-cluster-kafka-bootstrap:9092</span>
-<span class="na">target.ssl.endpoint.identification.algorithm</span><span class="o">=</span>
-<span class="na">source.bootstrap.servers</span><span class="o">=</span><span class="s">&lt;REPLACE-WITH-ES-BROKERSLIST&gt;</span>
-<span class="na">source.security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
-<span class="na">source.ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
-<span class="na">source.ssl.endpoint.identification.algorithm</span><span class="o">=</span><span class="s">https</span>
-<span class="na">source.sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
-<span class="na">source.sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;&lt;REPLACE-WITH-ES-APIKEY&gt;&quot;;</span>
-<span class="c"># enable and configure individual replication flows</span>
-<span class="na">source-&gt;target.enabled</span><span class="o">=</span><span class="s">true</span>
-<span class="na">sync.topic.acls.enabled</span><span class="o">=</span><span class="s">false</span>
-<span class="na">replication.factor</span><span class="o">=</span><span class="s">3</span>
-<span class="na">internal.topic.replication.factor</span><span class="o">=</span><span class="s">3</span>
-<span class="na">refresh.topics.interval.seconds</span><span class="o">=</span><span class="s">10</span>
-<span class="na">refresh.groups.interval.seconds</span><span class="o">=</span><span class="s">10</span>
-<span class="na">source-&gt;target.topics</span><span class="o">=</span><span class="s">products</span>
-<span class="na">tasks.max</span><span class="o">=</span><span class="s">10</span>
+<h2 id="topic-metadata-replication">Topic metadata replication</h2>
+<p>It is possible to disable the topic metadata replication (The configuration is ``). We do not encourage to do so. Per design topic can be added dynamically, specially when developing with Kafka Streams where intermediate topics are created, and topic configuration can be altered to increase the number of partitions. Changes to the source topic are dynamically propagated to the target avoiding maintenance nightmare.
+By synchronizing configuration properties, the need for rebalancing is reduced.</p>
+<p>When doing manual configuration, even if the initial topic configuration was duplicated, any dynamic changes to the topic properties are not going to be automatically propagate and the administrator needs to change the target topic. If the throughput on the source topic has increase and the number of partition was increased to support the load, then the target cluster will not have the same downstream capability which may lead to overloading (disk space or memory capavity).</p>
+<p>Also if the consumer of a partition is expecting to process the event in order within the partition, then changing the number of partition between source and target will make the ordering not valid any more. </p>
+<p>Also if the replication factor are set differently between the two clusters then the availability guarantees of the replicated data may be impacted and bad settings with broker failure will lead to data lost. </p>
+<p>Finally it is important to consider that changes to topic configuration triggers a consumer rebalance which stalls the mirroring process and creates a backlog in the pipeline and increases the end to end latency observed by the downstream application.</p>
+<h2 id="naming-convention">Naming convention</h2>
+<p>Mirror maker 2 prefix the name of the replicated topic with the name of the source cluster. This is an important and simple solution to avoid infinite loop when doing bi-directional mirroring. At the consumer side the subscribe() function support regular expression for topic name. So a code like:</p>
+<div class="codehilite"><pre><span></span><span class="n">kafkaConsumer</span><span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="s">&quot;^.*accounts&quot;</span><span class="o">)</span>
 </pre></div>
 
-<p>Start Mirror Maker 2.0: we use the properties setting one with custom docker image.</p>
-<div class="codehilite"><pre><span></span>oc apply -f mirror-maker/mm2-deployment.yaml
-</pre></div>
-
-</li>
-<li>
-<p>Produce some records to <code>products</code> topic on Event Streams. For that create a properties file (<code>eventstream.properties</code>) with the event streams API KEY and SASL_SSL properties:</p>
-<div class="codehilite"><pre><span></span><span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
-<span class="na">ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
-<span class="na">sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
-<span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;....&quot;</span>
-</pre></div>
-
-<p>Then starts a local container with Kafka 2.4 and console producer:</p>
-<div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="s2">&quot;event streams broker list&quot;</span>
-docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home --rm -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> strimzi/kafka:latest-kafka-2.4.0 bash -c <span class="s2">&quot;/opt/kafka/bin/kafka-console-producer.sh --broker-list </span><span class="nv">$KAFKA_BROKERS</span><span class="s2"> --producer.config /home/eventstreams.properties --topic products&quot;</span>
-&gt; 
-</pre></div>
-
-<p>For the data, you can use any text, or the products we have in the data folder.</p>
-</li>
-<li>
-<p>To validate the target <code>source.products</code> topic has records, start a consumer as pod on Openshift within the source Kafka cluster using the Strimzi/kafka image.</p>
-</li>
-</ol>
-<div class="codehilite"><pre><span></span>oc run kafka-consumer -ti --image<span class="o">=</span>strimzi/kafka:latest-kafka-2.4.0 --rm<span class="o">=</span><span class="nb">true</span> --restart<span class="o">=</span>Never -- bin/kafka-console-consumer.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --topic source.products --from-beginning
-
-If you don<span class="err">&#39;</span>t see a <span class="nb">command</span> prompt, try pressing enter.
-
-<span class="o">{</span> <span class="s2">&quot;product_id&quot;</span>: <span class="s2">&quot;P01&quot;</span>, <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Carrots&quot;</span>, <span class="s2">&quot;target_temperature&quot;</span>: <span class="m">4</span>,<span class="s2">&quot;target_humidity_level&quot;</span>: <span class="m">0</span>.4,<span class="s2">&quot;content_type&quot;</span>: <span class="m">1</span><span class="o">}</span>
-<span class="o">{</span> <span class="s2">&quot;product_id&quot;</span>: <span class="s2">&quot;P02&quot;</span>, <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Banana&quot;</span>, <span class="s2">&quot;target_temperature&quot;</span>: <span class="m">6</span>,<span class="s2">&quot;target_humidity_level&quot;</span>: <span class="m">0</span>.6,<span class="s2">&quot;content_type&quot;</span>: <span class="m">2</span><span class="o">}</span>
-<span class="o">{</span> <span class="s2">&quot;product_id&quot;</span>: <span class="s2">&quot;P03&quot;</span>, <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Salad&quot;</span>, <span class="s2">&quot;target_temperature&quot;</span>: <span class="m">4</span>,<span class="s2">&quot;target_humidity_level&quot;</span>: <span class="m">0</span>.4,<span class="s2">&quot;content_type&quot;</span>: <span class="m">1</span><span class="o">}</span>
-</pre></div>
-
-<h2 id="considerations">Considerations</h2>
-<p>When the source or target cluster is deployed on Openshift, the exposed route to access the brokers is using TLS connection. So we need the certificate and create a truststore to be used by the consumer or producer Java programs. All kafka tools are done in java or scala so running in a JVM, which needs truststore for keep trusted TLS certificates.</p>
-<p>To get the certificate do the following steps:</p>
-<ol>
-<li>
-<p>Get the host ip address from the Route resource</p>
-<div class="codehilite"><pre><span></span>oc get routes my-cluster-kafka-bootstrap -o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.ingress[0].host}{&quot;\n&quot;}&#39;</span>
-</pre></div>
-
-</li>
-<li>
-<p>Get the TLS CA root certificate from the broker</p>
-<div class="codehilite"><pre><span></span>oc get secrets
-oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
-</pre></div>
-
-</li>
-<li>
-<p>Transform the certificate for java truststore</p>
-<div class="codehilite"><pre><span></span>keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
-</pre></div>
-
-</li>
-</ol>
+<p>will listen to all the topics in the cluster having cluster name prefix and local <code>accounts</code> topics. This could be useful when we want to aggregate data from different data centers / clusters.</p>
+<h2 id="offset-management">Offset management</h2>
+<p>Mirror maker 2 track offset per consumer group. There are two topics created on the target cluster to manage the offset mapping between the source and target clusters and the checkpoints of the last committed offset in the source topic/partitions/consumer group. When a producer sends its record it gets the offset in the partition the record was saved.</p>
+<p>In the diagram below we have a source topic/partition A with the last write offset done by a producer to be  5, and the last read committed offset by the consumer assigned to partition 1 being 3. The last replicated offset 3 is mapped as 12 in the target partition. offset # do not match between partitions.
+So if the blue consumer needs to reconnect to the green target cluster it will read from the last committed offset which is 12 in this environment. This information is saved in the checkpoint topic.</p>
+<p><img alt="" src="../images/mm2-offset-mgt.png" /></p>
+<p>Offset synch are emitted at the beginning of the replication and when there is a situation which leads that the numbering sequencing diverges. For example the normal behavior is increase the offset by one 2,3,4,5,6,7 is mapped to 12,13,14,15,16,... if the write operation for offset 20 at the source is a 17 on the target then MM 2 emits a new offset synch records to the offset-synch topic.</p>
+<p>The checkpoint and offset_synch topics enable replication to be fully restored from the correct offset position on failover. </p>
+<p><img alt="" src="../images/mm2-offset-mgt-2.png" /></p>
+<h2 id="record-duplication">Record duplication</h2>
+<p>Exactly-once delivery is difficult to achieve in distributed system. In the case of Kafka producer, brokers, and consumers are working together to ensure only one message is processed end to end. With coding practice and configuration, within a unique cluster, Kafka can guaranty exactly once processing. No duplication between producer and broker, and committed read on consumer side is not reprocessed in case of consumer restarts.</p>
+<p>Cross cluster replications are traditionally based on at least once approach. Duplicate can happen when consumer task stop before committing its offset to the source topic. A restart will load records from the last committed offset which can generate duplicate. The following diagram illustrate this case:</p>
+<p><img alt="" src="" /></p>
+<p>As mirror maker is a generic consumer from a topic, it will not participate to a read-committed process, if the topic includes duplicate messages it will propagate to the target. 
+But MM2 will be able to support exactly once by using the <code>checkpoint</code> topic on the target cluster to keep the state of the committed offset from the consumer side, and write with an atomic transaction between the target topic and the checkpoint topic.</p>
+<h2 id="for-consumer-coding">For consumer coding</h2>
+<p>We recommend to review the <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers/">producer implementation best practices</a> and the <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers/">consumer considerations</a>.</p>
+<p>For platform sizing, the main metric to assess, is the number of partitions in the cluster to replicate. The number of partitions and number of brokers are somehow connected as getting a high number of partitions involves increasing the number of brokers. For Mirror Maker 2, as it is based on Kafka connect, there is a unique cluster and each partition mirroring is supported by a task within the JVM so the first constraint is the memory allocated to the container and the heap size.</p>
                 
                   
                 
@@ -782,7 +741,7 @@ oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.cr
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../local-to-es/" title="Replication from local to Event Streams" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../es-prem-to-es/" title="From Event Streams on OpenShift to Event Streams on Cloud" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -791,19 +750,19 @@ oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.cr
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Replication from local to Event Streams
+                From Event Streams on OpenShift to Event Streams on Cloud
               </span>
             </div>
           </a>
         
         
-          <a href="../es-prem-to-es/" title="From Event Streams on OpenShift to Event Streams on Cloud" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../monitoring/" title="Monitoring with Prometheus and Grafana" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                From Event Streams on OpenShift to Event Streams on Cloud
+                Monitoring with Prometheus and Grafana
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

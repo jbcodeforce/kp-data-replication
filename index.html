@@ -487,11 +487,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
     
     <label class="md-nav__link" for="nav-4">
-      Apache Kafka practices
+      Best practices
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-4">
-        Apache Kafka practices
+        Best practices
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -502,8 +502,8 @@
 
 
   <li class="md-nav__item">
-    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme" title="Summary" class="md-nav__link">
-      Summary
+    <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme" title="Kafka Summary" class="md-nav__link">
+      Kafka Summary
     </a>
   </li>
 
@@ -544,6 +544,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="consideration/" title="Replicaton considerations" class="md-nav__link">
+      Replicaton considerations
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -554,10 +566,46 @@
       
 
 
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Operations
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Operations
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
   <li class="md-nav__item">
     <a href="monitoring/" title="Monitoring with Prometheus and Grafana" class="md-nav__link">
       Monitoring with Prometheus and Grafana
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="upgrade/" title="Rolling upgrade" class="md-nav__link">
+      Rolling upgrade
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -579,8 +627,8 @@
 
 
   <li class="md-nav__item">
-    <a href="perf-tests/" title="Performance Tests" class="md-nav__link">
-      Performance Tests
+    <a href="perf-tests/" title="Tests" class="md-nav__link">
+      Tests
     </a>
   </li>
 
@@ -832,7 +880,7 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <li>
 <p>As a SRE I want to understand the CLI commands used to assess to assess how the provisioning process can be automated.</p>
 <ul>
-<li>We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could <a href="mm2-provisioning#provisioning-automation">consider using Ansible</a> for automation. </li>
+<li>We did not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could <a href="mm2-provisioning#provisioning-automation">consider using Ansible</a> for automation. </li>
 </ul>
 </li>
 <li>
@@ -846,10 +894,10 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <h3 id="version-to-version-migration">Version to version migration</h3>
 <ol>
 <li>
-<p>As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.</p>
+<p>As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade. </p>
 </li>
 <li>
-<p>As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.</p>
+<p>As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated. </p>
 </li>
 </ol>
 <h3 id="security">Security</h3>
@@ -861,12 +909,13 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <p>As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.</p>
 </li>
 </ol>
+<p>Those subjects are address in <a href="security/">the security note</a></p>
 <h3 id="monitoring">Monitoring</h3>
 <ol>
 <li>
 <p>As a SRE, I want to get Mirror Maker 2 metrics for Prometheus so that it fits in my current metrics processing practices.</p>
 <ul>
-<li>The explanation to setup Prometheus metris for mirror maker 2.0 is documented <a href="monitoring/">here</a>.</li>
+<li>The explanation to setup Prometheus metris for mirror maker 2.0 is documented <a href="monitoring/">in the monitoring note</a>.</li>
 </ul>
 </li>
 <li>
