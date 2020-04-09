@@ -53,12 +53,13 @@ The checkpoint and offset_synch topics enable replication to be fully restored f
 
 Exactly-once delivery is difficult to achieve in distributed system. In the case of Kafka producer, brokers, and consumers are working together to ensure only one message is processed end to end. With coding practice and configuration, within a unique cluster, Kafka can guarantee exactly once processing. No duplication between producer and broker, and committed read on consumer side is not reprocessed in case of consumer restarts.
 
-Cross cluster replications are traditionally based on at least once approach. Duplicate can happen when consumer task stops before committing its offset to the source topic. A restart will load records from the last committed offset which can generate duplicate. The following diagram illustrate this case:
+Cross cluster replications are traditionally based on at least once approach. Duplicates can happen when consumer task stops before committing its offset to the source topic. A restart will load records from the last committed offset which can generate duplicates. The following diagram illustrate this case:
 
-![]()
+![](images/mm2-dup.png)
 
-As mirror maker is a generic consumer from a topic, it will not participate to a read-committed process, if the topic includes duplicate messages it will propagate to the target. 
-But MM2 will be able to support exactly once by using the `checkpoint` topic on the target cluster to keep the state of the committed offset from the consumer side, and write with an atomic transaction between the target topic and the checkpoint topic.
+As mirror maker is a generic topic consumer, it will not participate to a read-committed process, if the topic includes duplicate messages it will propagate to the target.
+
+In the future MM2 will be able to support exactly once by using the `checkpoint` topic on the target cluster to keep the state of the committed offset from the consumer side, and write with an atomic transaction between the target topic and the checkpoint topic, and commit the source read offset as part of the same transaction.
 
 ## For consumer coding
 
