@@ -1,4 +1,5 @@
 site/
+tls/
 perf-tests/kafka/__pycache__/
 mirror-maker-2/local-cluster/jmx_prometheus_javaagent-0.12.0.jar
 local-cluster/kafka1/

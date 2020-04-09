@@ -10,14 +10,17 @@ nav:
     - Replication from local to Event Streams: local-to-es.md
     - Replication from Event Streams to local : es-to-local.md
     - From Event Streams on OpenShift to Event Streams on Cloud : es-prem-to-es.md
-  - Apache Kafka practices:
-    - Summary: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme
+  - Best practices:
+    - Kafka Summary: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme
     - Consumer practices: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers
     - Producer practices: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers
     - Kafka Connect: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect
-  - Monitoring with Prometheus and Grafana: monitoring.md
+    - Replicaton considerations: consideration.md
+  - Operations: 
+    - Monitoring with Prometheus and Grafana: monitoring.md
+    - Rolling upgrade: upgrade.md
   - Security: security.md
-  - Performance Tests: perf-tests.md
+  - Tests: perf-tests.md
   - Compendium: compendium.md
 theme: 
   name: material

@@ -11,20 +11,22 @@ def parseArguments():
     version = "0"
     fileName = "./data/data.json"
     topic = "products"
-    size = 'small'
+    size = 1000
     keyname = 'id'
     if len(sys.argv) == 1:
-        print("Usage: ProducerPerformance  --file datafilename --size [small, medium, large]")
+        print("Usage: ProducerPerformance  --file datafilename --size [small, medium, large] --topic topicname --keyname attributenameusedaskey")
         exit(1)
     else:
         for idx in range(1, len(sys.argv)):
             arg=sys.argv[idx]
             if arg == "--size":
-                size = sys.argv[idx+1]
-                if size not in ['small','medium', 'large']:
-                    print(size  + " not valid. Value can be only 'small','medium', 'large'")
-                    print("using size small")
-                    size= 'small'
+                sizeArg = sys.argv[idx+1]
+                if sizeArg not in ['small','medium', 'large']:
+                    size = int(sizeArg)
+                if sizeArg == "medium":
+                    size = 10000
+                if sizeArg == "large":
+                    size = 100000
             if arg == "--file":
                 fileName =sys.argv[idx+1]
             if arg == "--topic":
@@ -34,9 +36,9 @@ def parseArguments():
             if arg == "--help":
                 print("Send n messages to a kafka cluster. Use environment variables KAFKA_BROKERS")
                 print(" and KAFKA_APIKEY is the cluster accept sasl connection with token user")
-                print(" and KAFKA_CERT to ca.crt path to add for TLS communication")
+                print(" and KAFKA_CERT to ca.crt path to add for TLS communication when using TLS")
                 print(" --file <filename including records to send in json format>")
-                print(" --size small  | medium| large ")
+                print(" --size small  | medium| large | a_number")
                 print("        small= 1000| medium= 10k| large= 100k")
                 print(" --topic topicname")
                 print(" --keyname the attribute name in the json file to be used as record key")
@@ -64,22 +66,15 @@ def processRecords(nb_records, topicname, keyname,docsToSend):
                 print("sending -> " + str(doc))
                 producer.publishEvent(doc,keyname)
         for i in range(0,int(b)):
-            docsToSend['timestamp'] = time.time()
+            docsToSend[i]['timestamp'] = time.time()
             print("sending -> " + str(docsToSend[i]))
             producer.publishEvent(docsToSend[i],keyname)
     except KeyboardInterrupt:
         input('Press enter to continue')
         print("Thank you")
 
-def setNbOfRecords(size):
-    if size == "medium":
-        return 10000
-    if size == "large":
-        return 100000
-    return 1000
-
 if __name__ == "__main__":
     fileName, size, topic, keyname = parseArguments()
     messages = readMessages(fileName)
-    NBRECORDS=setNbOfRecords(size)
-    processRecords(NBRECORDS,topic,keyname, messages)
+    print("Sending " + str(size) + " messages to topic: " + topic)
+    processRecords(size,topic,keyname, messages)

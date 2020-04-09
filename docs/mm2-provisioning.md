@@ -1,6 +1,6 @@
 # Mirror Maker 2 Deployment
 
-In this article we are presenting different type of Mirror Maker 2 deployments. Updated 3/24 on Strimzi 017 rc4.
+In this article we are presenting different type of Mirror Maker 2 deployments. Updated 4/4 on Strimzi 017.
 
 * Using Strimzi operator to deploy on Kubernetes
 * To run in VM or docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.
@@ -211,7 +211,7 @@ Within a VM we can run multiple mirror maker instances. When needed we can add m
 
 ## Capacity planning
 
-We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters `max.tasks` specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions will be replicated. Each task is part of the same consumer group, so the load balancing will be transparent and is managed by the brokers.
+We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters `max.tasks` specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.
 
 The task processing is stateless, consume - produce wait for acknowledge,  commit offet. In this case the CPU and network are key. For platform tuning activity we need to monitor operating system performance metrics. If the CPU becomes the bottleneck, we can allocate more CPU or start to scale horizontally by adding mirror maker 2 instance. If the network at the server level is the bottleneck, then adding more servers will help. Kafka will automatically balance the load among all the tasks running on all the machines. The size of the message impacts also the throughtput as with small message the throughput is CPU bounded. With 100 bytes messages or more we can observe network saturation. 
 

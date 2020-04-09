@@ -88,7 +88,7 @@ This main epic is related to provisioning operation.
 
 1. As a SRE I want to understand the CLI commands used to assess to assess how the provisioning process can be automated.
 
-    * We do not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could [consider using Ansible](mm2-provisioning#provisioning-automation) for automation. 
+    * We did not proof how to automate the deployment, but as all deployments are done with CLI and configuration files we could [consider using Ansible](mm2-provisioning#provisioning-automation) for automation. 
 
 1. As a SRE I want to understand the server sizing for the Mirror Maker environment so that I can understand how to use leanest resources for minimal needs.
 
@@ -98,9 +98,9 @@ This main epic is related to provisioning operation.
 
 ### Version to version migration
 
-1. As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.
+1. As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade. 
 
-1. As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.
+1. As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated. 
 
 ### Security
 
@@ -108,11 +108,13 @@ This main epic is related to provisioning operation.
 
 1. As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.
 
+Those subjects are address in [the security note](security.md)
+
 ### Monitoring
 
 1. As a SRE, I want to get Mirror Maker 2 metrics for Prometheus so that it fits in my current metrics processing practices.
 
-    * The explanation to setup Prometheus metris for mirror maker 2.0 is documented [here](monitoring.md).
+    * The explanation to setup Prometheus metris for mirror maker 2.0 is documented [in the monitoring note](monitoring.md).
 
 1. As a SRE, I want to be able to add new dashboard into Grafana to visualize the Mirror Maker 2 metrics.
 

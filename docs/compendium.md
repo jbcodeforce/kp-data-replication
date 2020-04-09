@@ -8,3 +8,4 @@
 * [Grafana](https://grafana.com/)
 * [Ansible](https://www.ansible.com/resources/videos/quick-start-video)
 * [Performance test considerations](https://engineering.linkedin.com/kafka/benchmarking-apache-kafka-2-million-writes-second-three-cheap-machines)
+* [Cloudera kafka replication a case for MM2](https://blog.cloudera.com/kafka-replication-the-case-for-mirrormaker-2-0/)
