@@ -45,19 +45,23 @@ if __name__ == "__main__":
                     raise KafkaException(msg.error())
                 else:
                     message = msg.value()
-                    message_json = json.loads(message)
-                    # print(message_json['timestamp'])
+                    try:
+                        message_json = json.loads(message)
+                        print(message_json)
+                    except Exception as e:
+                        continue
                     totalMessageCount += 1
-                    # print(totalMessageCount)
                     secondsNow = time.time()
                     delta += (secondsNow - float(message_json['timestamp']))
-                    # print(secondsNow, message_json['timestamp'] , secondsNow - float(message_json['timestamp']))
-                    if totalMessageCount % 1000 == 0:
+                    print("Now: " + str(secondsNow) + " ts:" + str(message_json['timestamp']) + " delta:" + str(secondsNow - float(message_json['timestamp'])))
+                    if totalMessageCount % 100 == 0:
                         print('Average '+ str(delta / 1000 ) + ' seconds / ' + str(1000) + ' message' )
                         delta = 0
             except KeyboardInterrupt as identifier:
+                print(identifier)
                 input('Press enter to continue')
                 print("Thank you")
     except Exception as identifier:
+        print(identifier)
         input('Press enter to continue')
         print("Thank you")
