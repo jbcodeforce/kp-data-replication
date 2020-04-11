@@ -2,18 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
     labels:
-      app: mm2ocp
+      app: strimzi
     name: mm2ocp
     namespace: eda-strimzi-kafka24
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mm2ocp
+      app: strimzi
   template:
     metadata:
       labels:
-        app: mm2ocp
+        app: strimzi
     spec:
       volumes:
       - name: properties-volume

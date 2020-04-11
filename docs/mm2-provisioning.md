@@ -1,11 +1,11 @@
 # Mirror Maker 2 Deployment
 
-In this article we are presenting different type of Mirror Maker 2 deployments. Updated 4/4 on Strimzi 017.
+In this article we are presenting different type of Mirror Maker 2 deployments. Updated 4/4 on Strimzi version 0.17.
 
 * Using Strimzi operator to deploy on Kubernetes
-* To run in VM or docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.
+* To run MM2 on a VM or as docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.
 
-We are using the configuration to deploy from event streams on Cloud to a local Kafka cluster we deployed using Strimzi. 
+We are using the configuration to deploy from event streams on Cloud to a local Kafka cluster we deployed using Strimzi.
 
 ![ES to local](images/mm2-test1.png)
 
@@ -16,11 +16,11 @@ When we need to create Kubernetes secrets to manage APIKEY to access Event Strea
 * Create a project in OpenShift to deploy Mirror Maker cluster, for example: `oc new-project <projectname>`.
 * Create a secret for the API KEY of the Event Streams cluster:
 `oc create secret generic es-api-secret --from-literal=password=<replace-with-event-streams-apikey>`
-* As your vanilla Kafka source cluster may use TLS to communicate between clients and brokers, you need to use the k8s secret defined when deploying Kafka which includes the CAroot certificate. This secret is : `my-cluster-clients-ca-cert`.
+* As your vanilla Kafka source cluster may use TLS to communicate between clients and brokers, you need to use the k8s secret defined when deploying Kafka which includes the CAroot and generic client certificates. These secrets are : `eda-demo-24-cluster-clients-ca-cert` and  `eda-demo-24-cluster-cluster-ca-cert`.
 
 ```shell
-# build a local CA crt file from the secret:
-oc extract secret/my-cluster-clients-ca-cert --keys=ca.crt --to=- > ca.crt
+# build a local client CA crt file from the secret:
+oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys=ca.crt --to=- > ca.crt
 # Verify the certificate:
 openssl x509 -in ca.crt -text
 # transform it for java truststore.jks:
@@ -32,7 +32,7 @@ oc describe secret kafka-truststore
 ```
 
 !!! Attention
-    At this step, we have two options to deploy mirror maker, one using the Mirror Maker Operator and configure it via a yaml file, or use properties file and a special docker image that is deployed to Openshift. As of 3/20/2020 we have found an issue on Strimzi 0.17-rc2 Mirror Maker 2.0 operator, so we are proposing to use the properties approach as [documented this section](#deploying-a-customer-mirror-maker-docker-image).
+    At this step, we have two options to deploy mirror maker, one using the Mirror Maker Operator and configure it via a yaml file, or use properties file and a special docker image that is deployed to Openshift, see this approach as [documented this section](#deploying-a-customer-mirror-maker-docker-image).
 
 ## Deploying using Strimzi Mirror Maker operator
 

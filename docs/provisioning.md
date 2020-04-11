@@ -50,7 +50,7 @@ oc new-project eda-strimzi-kafka24
 
 ### Download the strimzi artefacts
 
-We have already created the configuration from the source strimzi github in the following folder `openshift-strimzi/eda-strimzi-kafka24`. So you do not need to do the following steps if you use the project: `eda-strimzi-kafka24`.
+We have already created the configuration from the [source strimzi github](https://github.com/strimzi/strimzi-kafka-operator/releases) in the following folder [openshift-strimzi/eda-strimzi-kafka24/cluster-operator](https://github.com/jbcodeforce/kp-data-replication/tree/master/openshift-strimzi/eda-strimzi-kafka24/cluster-operator). So you do not need to do the following steps if you use the same project name: `eda-strimzi-kafka24`.
 
 In case you want to do on your own, get the last Strimzi release from [this github page](https://github.com/strimzi/strimzi-kafka-operator/releases). Then modify the Role binding yaml files with the namespace set in previous step.
 
@@ -78,17 +78,21 @@ The commands above, should create the following service account, resource defini
 
 | Names | Resource | Command |
 | --- | :---: | --- |
-| strimzi-cluster-operator | Service account | oc get sa |
+| strimzi-cluster-operator | A [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) provides an identity for processes that run in a Pod. | oc get sa -l app=strimzi|
+| strimzi-cluster-operator-global, strimzi-cluster-operator-namespaced, strimzi-entity-operator, strimzi-kafka-broker, strimzi-topic-operator | Cluster Roles | oc get clusterrole |
 | strimzi-cluster-operator-entity-operator-delegation, strimzi-cluster-operator, strimzi-cluster-operator-topic-operator-delegation | Role binding | oc get rolebinding |
-| strimzi-cluster-operator-global, strimzi-cluster-operator-namespaced, strimzi-entity-operator, strimzi-kafka-broker, strimzi-topic-operator | Cluster Role | oc get clusterrole |
-| strimzi-cluster-operator, strimzi-cluster-operator-kafka-broker-delegation | Cluster Role Binding | oc get clusterrolebinding |
-| kafkabridges, kafkaconnectors, kafkaconnects, kafkamirrormaker2s kafka, kafkatopics, kafkausers | Custom Resource Definitions | oc get customresourcedefinition |grep kafka|
+| strimzi-cluster-operator, strimzi-cluster-operator-kafka-broker-delegation | Cluster Role Binding | oc get clusterrolebinding -l app=strimzi |
+| kafkabridges, kafkaconnectors, kafkaconnects, kafkamirrormaker2s kafka, kafkatopics, kafkausers | Custom Resource Definitions | oc get customresourcedefinition |
+
+!!! Note
+      All those resources are labelled with `strimzi` name.
+
 
 ### Add Strimzi Admin Role
 
-If you want to allow non-kubernetes cluster administators to manage Strimzi resources, you must assign them the Strimzi Administrator role.
+If you want to allow non-kubernetes cluster administators to manage Strimzi resources, you must assign them to the `Strimzi Administrator` role.
 
-First deploy the role definition using the folowing command: `oc apply -f openshift-strimzi/eda-strimzi-kafka24/010-ClusterRole-strimzi-admin.yaml`
+First deploy the role definition using the following command: `oc apply -f openshift-strimzi/eda-strimzi-kafka24/010-ClusterRole-strimzi-admin.yaml`
 
 Then assign the strimzi-admin ClusterRole to one or more existing users in the Kubernetes cluster.
 
@@ -100,10 +104,10 @@ Then assign the strimzi-admin ClusterRole to one or more existing users in the K
 
 The CRD for kafka cluster resource is [here](https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/040-Crd-kafka.yaml) and we recommend to study it before defining your own cluster.
 
-Change the name of the cluster in one the yaml in the `examples/kafka` folder or use the `openshift-strimzi/kafka-cluster.yml` file in this project. This file defines the default replication factor of 3 and in-synch replicas of 2. For development purpose we will accept plain (unencrypted) listener on port 9092 without TLS authentication.
+Change the name of the cluster in one the yaml in the `examples/kafka` folder or use our `openshift-strimzi/kafka-cluster.yml` file in this project as a starting point. This file defines the default replication factor of 3 and in-synch replicas of 2. For development purpose we will accept plain (unencrypted) listener on port 9092 without TLS authentication.
 For external to the kubernetes cluster access we need to have external listeners. For Openshift, as we use routes, we need to add the `external.type = route`. When exposing Kafka using OpenShift Routes and the HAProxy router, a dedicated Route is created for every Kafka broker pod. An additional Route is created to serve as a Kafka bootstrap address. Kafka clients can use these Routes to connect to Kafka on port 443.
 
-Even for development we added the metrics rules to expose kafka and zookeeper metrics for tool like Prometheus.
+Even for development we added the metrics rules in the `metrics` stamza within `kafka-cluster.yml` file to expose kafka and zookeeper metrics for tool like Prometheus.
 
 For production we need to use persistence for the kafka log, ingress or load balancer external listener and rack awareness policies. It has to use Mutual TLS authentication, and with Strimzi we can use the User Operator to manage cluster users. Mutual authentication or two-way authentication is when both the server and the client present certificates.
 
@@ -116,7 +120,7 @@ oc get kafka
 # my-cluster   3                        3
 ```
 
-When looking at the pods running we can see the three kafka and zookeeper nodes as pods, and the entity operator pod.
+When looking at the pods running we can see the three kafka and zookeeper nodes as pods, the strimzi entity operator pod and the strimzi cluster operator.
 
 ```shell
 $ oc get pods
@@ -139,9 +143,9 @@ oc apply -f strimzi/kafka-cluster.yaml
 
 ## Add Topic CRDs and operator
 
-This step is optional. Topic operator helps to manage Kafka topics via yaml configuration and get map the topics as kubernetes resources so a command like `oc get kafkatopics` returns the list of topics. The operator keep the resources and the kafka topic in synch. This allows you to declare a KafkaTopic as part of your application’s deployment.
+This step is optional. Topic operator helps to manage Kafka topics via yaml configuration and map the topics as kubernetes resources so a command like `oc get kafkatopics` returns the list of topics. The operator keeps the resources and the kafka topics in synch. This allows you to declare a KafkaTopic as part of your application’s deployment using yaml file.
 
-To manage Kafka topics with operators, first modify the file `05-Deployment-strimzi-topic-operator.yaml` to reflect your cluster name
+To manage Kafka topics with operators, first modify the file [05-Deployment-strimzi-topic-operator.yaml](https://github.com/jbcodeforce/kp-data-replication/blob/master/openshift-strimzi/install/topic-operator/05-Deployment-strimzi-topic-operator.yaml) to reflect your cluster name
 
 ```yaml
 env:
@@ -160,7 +164,7 @@ oc apply -f openshift-strimzi/install/topic-operator
 oc adm policy add-cluster-role-to-user strimzi-topic-operator --serviceaccount strimzi-cluster-operator -n eda-strimzi-kafka24 
 ```
 
-This will add the following:
+This will add the following resources:
 
 | Names | Resource | Command |
 | :---: | :---: | :---: |

@@ -22,7 +22,29 @@ rules:
     verbs: ["get"]
 
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-server
+  labels:
+    app: strimzi
   
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-server
+  labels:
+    app: strimzi
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-server
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-server
+    namespace: eda-strimzi-kafka24
+---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
@@ -32,9 +54,7 @@ metadata:
 spec:
   replicas: 1
   serviceAccountName: prometheus-server
-  serviceMonitorSelector:
-    matchLabels:
-      app: strimzi
+  serviceMonitorSelector: {}
   resources:
     requests:
       memory: 400Mi
@@ -53,7 +73,7 @@ kind: Service
 metadata:
   labels:
     prometheus: prometheus
-  name: prometheus
+  name: prometheus-operated
   namespace: eda-strimzi-kafka24
 spec:
   ports:

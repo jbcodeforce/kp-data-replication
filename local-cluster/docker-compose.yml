@@ -1,4 +1,3 @@
-# wurstmeister
 version: '3'
 services:
     zookeeper1:
