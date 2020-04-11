@@ -750,12 +750,12 @@
                 
                 
                 <h1 id="mirror-maker-2-deployment">Mirror Maker 2 Deployment</h1>
-<p>In this article we are presenting different type of Mirror Maker 2 deployments. Updated 4/4 on Strimzi 017.</p>
+<p>In this article we are presenting different type of Mirror Maker 2 deployments. Updated 4/4 on Strimzi version 0.17.</p>
 <ul>
 <li>Using Strimzi operator to deploy on Kubernetes</li>
-<li>To run in VM or docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.</li>
+<li>To run MM2 on a VM or as docker image which can be adapted with your own configuration, like for example by adding prometheus JMX Exporter as java agent.</li>
 </ul>
-<p>We are using the configuration to deploy from event streams on Cloud to a local Kafka cluster we deployed using Strimzi. </p>
+<p>We are using the configuration to deploy from event streams on Cloud to a local Kafka cluster we deployed using Strimzi.</p>
 <p><img alt="ES to local" src="../images/mm2-test1.png" /></p>
 <h2 id="common-configuration">Common configuration</h2>
 <p>When we need to create Kubernetes secrets to manage APIKEY to access Event Streams, and TLS certificate to access local Kafka brokers, we need to do the following steps:</p>
@@ -763,10 +763,10 @@
 <li>Create a project in OpenShift to deploy Mirror Maker cluster, for example: <code>oc new-project &lt;projectname&gt;</code>.</li>
 <li>Create a secret for the API KEY of the Event Streams cluster:
 <code>oc create secret generic es-api-secret --from-literal=password=&lt;replace-with-event-streams-apikey&gt;</code></li>
-<li>As your vanilla Kafka source cluster may use TLS to communicate between clients and brokers, you need to use the k8s secret defined when deploying Kafka which includes the CAroot certificate. This secret is : <code>my-cluster-clients-ca-cert</code>.</li>
+<li>As your vanilla Kafka source cluster may use TLS to communicate between clients and brokers, you need to use the k8s secret defined when deploying Kafka which includes the CAroot and generic client certificates. These secrets are : <code>eda-demo-24-cluster-clients-ca-cert</code> and  <code>eda-demo-24-cluster-cluster-ca-cert</code>.</li>
 </ul>
-<div class="codehilite"><pre><span></span><span class="c1"># build a local CA crt file from the secret:</span>
-oc extract secret/my-cluster-clients-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
+<div class="codehilite"><pre><span></span><span class="c1"># build a local client CA crt file from the secret:</span>
+oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
 <span class="c1"># Verify the certificate:</span>
 openssl x509 -in ca.crt -text
 <span class="c1"># transform it for java truststore.jks:</span>
@@ -779,7 +779,7 @@ oc describe secret kafka-truststore
 
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p>At this step, we have two options to deploy mirror maker, one using the Mirror Maker Operator and configure it via a yaml file, or use properties file and a special docker image that is deployed to Openshift. As of 3/20/2020 we have found an issue on Strimzi 0.17-rc2 Mirror Maker 2.0 operator, so we are proposing to use the properties approach as <a href="#deploying-a-customer-mirror-maker-docker-image">documented this section</a>.</p>
+<p>At this step, we have two options to deploy mirror maker, one using the Mirror Maker Operator and configure it via a yaml file, or use properties file and a special docker image that is deployed to Openshift, see this approach as <a href="#deploying-a-customer-mirror-maker-docker-image">documented this section</a>.</p>
 </div>
 <h2 id="deploying-using-strimzi-mirror-maker-operator">Deploying using Strimzi Mirror Maker operator</h2>
 <p>We assume you have an existing namespace or project to deploy Mirror Maker. You also need to get the latest (0.17-rc4 at least) Strimzi configuration from the <a href="https://github.com/strimzi/strimzi-kafka-operator/releases/tag/0.17.0-rc4">download page</a>.</p>
