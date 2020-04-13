@@ -933,14 +933,15 @@ prometheus             <span class="m">1</span>          52s
 <p>Once define the url will be something like:</p>
 <p>http://prometheus-route-eda-strimzi-kafka24.gse-eda-demo-43-f......us-east.containers.appdomain.cloud/graph</p>
 <h2 id="configure-monitoring">Configure monitoring</h2>
-<p>To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitoring.</p>
+<p>To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitor. An example of such file can be found <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/strimzi-service-monitor.yaml">here</a></p>
 <div class="codehilite"><pre><span></span>oc apply -f strimzi-service-monitor.yaml
 oc describe servicemonitor
 </pre></div>
 
 <h2 id="mirror-maker-20-monitoring">Mirror maker 2.0 monitoring</h2>
-<p>To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be <a href="https://github.com/prometheus/jmx_exporter">found here</a>. We copied a version in the folder <code>mirror-maker-2/libs</code>. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">Dockerfile</a> in this <a href="../mm2-provisioning/">separate note</a>. We have used this approach as we have found an issue with the Strimzi Mirror Maker operator, that blocks us to continue the monitoring. We expect that htis operator, when it sees metrics declaration in the Mirror Maker 2 configuration yaml file, with use the JMX exporter jar.</p>
-<p>Once the Mirror Maker 2.0 is connected...</p>
+<p>To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be <a href="https://github.com/prometheus/jmx_exporter">found here</a>. We copied a version in the folder <code>mirror-maker-2/libs</code>. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">Dockerfile</a> in this <a href="../mm2-provisioning/">separate note</a>.</p>
+<p>The next step is to define a service monitor 
+Once the Mirror Maker 2.0 is connected...</p>
 <h2 id="install-grafana">Install Grafana</h2>
 <p><a href="https://grafana.com/">Grafana</a> provides visualizations of Prometheus metrics. Again we will use the Strimzi dashboard definition as starting point to monitor Kafka cluster but also mirror maker.</p>
 <ul>
@@ -998,6 +999,7 @@ kubectl port-forward <span class="nv">$PODNAME</span> <span class="m">3000</span
 <ul>
 <li><a href="https://ibm.github.io/event-streams/tutorials/monitor-with-prometheus/">Monitoring Event Streams cluster health with Prometheus</a></li>
 <li><a href="https://github.ibm.com/CASE/openshift-custom-app-monitoring">How to monitor applications on OpenShift 4.x with Prometheus Operator</a></li>
+<li><a href="https://ibm.github.io/event-streams/security/secure-jmx-connections/">Access Event streams using secured JMX connections</a></li>
 </ul>
                 
                   
