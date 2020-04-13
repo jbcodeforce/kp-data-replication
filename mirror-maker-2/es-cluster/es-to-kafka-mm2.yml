@@ -13,7 +13,7 @@ spec:
       connect.root.logger.level: "INFO"
   clusters:
   - alias: "kafka-on-premise-cluster"
-    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:443
+    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:9404
     config:
       config.storage.replication.factor: 3
       offset.storage.replication.factor: 3

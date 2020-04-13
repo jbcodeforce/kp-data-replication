@@ -147,7 +147,7 @@ http://prometheus-route-eda-strimzi-kafka24.gse-eda-demo-43-f......us-east.conta
 
 ## Configure monitoring
 
-To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitoring.
+To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitor. An example of such file can be found [here](https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/strimzi-service-monitor.yaml)
 
 ```
 oc apply -f strimzi-service-monitor.yaml
@@ -156,8 +156,9 @@ oc describe servicemonitor
 
 ## Mirror maker 2.0 monitoring
 
-To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be [found here](https://github.com/prometheus/jmx_exporter). We copied a version in the folder `mirror-maker-2/libs`. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this [Dockerfile](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile) in this [separate note](mm2-provisioning.md). We have used this approach as we have found an issue with the Strimzi Mirror Maker operator, that blocks us to continue the monitoring. We expect that htis operator, when it sees metrics declaration in the Mirror Maker 2 configuration yaml file, with use the JMX exporter jar.
+To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be [found here](https://github.com/prometheus/jmx_exporter). We copied a version in the folder `mirror-maker-2/libs`. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this [Dockerfile](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile) in this [separate note](mm2-provisioning.md).
 
+The next step is to define a service monitor 
 Once the Mirror Maker 2.0 is connected...
 
 ## Install Grafana
@@ -225,3 +226,4 @@ oc create secret generic additional-scrape-configs --from-file=./local-cluster/p
 
 * [Monitoring Event Streams cluster health with Prometheus](https://ibm.github.io/event-streams/tutorials/monitor-with-prometheus/)
 * [How to monitor applications on OpenShift 4.x with Prometheus Operator](https://github.ibm.com/CASE/openshift-custom-app-monitoring)
+* [Access Event streams using secured JMX connections](https://ibm.github.io/event-streams/security/secure-jmx-connections/)
