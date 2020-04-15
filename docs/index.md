@@ -135,4 +135,4 @@ Those subjects are address in [the security note](security.md)
 
 1. As a developer, I want to understand how to measure latency / lag in data replication.
 
-1. As an SRE I want to understand current thoughput for the replication solution.
+1. As an SRE, I want to understand current thoughput for the replication solution.
