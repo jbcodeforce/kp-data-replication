@@ -98,9 +98,11 @@ This main epic is related to provisioning operation.
 
 ### Version to version migration
 
-1. As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade. 
+1. As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.
+    
+    * See some rolling upgrade recommendations in [this section]([this section](mm2-provisioning#version-migration) )
 
-1. As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated. 
+1. As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.
 
 ### Security
 
@@ -108,7 +110,7 @@ This main epic is related to provisioning operation.
 
 1. As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.
 
-Those subjects are address in [the security note](security.md)
+Those subjects are addressed in [the security note](security.md)
 
 ### Monitoring
 
@@ -128,7 +130,7 @@ Those subjects are address in [the security note](security.md)
     * Here is [a note on records duplication](consideration#record-duplication).
 
 1. As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.
-    * Lag will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally. 
+    * Lag will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally.
 1. As a developer I want to understand what are the condition for message loss.
 
 ### Performance  tests
