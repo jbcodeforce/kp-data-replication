@@ -592,18 +592,6 @@
   </li>
 
         
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="upgrade/" title="Rolling upgrade" class="md-nav__link">
-      Rolling upgrade
-    </a>
-  </li>
-
-        
       </ul>
     </nav>
   </li>
@@ -896,11 +884,14 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <li>
 <p>As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.</p>
 <ul>
-<li>See some rolling upgrade recommendations in <a href="[this section](mm2-provisioning#version-migration)">this section</a></li>
+<li>See some rolling upgrade recommendations in <a href="mm2-provisioning#version-migration">this section</a>.</li>
 </ul>
 </li>
 <li>
 <p>As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.</p>
+<ul>
+<li>Mirror maker 2 configuration is done with yaml files and applied using <code>kubectl or oc</code> CLI. The Strimzi cluster operator is managing the redeployment of the mirror maker deployment.</li>
+</ul>
 </li>
 </ol>
 <h3 id="security">Security</h3>
@@ -912,7 +903,7 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <p>As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.</p>
 </li>
 </ol>
-<p>Those subjects are addressed in <a href="security/">the security note</a></p>
+<p>Those subjects are addressed in <a href="security/">the security note</a>.</p>
 <h3 id="monitoring">Monitoring</h3>
 <ol>
 <li>
@@ -934,7 +925,7 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <h3 id="best-practices">Best Practices</h3>
 <ol>
 <li>
-<p>As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication. </p>
+<p>As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication.</p>
 <ul>
 <li>Here is <a href="consideration#record-duplication">a note on records duplication</a>.</li>
 </ul>
@@ -942,18 +933,26 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <li>
 <p>As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.</p>
 <ul>
-<li>Lag will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally.</li>
+<li>Lags will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally.</li>
 </ul>
 </li>
-<li>As a developer I want to understand what are the condition for message loss.</li>
+<li>
+<p>As a developer I want to understand what are the conditions for message loss. We are detailing the exactly once and ensuring delivery in <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers#how-to-support-exactly-once-delivery">those notes: producer</a> and <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers">consumer</a>.</p>
+</li>
 </ol>
 <h3 id="performance-tests">Performance  tests</h3>
 <ol>
 <li>
 <p>As a developer I want to understand how to measure data latency and lag in data replication.</p>
+<ul>
+<li>IBM Event streams offers an event producers to do stress testing. The performance tests are documented <a href="perf-tests/">in this chapter</a>.</li>
+</ul>
 </li>
 <li>
-<p>As a SRE I want to understand current thoughput for the replication solution.</p>
+<p>As a SRE I want to understand current throughput for the replication solution.</p>
+<ul>
+<li>Kafka brokers are reporting the number of request per second, and the byte in per sec as part of the metrics visible in Prometheus. Those metrics can be at the producer Fetch consumer or fetch follower level.</li>
+</ul>
 </li>
 </ol>
                 

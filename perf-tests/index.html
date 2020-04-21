@@ -472,18 +472,6 @@
   </li>
 
         
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../upgrade/" title="Rolling upgrade" class="md-nav__link">
-      Rolling upgrade
-    </a>
-  </li>
-
-        
       </ul>
     </nav>
   </li>
@@ -647,6 +635,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#basic-measurement" title="Basic Measurement" class="md-nav__link">
+    Basic Measurement
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measuring-with-consumer-app" title="Measuring with consumer app" class="md-nav__link">
+    Measuring with consumer app
+  </a>
+  
+</li>
+      
       
       
       
@@ -804,6 +806,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#basic-measurement" title="Basic Measurement" class="md-nav__link">
+    Basic Measurement
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measuring-with-consumer-app" title="Measuring with consumer app" class="md-nav__link">
+    Measuring with consumer app
+  </a>
+  
+</li>
+      
       
       
       
@@ -933,7 +949,7 @@ Topic: source.accounts  PartitionCount: <span class="m">5</span>   ReplicationFa
 <h4 id="conclusion-method-1">Conclusion Method 1</h4>
 <p>Hypothesis proven - MirrorMaker 2 can replicate from a local topic with 10 partitions to a remote topic with 5 partitions.</p>
 <h2 id="performance-tests">Performance tests</h2>
-<p>The producer code, we used is based on the Apache <a href="https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java">Kafka producer performance tool</a> which can read data from a file and generates n records to the source topic. We use the IBM Event Stream, wrapper on top of this tool to communicate with Event streams. <a href="https://ibm.github.io/event-streams/getting-started/testing-loads/">This article</a> explains how to use the tool. We have cloned this tool under the <code>perf-test/event-streams-sample-producer</code> folder.</p>
+<p>For the performance test producer code, we use the IBM Event Stream tool which is itself based on the Apache <a href="https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java">Kafka producer performance tool</a>. This tool can read data from a file and generates n records to the source topic. <a href="https://ibm.github.io/event-streams/getting-started/testing-loads/">This article</a> explains how to use the tool. We have cloned this tool under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">perf-test/event-streams-sample-producer</a> folder.</p>
 <p>The tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.</p>
 <p>The arguments supported are:</p>
 <table>
@@ -986,6 +1002,16 @@ Topic: source.accounts  PartitionCount: <span class="m">5</span>   ReplicationFa
 </tr>
 </tbody>
 </table>
+<p>To completement this tool, we need a consumer that will be responsible to measure some of the latency between given timestamps. The following diagram presents the interesting time stamps we can assess with some tooling:</p>
+<p><img alt="" src="../images/mm2-ts-test.png" /></p>
+<ul>
+<li>ts-1: timestamp when creating the record object before sending</li>
+<li>ts-2: record timestamp when broker write to topic-partition: source topic</li>
+<li>ts-3: record timestamp when broker write to topic-partition: target topic</li>
+<li>ts-4: timestamp when polling the record</li>
+</ul>
+<p>The consumer needs to be deployable on OpenShift to scale horizontally. The metrics can be exposed as metrics for Prometheus. The metrics are: average latency, min and max latencies.</p>
+<p>The performance test consumer webapp is under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/perf-consumer-app">perf-tests/perf-consumer-app folder</a>. The readme explains how to build and deploy it.</p>
 <h3 id="test-approach_1">Test approach</h3>
 <p>Using IBM event streams producer tool we can run 3 different workload size, the payload is generated with random bytes or with records read from a data file.</p>
 <div class="codehilite"><pre><span></span>java -jar target/es-producer.jar -t <span class="nb">test</span> -s small
@@ -995,34 +1021,35 @@ java -jar target/es-producer.jar -t <span class="nb">test</span> -s large
 
 <p>To build the jar,run <code>mvn package</code> in the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">event-streams-sample-producer-1.1.0</a> folder.</p>
 <p>Here is an example of call to this performance producer</p>
-<p><div class="codehilite"><pre><span></span> java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
- <span class="sb">```</span>
-
-The <span class="sb">`</span>eventstream.properties<span class="sb">`</span> file define the bootstrap.servers, sasl configuration using Event Streams credentials and URLs. Something like:
+<div class="codehilite"><pre><span></span> java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
 </pre></div>
-bootstrap.servers=broker-3-.....eventstreams.cloud.ibm.com:9093
-security.protocol=SASL_SSL
-ssl.protocol=TLSv1.2
-sasl.mechanism=PLAIN
-sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="<replace with APIKAY>";
-<div class="codehilite"><pre><span></span>## Measurements
 
-This is the type of traces reported.
+<p>The <code>eventstream.properties</code> file define the bootstrap.servers, sasl configuration using Event Streams credentials and URLs. Something like:</p>
+<div class="codehilite"><pre><span></span><span class="na">bootstrap.servers</span><span class="o">=</span><span class="s">broker-3-.....eventstreams.cloud.ibm.com:9093</span>
+<span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_SSL</span>
+<span class="na">ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.2</span>
+<span class="na">sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
+<span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;&lt;replace with APIKAY&gt;&quot;;</span>
+</pre></div>
 
-```shell
-1261 records sent, 251.8 records/sec (0.97 MB/sec), 2233.3 ms avg latency, 3320.0 max latency.
-2848 records sent, 569.5 records/sec (2.19 MB/sec), 5797.0 ms avg latency, 8294.0 max latency.
-2840 records sent, 567.8 records/sec (2.19 MB/sec), 10760.9 ms avg latency, 13288.0 max latency.
+<h2 id="basic-measurement">Basic Measurement</h2>
+<p>This is the type of traces reported.</p>
+<div class="codehilite"><pre><span></span><span class="m">1261</span> records sent, <span class="m">251</span>.8 records/sec <span class="o">(</span><span class="m">0</span>.97 MB/sec<span class="o">)</span>, <span class="m">2233</span>.3 ms avg latency, <span class="m">3320</span>.0 max latency.
+<span class="m">2848</span> records sent, <span class="m">569</span>.5 records/sec <span class="o">(</span><span class="m">2</span>.19 MB/sec<span class="o">)</span>, <span class="m">5797</span>.0 ms avg latency, <span class="m">8294</span>.0 max latency.
+<span class="m">2840</span> records sent, <span class="m">567</span>.8 records/sec <span class="o">(</span><span class="m">2</span>.19 MB/sec<span class="o">)</span>, <span class="m">10760</span>.9 ms avg latency, <span class="m">13288</span>.0 max latency.
 
 ..
 
-60000 records sent, 490.869821 records/sec (1.89 MB/sec), 14698.93 ms avg latency, 24949.00 ms max latency, 14490 ms 50th, 22298 ms 95th, 23413 ms 99th, 24805 ms 99.9th.
-</pre></div></p>
+<span class="m">60000</span> records sent, <span class="m">490</span>.869821 records/sec <span class="o">(</span><span class="m">1</span>.89 MB/sec<span class="o">)</span>, <span class="m">14698</span>.93 ms avg latency, <span class="m">24949</span>.00 ms max latency, <span class="m">14490</span> ms 50th, <span class="m">22298</span> ms 95th, <span class="m">23413</span> ms 99th, <span class="m">24805</span> ms <span class="m">99</span>.9th.
+</pre></div>
+
 <p>Adding a consumer is simple, start a python environment using docker image, and launch the PerfConsumer code.</p>
 <div class="codehilite"><pre><span></span><span class="nb">source</span> ./scripts/setenv.sh
 docker run -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> --rm -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home -it  ibmcase/python37 bash
 $ python consumer/PerfConsumer.py
 </pre></div>
+
+<h2 id="measuring-with-consumer-app">Measuring with consumer app</h2>
                 
                   
                 
