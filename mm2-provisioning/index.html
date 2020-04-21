@@ -329,6 +329,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mm2-topology" title="MM2 topology" class="md-nav__link">
+    MM2 topology
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capacity-planning" title="Capacity planning" class="md-nav__link">
+    Capacity planning
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-migration" title="Version migration" class="md-nav__link">
+    Version migration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deploying-a-custom-mirror-maker-docker-image" title="Deploying a custom Mirror Maker docker image" class="md-nav__link">
     Deploying a custom Mirror Maker docker image
   </a>
@@ -351,13 +372,6 @@
         <li class="md-nav__item">
   <a href="#deploying-on-vm" title="Deploying on VM" class="md-nav__link">
     Deploying on VM
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#capacity-planning" title="Capacity planning" class="md-nav__link">
-    Capacity planning
   </a>
   
 </li>
@@ -669,6 +683,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mm2-topology" title="MM2 topology" class="md-nav__link">
+    MM2 topology
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capacity-planning" title="Capacity planning" class="md-nav__link">
+    Capacity planning
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-migration" title="Version migration" class="md-nav__link">
+    Version migration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deploying-a-custom-mirror-maker-docker-image" title="Deploying a custom Mirror Maker docker image" class="md-nav__link">
     Deploying a custom Mirror Maker docker image
   </a>
@@ -691,13 +726,6 @@
         <li class="md-nav__item">
   <a href="#deploying-on-vm" title="Deploying on VM" class="md-nav__link">
     Deploying on VM
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#capacity-planning" title="Capacity planning" class="md-nav__link">
-    Capacity planning
   </a>
   
 </li>
@@ -813,6 +841,53 @@ The config part can match the Kafka configuration for consumer or producer, exce
 <p>This commmand creates a kubernetes deployment as illustrated below, with one pod as the replicas is set to 1. If we need to add parallel processing because of the topics to replicate have multiple partitions, or there are a lot of topics to replicate, then adding pods will help to scale horizontally. The pods are in the same consumer group, so Kafka Brokers will do the partition rebalancing among those new added consumers.</p>
 <p><img alt="Mirror maker deployment" src="../images/mm2-deployment.png" /></p>
 <p>Now with this deployment we can test consumer and producer as described <a href="es-to-local/#scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift">in the scenario 4</a>.</p>
+<h2 id="mm2-topology">MM2 topology</h2>
+<p>In this section we want to address horizontal scalability and organizing the Mirror Maker 2 topology. The simplest approach is to use one mirror maker instance per familly of topics: the classification of familly of topic can be anything, from line of business to application scope. Suppose an application is using 1000 topic - partitions, for data replication it may make sense to have one MM2 instance per application responsible to manage the topic replication.</p>
+<p>The following diagram illustrates this kind of topology by using regular expression on the topic white list selection, there are 3 mm2 instances mirroring the different topics with name starting with <code>topic-name-A*, topic-name-B*, topic-name-C*,</code> respectively.</p>
+<p><img alt="" src="../images/mm2-topology.png" /></p>
+<p>Each instance is part of different consumer group.</p>
+<h2 id="capacity-planning">Capacity planning</h2>
+<p>We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters <code>max.tasks</code> specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.</p>
+<p>The task processing is stateless, consume - produce wait for acknowledge,  commit offet. In this case the CPU and network are key. For platform tuning activity we need to monitor operating system performance metrics. If the CPU becomes the bottleneck, we can allocate more CPU or start to scale horizontally by adding mirror maker 2 instance. If the network at the server level is the bottleneck, then adding more servers will help. Kafka will automatically balance the load among all the tasks running on all the machines. The size of the message impacts also the throughtput as with small message the throughput is CPU bounded. With 100 bytes messages or more we can observe network saturation. </p>
+<p>The parameters to consider for sizing are the following:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number of topic/ partition</td>
+<td>Each task processes one partition</td>
+<td>For pure parallel processing max.tasks is the number of CPU</td>
+</tr>
+<tr>
+<td>Record size</td>
+<td>Size of the message in each partition in average</td>
+<td>Memory usage and Throughput: the # of records/s descrease when size increase, while MB/s throughput increases in logarithmic</td>
+</tr>
+<tr>
+<td>Expected input throughput</td>
+<td>The producer writing to the source topic throughput</td>
+<td>Be sure the consumers inside MM2 absorb the demand</td>
+</tr>
+<tr>
+<td>Network latency</td>
+<td></td>
+<td>This is where positioning MM2 close to the target cluster may help improve latency</td>
+</tr>
+</tbody>
+</table>
+<h2 id="version-migration">Version migration</h2>
+<p>Once the Mirror Maker cluster is up and running, it may be needed to update the underlying code when a new product version is released. As of now the recommendation is to stop the current mirror maker instance and restart it with the new version. As each mirror maker instance is part of the same consumer group, the internal workers will coordinate with the consumer group controller to assign 'consumer' task to partition.</p>
+<ul>
+<li>If the MM2 CRD changes, just reapplying the CRD should be enough.</li>
+<li>Deploy the new cluster operator with the new code version.</li>
+</ul>
+<p>Be sure to verify the product documentation as new version may enforce to have new topics. It was the case when Kafka connect added the config topic in a recent version.</p>
 <h2 id="deploying-a-custom-mirror-maker-docker-image">Deploying a custom Mirror Maker docker image</h2>
 <p>We want to use custom docker image when we want to add Prometheus JMX exporter as Java Agent so we can monitor MM2 with Prometheus. The proposed docker file is <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">in this folder</a> and may look like:</p>
 <div class="codehilite"><pre><span></span><span class="k">FROM</span><span class="s"> strimzi/kafka:latest-kafka-2.4.0</span>
@@ -926,41 +1001,6 @@ mm2-cluster   <span class="m">1</span>
 <h2 id="deploying-on-vm">Deploying on VM</h2>
 <p>On virtual machine, it is possible to deploy the Apache Kafka 2.4+ binary file and then use the command <code>/opt/kafka/bin/connect-mirror-maker.sh</code> with the good properties file as argument.</p>
 <p>Within a VM we can run multiple mirror maker instances. When needed we can add more VMs to scale horizontally. Each mirror makers workers are part of the same consumer groups, so it is possible to scale at the limit of the topic partition number.</p>
-<h2 id="capacity-planning">Capacity planning</h2>
-<p>We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters <code>max.tasks</code> specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.</p>
-<p>The task processing is stateless, consume - produce wait for acknowledge,  commit offet. In this case the CPU and network are key. For platform tuning activity we need to monitor operating system performance metrics. If the CPU becomes the bottleneck, we can allocate more CPU or start to scale horizontally by adding mirror maker 2 instance. If the network at the server level is the bottleneck, then adding more servers will help. Kafka will automatically balance the load among all the tasks running on all the machines. The size of the message impacts also the throughtput as with small message the throughput is CPU bounded. With 100 bytes messages or more we can observe network saturation. </p>
-<p>The parameters to consider for sizing are the following:</p>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Description</th>
-<th>Impact</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Number of topic/ partition</td>
-<td>Each task processes one partition</td>
-<td>For pure parallel processing max.tasks is the number of CPU</td>
-</tr>
-<tr>
-<td>Record size</td>
-<td>Size of the message in each partition in average</td>
-<td>Memory usage and Throughput: the # of records/s descrease when size increase, while MB/s throughput increases in logarithmic</td>
-</tr>
-<tr>
-<td>Expected input throughput</td>
-<td>The producer writing to the source topic throughput</td>
-<td>Be sure the consumers inside MM2 absorb the demand</td>
-</tr>
-<tr>
-<td>Network latency</td>
-<td></td>
-<td>This is where positioning MM2 close to the target cluster may help improve latency</td>
-</tr>
-</tbody>
-</table>
 <h2 id="deploying-mirror-maker-2-on-its-own-project">Deploying Mirror Maker 2 on its own project</h2>
 <p>In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The approach may be used with Event Streams on Cloud as backend Kafka cluster and Mirror Maker 2 for replication.</p>
 <p>Using the Strimzi operator we need to define a Yaml file for the connector and white and black lists for the topics to replicate. Here is an <a href="">example of such descriptor</a>.</p>
@@ -989,7 +1029,7 @@ mm2-cluster   <span class="m">1</span>
 <li>ERROR WorkerSourceTask{id=MirrorSourceConnector-0} Failed to flush, timed out while waiting for producer to flush outstanding 1 messages</li>
 <li>ERROR WorkerSourceTask{id=MirrorSourceConnector-0} Failed to commit offsets (org.apache.kafka.connect.runtime.SourceTaskOffsetCommitter:114)</li>
 </ul>
-<p><strong>Some usefule commands</strong></p>
+<p><strong>Some useful commands</strong></p>
 <ul>
 <li>Connect to local cluster: <code>oc exec -ti eda-demo-24-cluster-kafka-0 bash</code></li>
 <li>list the topics: <code>./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --list</code></li>

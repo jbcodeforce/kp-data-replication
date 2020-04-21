@@ -503,9 +503,58 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Security
+      </label>
+    
     <a href="./" title="Security" class="md-nav__link md-nav__link--active">
       Security
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" title="Concepts" class="md-nav__link">
+    Concepts
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encryption" title="Encryption" class="md-nav__link">
+    Encryption
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acl-replications" title="ACL replications" class="md-nav__link">
+    ACL replications
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -551,6 +600,42 @@
     
   
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" title="Concepts" class="md-nav__link">
+    Concepts
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encryption" title="Encryption" class="md-nav__link">
+    Encryption
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acl-replications" title="ACL replications" class="md-nav__link">
+    ACL replications
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -565,7 +650,148 @@
                 
                 
                 <h1 id="security-considerations">Security considerations</h1>
-<p>org.apache.kafka.common.errors.TopicAuthorizationException: Not authorized to access topics: [products]</p>
+<h2 id="concepts">Concepts</h2>
+<p>The following diagram illustrates the security context in term of encryption and authentication between the different cluster types. Event Streams on premise, as part of Cloud Pak for integration, supports TLSv1.2 and CA certificates.</p>
+<p><img alt="" src="../images/sec-view.png" /></p>
+<p>For Event Streams on Cloud as managed service, or on premise,  the authentication and authorization are done using <a href="https://docs.oracle.com/javase/7/docs/technotes/guides/security/jaas/JAASRefGuide.html">Java Authentication and Authorization Service</a> using generic user name: <code>token</code> and APIKEY as password as part of the Jaas configuration. Here is an example of properties setting.</p>
+<div class="codehilite"><pre><span></span><span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;&lt;event-streams-apikey&gt;&quot;;</span>
+</pre></div>
+
+<p>When deployed in kubernetes those properties can be set in secret as config map and injected inside the consumer or producer pods. For mirror maker 2, the CRD definition supports the authentication stanza that can use secret, which will be used by the MM2 java code to define a JaaS configuration.</p>
+<div class="codehilite"><pre><span></span>    authentication:
+      passwordSecret:
+          secretName: es-api-secret  
+          password: password 
+      username: token
+      type: plain
+</pre></div>
+
+<p>For other app connecting to event streams, the code need to set other SaaS parameters to encrypt via TLS and authenticate via SASL (the security protocol is SASL_SSL):</p>
+<div class="codehilite"><pre><span></span><span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">CommonClientConfigs</span><span class="o">.</span><span class="na">SECURITY_PROTOCOL_CONFIG</span><span class="o">,</span> <span class="s">&quot;SASL_SSL&quot;</span><span class="o">);</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">SaslConfigs</span><span class="o">.</span><span class="na">SASL_MECHANISM</span><span class="o">,</span> <span class="s">&quot;PLAIN&quot;</span><span class="o">);</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">SaslConfigs</span><span class="o">.</span><span class="na">SASL_JAAS_CONFIG</span><span class="o">,</span>
+<span class="s">&quot;org.apache.kafka.common.security.plain.PlainLoginModule required username=\&quot;token\&quot; password=\&quot;&quot;</span>
+<span class="o">+</span> <span class="n">env</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;KAFKA_APIKEY&quot;</span><span class="o">)</span> <span class="o">+</span> <span class="s">&quot;\&quot;;&quot;</span><span class="o">);</span>
+</pre></div>
+
+<h3 id="encryption">Encryption</h3>
+<p>The Clients to Broker communications are encrypted. Event Streams clients need to define the protocol using properties like:</p>
+<div class="codehilite"><pre><span></span><span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">SslConfigs</span><span class="o">.</span><span class="na">SSL_PROTOCOL_CONFIG</span><span class="o">,</span> <span class="s">&quot;TLSv1.2&quot;</span><span class="o">);</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">SslConfigs</span><span class="o">.</span><span class="na">SSL_ENABLED_PROTOCOLS_CONFIG</span><span class="o">,</span> <span class="s">&quot;TLSv1.2&quot;</span><span class="o">);</span>
+</pre></div>
+
+<p>With Java code, the CA root and client certiticates needs to be in the Truststore.jks file. Host name verification is enabled by default to avoid man in the middle attacks. The clients code will verify the server’s fully qualified domain name (FQDN) against Common Name or Subject Alternative Name.</p>
+<h2 id="acl-replications">ACL replications</h2>
+<p>The following scenario validates the Mirror Maker 2 ACL replication. The goal is to define the same users between Event Streams on the cloud and local kafka may be deployed and operated with Strimzi. Two users are created (kp-consumer-1,kp-consumer-2) to access two different topics (kp-topic-1, kp-topic-2) respectively.</p>
+<ul>
+<li>Create new user, named <code>kp-consumer-1</code> on local Kafka environment, using for example a Strimzi Kafka User, or using any mechanism to add user to k8s cluster. The following descriptor defines the ACL at a given topic: <code>kp-topic-1</code></li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.strimzi.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">KafkaUser</span>
+<span class="nt">metadata</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-consumer-1</span>
+  <span class="nt">labels</span><span class="p">:</span>
+    <span class="nt">strimzi.io/cluster</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-local</span>
+  <span class="nt">namespace</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-kafka</span>
+<span class="nt">spec</span><span class="p">:</span>
+  <span class="nt">authentication</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">tls</span>
+  <span class="nt">authorization</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">simple</span>
+    <span class="nt">acls</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">topic</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-topic-1</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Read</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">topic</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-topic-1</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Describe</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">group</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-users</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Read</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">topic</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-topic-1</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Write</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+</pre></div>
+
+<ul>
+<li>Do the same for a second user <code>kp-consumer-2</code> accessing another topic `kp-topic-2:</li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kafka.strimzi.io/v1beta1</span>
+<span class="nt">kind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">KafkaUser</span>
+<span class="nt">metadata</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-consumer-2</span>
+  <span class="nt">labels</span><span class="p">:</span>
+    <span class="nt">strimzi.io/cluster</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-local</span>
+  <span class="nt">namespace</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-kafka</span>
+<span class="nt">spec</span><span class="p">:</span>
+  <span class="nt">authentication</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">tls</span>
+  <span class="nt">authorization</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">simple</span>
+    <span class="nt">acls</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">topic</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-topic-2</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Read</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">topic</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-topic-2</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Describe</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">group</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-users</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Read</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+      <span class="p p-Indicator">-</span> <span class="nt">resource</span><span class="p">:</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">topic</span>
+          <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kp-topic-2</span>
+          <span class="nt">patternType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">literal</span>
+        <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Write</span>
+        <span class="nt">host</span><span class="p">:</span> <span class="s">&#39;*&#39;</span>
+</pre></div>
+
+<ul>
+<li>On the IBM Event Streams side, define credentials for the different potential access roles: reader, writer or manager. </li>
+</ul>
+<p><img alt="" src="../images/sec-serv-cred.png" /></p>
+<p>Those credentials are automatically visible as <code>Service IDs</code> inside IBM Access Manager.</p>
+<p><img alt="" src="../images/image.png" /></p>
+<ul>
+<li>Using IBM IAM and the service ID, define the access control for each of the service ID. The following figure  </li>
+</ul>
+<p><img alt="" src="../images/user-access-policies.png" /></p>
+<ul>
+<li>In the mirror maker 2 configuration you can enable/disable the ACLs synch flag using the property:</li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="na">sync.topic.acls.enabled</span><span class="o">=</span><span class="s">true</span>
+</pre></div>
+
+<p>If it was set to false (default), we can assess the access per topic using the kafka ACL tool. User <code>kp-consumer-1</code> has access to source topic <code>kp-topic-1</code> and the remote topic on target cluster has no ACL moved.</p>
+<div class="codehilite"><pre><span></span>sh-4.2$ bin/kafka-acls.sh --authorizer kafka.security.auth.SimpleAclAuthorizer --authorizer-properties zookeeper.connect<span class="o">=</span>localhost:2181 --list --topic kp-topic-1
+Current ACLs <span class="k">for</span> resource <span class="sb">`</span>Topic:LITERAL:kp-topic-1<span class="sb">`</span>: 
+        User:CN<span class="o">=</span>kp-consumer-1 has Allow permission <span class="k">for</span> operations: Write from hosts: *
+        User:CN<span class="o">=</span>kp-consumer-1 has Allow permission <span class="k">for</span> operations: Describe from hosts: *
+        User:CN<span class="o">=</span>kp-consumer-1 has Allow permission <span class="k">for</span> operations: Read from hosts: * 
+
+sh-4.2$ bin/kafka-acls.sh --authorizer kafka.security.auth.SimpleAclAuthorizer --authorizer-properties zookeeper.connect<span class="o">=</span>localhost:2181 --list --topic kp-remote.kp-topic-1
+</pre></div>
                 
                   
                 

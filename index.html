@@ -894,10 +894,13 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <h3 id="version-to-version-migration">Version to version migration</h3>
 <ol>
 <li>
-<p>As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade. </p>
+<p>As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.</p>
+<ul>
+<li>See some rolling upgrade recommendations in <a href="[this section](mm2-provisioning#version-migration)">this section</a></li>
+</ul>
 </li>
 <li>
-<p>As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated. </p>
+<p>As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.</p>
 </li>
 </ol>
 <h3 id="security">Security</h3>
@@ -909,7 +912,7 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <p>As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.</p>
 </li>
 </ol>
-<p>Those subjects are address in <a href="security/">the security note</a></p>
+<p>Those subjects are addressed in <a href="security/">the security note</a></p>
 <h3 id="monitoring">Monitoring</h3>
 <ol>
 <li>
@@ -939,7 +942,7 @@ creates only one single task. <code>MirrorSourceConnector</code> will have one t
 <li>
 <p>As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.</p>
 <ul>
-<li>Lag will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally. </li>
+<li>Lag will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally.</li>
 </ul>
 </li>
 <li>As a developer I want to understand what are the condition for message loss.</li>
