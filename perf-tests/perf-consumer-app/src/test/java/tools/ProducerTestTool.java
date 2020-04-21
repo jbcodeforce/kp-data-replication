@@ -8,7 +8,7 @@ import java.util.Properties;
  * between the last topic record timestamp.
  * 
  * The following timestamps are interresting to measure: TS1 = the time stamp
- * when the payload is created at the producer code level TS2 = the kafka record
+ * when the payload is created at the producer code level TS2 = the kafka recordcd ..
  * time stamp on the first topic, in a chain of topic when doing kafka streams
  * solution for example TS3 = the kafka record time stamp on the last topic in
  * the chain TS4 = the consumer now timestamp.

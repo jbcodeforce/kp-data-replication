@@ -2,19 +2,31 @@
 
 ## Implementation Approach
 
+The approach is to implement producer and consumer to get the different timestamps to measure the latency of the data mirroring. 
 
-## Building your application
+![](docs/mm2-ts-test.png)
+
+* ts-1: timestamp when creating the record object before sending
+* ts-2: record timestamp when broker write to topic-partition: source topic
+* ts-3: record timestamp when broker write to topic-partition: target topic
+* ts-4: timestamp when polling the record
+
+The consumer needs to be deployable on OpenShift to scale horizontally. The metrics can be exposed as metrics for Prometheus. The metrics are: average latency, min and max latencies.
+
+The producer tool is just an simple java class and is not yet deployable as webapp.
+
+## Building the consumer
 
 ```
 mvn install
 ```
 
-Your `pom.xml` file is already configured to add your REST application to the OpenLiberty `defaultServer`. 
+Your `pom.xml` file is already configured to add the consumer application to the OpenLiberty `defaultServer`. 
 
-The `install-apps` goal copies the application into the specified directory of the specified server.
+The `deploy` goal copies the application into the specified directory of the specified server.
 In this case, the goal copies the `PerfConsumerApp.war` file into the `apps` directory of the `defaultServer` server.
 
-## Building the image
+## Building the docker image
 
 To build your image, make sure that your Docker daemon is running and execute the Docker `build` command
 from the command line. If you execute your build from the same directory as your Dockerfile, you can
@@ -49,52 +61,5 @@ CONTAINER ID        IMAGE               CREATED             STATUS              
 
 To view a full list of all available containers, run the `docker ps -a` command from the command line.
 
-If your container is running without problems, point your browser to http://localhost:9080/LibertyProject/System/properties[http://localhost:9080/LibertyProject/System/properties^],
-where you can see a JSON file that contains the system properties of the JVM in your container.
-[role="code_command hotspot", subs="quotes"]
-----
-#Update the `PropertiesResource` class.#
-`src/main/java/io/openliberty/guides/rest/PropertiesResource.java`
-----
+### Access to the APIs
 
-[role="edit_command_text"]
-Change the endpoint of your application from `properties` to `properties-new` by changing the [hotspot=Path]`@Path`
-annotation to `"properties-new"`.
-
-
-To see these changes reflected in the container, run the following command from the command line to
-rebuild your application and point your browser to http://localhost:9080/LibertyProject/System/properties-new[http://localhost:9080/LibertyProject/System/properties-new^].
-[role='command']
-```
-mvn package
-```
-You see the same JSON file that you saw previously.
-
-To stop your container, run the following command from the command line.
-[role='command']
-```
-docker stop rest-app
-```
-
-If a problem occurs and your container exits prematurely, the container won't appear in the container
-list that the `docker ps` command displays. Instead, your container appears with an `Exited`
-status when you run the `docker ps -a` command. Run the `docker logs rest-app` command to view the
-container logs for any potential problems and double-check that your Dockerfile is correct. When you
-find the cause of the issue, remove the faulty container with the `docker rm rest-app` command, rebuild
-your image, and start the container again.
-
-PropertiesResource.java
-[source, Java, linenums, role='code_column hide_tags=comment']
-----
-include::finish/src/main/java/io/openliberty/guides/rest/PropertiesResource.java[]
-----
-
-== Great work! You're done!
-
-You have learned how to set up, run, iteractively develop a simple REST application in a container with
-Open Liberty and Docker. Whenever you make changes to your application code, they will now reflect
-automatically on the Open Liberty server running in a container when the application rebuilds.
-
-
-
-include::{common-includes}/attribution.adoc[subs="attributes"]
