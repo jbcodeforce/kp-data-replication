@@ -9,7 +9,7 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.springframework.boot.SpringApplication;
+//import org.springframework.boot.SpringApplication;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -69,7 +69,7 @@ public class ProducerTestTool {
                 map.put("value", count);
                 map.put("id", count);
                 System.out.println(map);
-                ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, map.toString());
+                ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic,count + "", map.toString());
                 producer.send(record);
                 count++;
             }
