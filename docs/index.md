@@ -100,9 +100,11 @@ This main epic is related to provisioning operation.
 
 1. As a SRE, I want to understand how to perform a version to version migration for the Mirror Maker 2 product so that existing streaming replication is not impacted by the upgrade.
     
-    * See some rolling upgrade recommendations in [this section]([this section](mm2-provisioning#version-migration) )
+    * See some rolling upgrade recommendations in [this section](mm2-provisioning#version-migration).
 
 1. As a developer I want to deploy configuration updates to modify the topic white or black lists so that newly added topics are replicated.
+
+    * Mirror maker 2 configuration is done with yaml files and applied using `kubectl or oc` CLI. The Strimzi cluster operator is managing the redeployment of the mirror maker deployment.
 
 ### Security
 
@@ -110,7 +112,7 @@ This main epic is related to provisioning operation.
 
 1. As a developer I want to design Mirror Maker 2 based replication solution to support different line of businesses who should not connect to topics and data not related to their business and security scope.
 
-Those subjects are addressed in [the security note](security.md)
+Those subjects are addressed in [the security note](security.md).
 
 ### Monitoring
 
@@ -126,15 +128,23 @@ Those subjects are addressed in [the security note](security.md)
 
 ### Best Practices
 
-1. As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication. 
+1. As a developer I want to understand how Mirror Maker 2 based replication addresses the record duplication.
+
     * Here is [a note on records duplication](consideration#record-duplication).
 
 1. As a developer I want to design replication solution to minimize the instance of Mirror Maker or being able to scale them if I observe lag into data replication processing.
-    * Lag will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally.
-1. As a developer I want to understand what are the condition for message loss.
+
+    * Lags will be present anyway dues to the asynchronous processing, but it is possible to scale vertically and horizontally.
+
+1. As a developer I want to understand what are the conditions for message loss. We are detailing the exactly once and ensuring delivery in [those notes: producer](https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers#how-to-support-exactly-once-delivery) and [consumer](https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers).
 
 ### Performance  tests
 
 1. As a developer I want to understand how to measure data latency and lag in data replication.
 
-1. As a SRE I want to understand current thoughput for the replication solution.
+    * IBM Event streams offers an event producers to do stress testing. The performance tests are documented [in this chapter](perf-tests.md).
+
+1. As a SRE I want to understand current throughput for the replication solution.
+
+    * Kafka brokers are reporting the number of request per second, and the byte in per sec as part of the metrics visible in Prometheus. Those metrics can be at the producer Fetch consumer or fetch follower level.
+

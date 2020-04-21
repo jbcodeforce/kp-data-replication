@@ -18,7 +18,6 @@ nav:
     - Replicaton considerations: consideration.md
   - Operations: 
     - Monitoring with Prometheus and Grafana: monitoring.md
-    - Rolling upgrade: upgrade.md
   - Security: security.md
   - Tests: perf-tests.md
   - Compendium: compendium.md
