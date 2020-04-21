@@ -98,9 +98,15 @@ Thinking of our goals as Agile user stories, we list our stories and some notes 
 
 ### Version-to-Version Migration
 
-1. As an SRE, I want to understand how to perform a version-to-version migration for the MirrorMaker 2 product so that existing streaming replication is not impacted by the upgrade. 
 
-1. As a developer I want to deploy configuration updates to modify the topic replication white or black lists so that newly added topics are replicated. 
+1. As a SRE, I want to understand how to perform a version-to-version migration for the MirrorMaker 2 product so that existing streaming replication is not impacted by the upgrade.
+    
+    * See some rolling upgrade recommendations in [this section](mm2-provisioning#version-migration).
+
+1. As a developer I want to deploy configuration updates to modify the topic replication white or black lists so that newly added topics are replicated.
+
+    * Mirror maker 2 configuration is done with yaml files and applied using `kubectl or oc` CLI. The Strimzi cluster operator is managing the redeployment of the mirror maker deployment.
+
 
 ### Security
 
@@ -108,7 +114,7 @@ Thinking of our goals as Agile user stories, we list our stories and some notes 
 
 1. As a developer, I want to design MirrorMaker 2 based replication solution to support different lines of businesses who should not connect to topics and data not related to their business and security scope.
 
-Those subjects are address in [the security note](security.md)
+Those subjects are addressed in [the security note](security.md).
 
 ### Monitoring
 
@@ -124,15 +130,24 @@ Those subjects are address in [the security note](security.md)
 
 ### Best Practices
 
-1. As a developer, I want to understand how MirrorMaker 2 based replication addresses record duplication. 
+1. As a developer I want to understand how MirrorMaker 2 based replication addresses the record duplication.
+
     * Here is [a note on records duplication](consideration#record-duplication).
 
-1. As a developer, I want to design the MirrorMaker 2 Kafka topic replication solution to use minimal resources but also be able to scale-up if I observe data replication lag.
-    * Some lag will always be present due to the the fact that MirrorMaker 2 does asynchronous replication, but it is possible to scale MirrorMaker 2 vertically and horizontally to minimize the lag.
-1. As a developer, I want to understand what are the conditions under which messages may be lost.
+1. As a developer I want to design the MirrorMaker 2 Kafka topic replication solution to use minimal resources but also be able to scale-up if I observe data replication lag.
+
+    * Some lag will always be present due to the the fact that MirrorMaker 2 does asynchronous replication, but it is possible to scale MirrorMaker 2 vertically and horizontally to minimize the lag
+
+1. As a developer I want to understand what are the conditions under which messages may be lost. We are detailing the exactly once and ensuring delivery in [those notes: producer](https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers#how-to-support-exactly-once-delivery) and [consumer](https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers).
+
 
 ### Performance  tests
 
 1. As a developer, I want to understand how to measure latency / lag in data replication.
 
-1. As an SRE, I want to understand current thoughput for the replication solution.
+    * IBM Event streams offers an event producers to do stress testing. The performance tests are documented [in this chapter](perf-tests.md).
+
+1. As a SRE I want to understand current throughput for the replication solution.
+
+    * Kafka brokers are reporting the number of request per second, and the byte in per sec as part of the metrics visible in Prometheus. Those metrics can be at the producer Fetch consumer or fetch follower level.
+

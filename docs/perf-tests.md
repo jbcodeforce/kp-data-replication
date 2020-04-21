@@ -139,7 +139,7 @@ Hypothesis proven - MirrorMaker 2 can replicate from a local topic with 10 parti
 
 ## Performance tests
 
-The producer code, we used is based on the Apache [Kafka producer performance tool](https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java) which can read data from a file and generates n records to the source topic. We use the IBM Event Stream, wrapper on top of this tool to communicate with Event streams. [This article](https://ibm.github.io/event-streams/getting-started/testing-loads/) explains how to use the tool. We have cloned this tool under the `perf-test/event-streams-sample-producer` folder.
+For the performance test producer code, we use the IBM Event Stream tool which is itself based on the Apache [Kafka producer performance tool](https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java). This tool can read data from a file and generates n records to the source topic. [This article](https://ibm.github.io/event-streams/getting-started/testing-loads/) explains how to use the tool. We have cloned this tool under the [perf-test/event-streams-sample-producer](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0) folder.
 
 The tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.
 
@@ -158,6 +158,19 @@ The arguments supported are:
 | --transactional-id `value` | Test with transaction |
 | --transaction-duration-ms `value`| The max age of each transaction. Test with transaction if v>0 |
 
+To completement this tool, we need a consumer that will be responsible to measure some of the latency between given timestamps. The following diagram presents the interesting time stamps we can assess with some tooling:
+
+
+![](images/mm2-ts-test.png)
+
+* ts-1: timestamp when creating the record object before sending
+* ts-2: record timestamp when broker write to topic-partition: source topic
+* ts-3: record timestamp when broker write to topic-partition: target topic
+* ts-4: timestamp when polling the record
+
+The consumer needs to be deployable on OpenShift to scale horizontally. The metrics can be exposed as metrics for Prometheus. The metrics are: average latency, min and max latencies.
+
+The performance test consumer webapp is under the [perf-tests/perf-consumer-app folder](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/perf-consumer-app). The readme explains how to build and deploy it.
 
 ### Test approach
 
@@ -175,11 +188,11 @@ Here is an example of call to this performance producer
 
 ```shell
  java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
- ```
+```
 
 The `eventstream.properties` file define the bootstrap.servers, sasl configuration using Event Streams credentials and URLs. Something like:
 
-```
+```properties
 bootstrap.servers=broker-3-.....eventstreams.cloud.ibm.com:9093
 security.protocol=SASL_SSL
 ssl.protocol=TLSv1.2
@@ -187,7 +200,7 @@ sasl.mechanism=PLAIN
 sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="<replace with APIKAY>";
 ```
 
-## Measurements
+## Basic Measurement
 
 This is the type of traces reported.
 
@@ -208,4 +221,8 @@ source ./scripts/setenv.sh
 docker run -e KAFKA_BROKERS=$KAFKA_BROKERS --rm -v $(pwd):/home -it  ibmcase/python37 bash
 $ python consumer/PerfConsumer.py
 ```
+
+## Measuring with consumer app
+
+
 
