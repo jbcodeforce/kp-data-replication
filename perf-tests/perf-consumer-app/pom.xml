@@ -1,9 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation=
-"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-             
+<?xml version="1.0" encoding="utf-8" ?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ibm.gse.eda</groupId>
@@ -18,6 +15,7 @@ xsi:schemaLocation=
         <maven.compiler.target>1.8</maven.compiler.target>
         <openliberty.version>[20.0.0.4,)</openliberty.version>
         <openliberty.maven.version>3.2</openliberty.maven.version>
+        <kafka.version>2.4.0</kafka.version>
         <app.name>PerfConsumerApp</app.name>
         <testServerHttpPort>9081</testServerHttpPort>
         <testServerHttpsPort>9444</testServerHttpsPort>
@@ -35,7 +33,7 @@ xsi:schemaLocation=
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-    
+
         </dependencies>
     </dependencyManagement>
 
@@ -52,14 +50,49 @@ xsi:schemaLocation=
             <version>3.2</version>
             <type>pom</type>
             <scope>provided</scope>
-          </dependency>
-
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.30</version>
+            <scope>test</scope>
+        </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.6.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
@@ -156,29 +189,29 @@ xsi:schemaLocation=
                 <version>${openliberty.maven.version}</version>
                 <executions>
                     <execution>
-                      <id>package-server</id>
-                      <phase>package</phase>
-                      <goals>
-                        <goal>create</goal>
-                        <goal>install-feature</goal>
-                        <goal>deploy</goal>
-                        <goal>package</goal>
-                      </goals>
-                      <configuration>
-                        <outputDirectory>target/wlp-package</outputDirectory>
-                      </configuration>
+                        <id>package-server</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>create</goal>
+                            <goal>install-feature</goal>
+                            <goal>deploy</goal>
+                            <goal>package</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/wlp-package</outputDirectory>
+                        </configuration>
                     </execution>
-                  </executions>
-                  <configuration>
+                </executions>
+                <configuration>
                     <include>runnable</include>
                     <serverName>defaultServer</serverName>
                     <bootstrapProperties>
-                      <project.name>${final.name}</project.name>
-                      <default.http.port>${testServerHttpPort}</default.http.port>
-                      <default.https.port>${testServerHttpsPort}</default.https.port>
-                      <jwt.issuer>https://server.example.com</jwt.issuer>
+                        <project.name>${final.name}</project.name>
+                        <default.http.port>${testServerHttpPort}</default.http.port>
+                        <default.https.port>${testServerHttpsPort}</default.https.port>
+                        <jwt.issuer>https://server.example.com</jwt.issuer>
                     </bootstrapProperties>
-                  </configuration>
+                </configuration>
             </plugin>
             <!-- Plugin to run functional tests -->
             <plugin>
