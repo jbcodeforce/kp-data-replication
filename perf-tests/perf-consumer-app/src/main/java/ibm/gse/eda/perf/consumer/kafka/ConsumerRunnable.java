@@ -78,6 +78,10 @@ public class ConsumerRunnable implements Runnable {
     public void run() {
         logger.log(Level.SEVERE,"Start runnable");
         init();
+        loop();
+    }
+
+    private void loop(){
         int i = 0;
         while(running) {
             try {
@@ -101,9 +105,9 @@ public class ConsumerRunnable implements Runnable {
                     lagSum += difference;
                     count = count +1;
                     averageLatency = lagSum / count;
-                    logger.log(Level.SEVERE,Long.toString(averageLatency) + " " + Long.toString(minLatency));
+                    logger.log(Level.WARNING,Long.toString(averageLatency) + " " + Long.toString(minLatency));
                 }
-                logger.log(Level.SEVERE, "in thread");
+                logger.log(Level.WARNING, "in thread");
             } catch (final Exception e) {
                 logger.log(Level.SEVERE, "Consumer loop has been unexpectedly interrupted");
                 stop();
@@ -113,17 +117,17 @@ public class ConsumerRunnable implements Runnable {
                 kafkaConsumer.commitSync();
             }
         } //loop
-
     }
 
     public void stop(){
-        logger.log(Level.INFO, "Stop consumer");
+        logger.log(Level.WARNING, "Stop consumer");
         running = false;
     }
 
     public void reStart(){
-        logger.log(Level.INFO, "ReStart consumer");
+        logger.log(Level.WARNING,"ReStart consumer");
         running = true;
+        loop();
     }
 
     public boolean isRunning(){

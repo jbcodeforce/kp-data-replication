@@ -15,6 +15,7 @@ The consumer needs to be deployable on OpenShift to scale horizontally. The metr
 
 The producer tool is just an simple java class and is not yet deployable as webapp.
 
+
 ## Building the consumer
 
 ```
@@ -63,3 +64,27 @@ To view a full list of all available containers, run the `docker ps -a` command 
 
 ### Access to the APIs
 
+
+Here is a quick view of the openapi: http://localhost:9081/openapi/ui
+![](docs/perf-api.png)
+
+Get the metrics via API
+
+```
+http://localhost:9081/perf-consumer-app/perf/current
+
+{ "Max-latency":51830729","Min-latency":51450505", "Average-latency":51698170}
+```
+
+Get application metrics like min, max, average latencies via the metrics: metrics/application
+
+```
+```
+
+Get the configuration: http://localhost:9081/perf-consumer-app/config
+
+```json
+{ 
+"key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer","value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer","enable.auto.commit": "false","group.id": "test-cons-group","bootstrap.servers": "localhost:29092,localhost:29093,localhost:29094","auto.offset.reset": "earliest","client.id": "test-cons-group-client-8980675c-fdc6-4991-95e0-793e4d487ce1"
+}
+```

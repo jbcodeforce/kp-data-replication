@@ -4,10 +4,10 @@ import java.util.Collection;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -32,13 +32,6 @@ public class PerfConsumerController {
 
     @Inject
     private ConsumerRunnable consumerRunnable;
-    
-    @GET
-    @Path("hello")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String sayHello() {
-        return "Hello From Kafka Performance Test Consumer";
-    }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -86,30 +79,33 @@ public class PerfConsumerController {
         StringBuffer sb = new StringBuffer();
         sb.append("{ \"Max-latency\":");
         sb.append(getMaxLatency());
-        sb.append("\",\"Min-latency\":");
+        sb.append(",\"Min-latency\":");
         sb.append(getMinLatency());
-        sb.append("\", \"Average-latency\":");
+        sb.append(", \"Average-latency\":");
         sb.append(getAverageLatency());
         sb.append("}");
         return sb.toString();
      }
 
      @PUT
-     @Path("{order}")
-     @Operation(summary = "Start or stop consumer", description = "")
+     @Consumes(MediaType.TEXT_PLAIN)
+     @Produces(MediaType.TEXT_PLAIN)
+     @Operation(summary = "Stop or restart consumer", description = "")
      @APIResponses(value = {
-             @APIResponse(responseCode = "404", description = "Unknown order", content = @Content(mediaType = "text/plain")),
+             @APIResponse(responseCode = "400", description = "Unknown order should be STOP or START", content = @Content(mediaType = "text/plain")),
              @APIResponse(responseCode = "200", description = "Processed", content = @Content(mediaType = "text/plain")) })
-     
-     public void stopConsumer(@PathParam("order") String order){
+     public void stopConsumer(String order){
          if ("STOP".equals(order)) {
             consumerRunnable.stop();
-            Response.status(Status.ACCEPTED).build();
+            Response.status(Status.OK).build();
          }
 
          if ("START".equals(order)) {
-            consumerRunnable.reStart();
-            Response.status(Status.ACCEPTED).build();
+            if (! consumerRunnable.isRunning()) {
+                consumerRunnable.reStart();
+                Response.status(Status.OK).build();
+            }
+            
          }
          Response.status(Status.BAD_REQUEST).build();
        

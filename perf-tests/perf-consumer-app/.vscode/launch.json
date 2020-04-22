@@ -4,18 +4,26 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    {
-        "type": "java",
-        "name": "Debug (Attach)",
-        "request": "attach",
-        "hostName": "localhost",
-        "port": "7777"
-    },
         {
             "type": "java",
-            "name": "Debug (Launch) - Current File",
+            "name": "CodeLens (Launch) - ProducerTestTool",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "tools.ProducerTestTool",
+            "projectName": "perf-consumer-app"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": "7777"
+        },
+        {
+            "type": "java",
+            "name": "Run Producer Tool",
+            "request": "launch",
+            "mainClass": "${file}",
+            "args": "--num-records 5 --topic accounts --bootstrap localhost:29092,localhost:29093,localhost:29094"
         }
     ]
 }

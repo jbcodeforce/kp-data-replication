@@ -43,8 +43,8 @@ public class KafkaConfiguration {
     private boolean commit;
 
     @Inject
-    @ConfigProperty(name = "kafka.consumer.offset", defaultValue = "earliest")
-    private String offset;
+    @ConfigProperty(name = "kafka.consumer.offsetPolicy", defaultValue = "earliest")
+    private String offsetPolicy;
 
     @Inject
     @ConfigProperty(name = "kafka.brokers", defaultValue = "localhost:9092")
@@ -129,8 +129,12 @@ public class KafkaConfiguration {
         return this.commit;
     }
 
-    public String getOffset(){
-        return this.offset;
+    public void setCommit(boolean b) {
+        this.commit = b;
+    }
+
+    public String getOffsetPolicy(){
+        return this.offsetPolicy;
     }
 
     public String getBrokers(){
@@ -151,7 +155,8 @@ public class KafkaConfiguration {
     public String getPropertiesAsString(){
         StringBuffer sb = new StringBuffer();
         sb.append("{ \n");
-        properties.forEach((k, v) -> sb.append("\"" + k + "\": \"" + v +"\",\n"));
+        properties.forEach((k, v) -> sb.append("\"" + k + "\": \"" + v +"\","));
+        sb.replace(sb.length()-1, sb.length(), "\n");
         sb.append("}");
         return sb.toString();
     }

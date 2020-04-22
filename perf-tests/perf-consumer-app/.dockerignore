@@ -1,4 +1,6 @@
 .DS_Store
+.vscode/
+.settings/
 # tag::src[]
 src/
 # end::src[]
