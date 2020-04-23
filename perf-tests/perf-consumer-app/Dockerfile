@@ -1,9 +1,6 @@
-# Start with OL runtime.
 FROM open-liberty:20.0.0.3-full-java8-openj9
-USER root
-RUN ln -s /opt/ol/wlp/usr/servers /servers
-USER 1001
-COPY target/PerfConsumerApp.war /config/dropins
+COPY --chown=1001:0 src/main/liberty/config /config/
 
-ENTRYPOINT ["/opt/ol/wlp/bin/server", "run"]
-CMD ["defaultServer"]
+COPY  --chown=1001:0 target/PerfConsumerApp.war /config/apps
+USER 1001
+RUN configure.sh

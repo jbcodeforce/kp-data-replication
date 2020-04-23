@@ -105,7 +105,7 @@ public class KafkaConfiguration {
     }
 
     public Properties getConsumerProperties() {
-       return  getConsumerProperties(getGroupId(),getCommit(),getOffset());
+       return  getConsumerProperties(getGroupId(),getCommit(),getOffsetPolicy());
     }
 
 

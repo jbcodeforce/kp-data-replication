@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perfconsumerapp-deployment
+  labels:
+    app: perfconsumerapp
+spec:
+  selector:
+    matchLabels:
+      app: perfconsumerapp
+  template:
+    metadata:
+      labels:
+        app: perfconsumerapp
+    spec:
+      containers:
+      - name: perfconsumerapp
+        image: ibmcase/perfconsumerapp
+        ports:
+        - containerPort: 9080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: perfconsumerapp-service
+spec:
+  selector:
+    app: perfconsumerapp
+  ports:
+  - protocol: TCP
+    port: 9080
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: perfconsumerapp-route
+spec:
+  to:
+    kind: Service
+    name: perfconsumerapp-service
