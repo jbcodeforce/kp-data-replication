@@ -40,15 +40,15 @@ public class ServiceReadyHealthCheck implements HealthCheck {
 
     @Inject
     private ConsumerRunnable consumerRunnable;
-    private ExecutorService executor;
+//    private ExecutorService executor;
     
 	public void init(@Observes 
     @Initialized(ApplicationScoped.class) ServletContext context) {
         logger.log(Level.INFO,"App listener, start kafka consumer");
 
-        // Initialise Kafka Consumer
-        executor = Executors.newFixedThreadPool(1);
-        executor.execute(consumerRunnable);
+//        // Initialise Kafka Consumer
+//        executor = Executors.newFixedThreadPool(1);
+//        executor.execute(consumerRunnable);
         ready=consumerRunnable.isRunning();
     }
 
@@ -57,11 +57,11 @@ public class ServiceReadyHealthCheck implements HealthCheck {
     @Destroyed(ApplicationScoped.class) ServletContext contextServlet) {
         logger.log(Level.INFO,"APP ctx destroyed");
         consumerRunnable.stop();
-        executor.shutdownNow();
-        try {
-            executor.awaitTermination(KafkaConfiguration.TERMINATION_TIMEOUT_SEC, TimeUnit.SECONDS);
-        } catch (InterruptedException ie) {
-            logger.warning("await Termination( interrupted " + ie.getLocalizedMessage());
-        }
+//        executor.shutdownNow();
+//        try {
+//            executor.awaitTermination(KafkaConfiguration.TERMINATION_TIMEOUT_SEC, TimeUnit.SECONDS);
+//        } catch (InterruptedException ie) {
+//            logger.warning("await Termination( interrupted " + ie.getLocalizedMessage());
+//        }
 	}
 }

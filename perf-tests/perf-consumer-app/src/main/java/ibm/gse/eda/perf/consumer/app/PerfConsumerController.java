@@ -1,6 +1,8 @@
 package ibm.gse.eda.perf.consumer.app;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import ibm.gse.eda.perf.consumer.app.dto.Control;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Gauge;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -32,7 +35,8 @@ public class PerfConsumerController {
 
     @Inject
     private ConsumerRunnable consumerRunnable;
-    
+    private ExecutorService executor;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Retrieve last 50 messages",description=" Retrieve the last 50 messages consumed in the kafka consumer")
@@ -87,25 +91,30 @@ public class PerfConsumerController {
         return sb.toString();
      }
 
+     private void createThread(int count ){
+        executor = Executors.newFixedThreadPool(count);
+        executor.execute(consumerRunnable);
+     }
+
      @PUT
-     @Consumes(MediaType.TEXT_PLAIN)
+     @Consumes(MediaType.APPLICATION_JSON)
      @Produces(MediaType.TEXT_PLAIN)
      @Operation(summary = "Stop or restart consumer", description = "")
      @APIResponses(value = {
              @APIResponse(responseCode = "400", description = "Unknown order should be STOP or START", content = @Content(mediaType = "text/plain")),
              @APIResponse(responseCode = "200", description = "Processed", content = @Content(mediaType = "text/plain")) })
-     public void stopConsumer(String order){
-         if ("STOP".equals(order)) {
+     public void stopConsumer(Control control){
+         if ("STOP".equals(control.order)) {
             consumerRunnable.stop();
+            createThread(control.numOfConsumer);
             Response.status(Status.OK).build();
          }
 
-         if ("START".equals(order)) {
+         if ("START".equals(control.order)) {
             if (! consumerRunnable.isRunning()) {
                 consumerRunnable.reStart();
                 Response.status(Status.OK).build();
             }
-            
          }
          Response.status(Status.BAD_REQUEST).build();
        

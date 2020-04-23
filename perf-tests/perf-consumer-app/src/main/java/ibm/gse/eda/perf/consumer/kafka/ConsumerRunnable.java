@@ -100,12 +100,13 @@ public class ConsumerRunnable implements Runnable {
                     Date date = new Date();
                     long now = date.getTime();
                     long difference = now - record.timestamp();
-                    maxLatency = max(maxLatency, difference);
-                    minLatency = min(minLatency, difference);
-                    lagSum += difference;
-                    count = count +1;
-                    averageLatency = lagSum / count;
-                    logger.log(Level.WARNING,Long.toString(averageLatency) + " " + Long.toString(minLatency));
+                    updateValue(difference);
+//                    maxLatency = max(maxLatency, difference);
+//                    minLatency = min(minLatency, difference);
+//                    lagSum += difference;
+//                    count = count +1;
+//                    averageLatency = lagSum / count;
+//                    logger.log(Level.WARNING,Long.toString(averageLatency) + " " + Long.toString(minLatency));
                 }
                 logger.log(Level.WARNING, "in thread");
             } catch (final Exception e) {
@@ -119,6 +120,15 @@ public class ConsumerRunnable implements Runnable {
         } //loop
     }
 
+    public synchronized void updateValue(long difference){
+        maxLatency = max(maxLatency, difference);
+        minLatency = min(minLatency, difference);
+        lagSum += difference;
+        count = count +1;
+        averageLatency = lagSum / count;
+        logger.log(Level.WARNING,Long.toString(averageLatency) + " " + Long.toString(minLatency));
+
+    }
     public void stop(){
         logger.log(Level.WARNING, "Stop consumer");
         running = false;

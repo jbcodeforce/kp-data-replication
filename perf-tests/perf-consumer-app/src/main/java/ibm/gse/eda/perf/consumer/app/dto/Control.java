@@ -6,7 +6,7 @@ public class Control {
     public boolean commit;
     public String timeStamps;
     public String order;
-
+    public int numOfConsumer;
     public Control(){}
 
 }
