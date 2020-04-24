@@ -80,7 +80,7 @@ http://localhost:9081/perf-consumer-app/perf/current
 { "Max-latency":51830729","Min-latency":51450505", "Average-latency":51698170}
 ```
 
-Get application metrics like min, max, average latencies via the Prometheus metrics: metrics/application
+Get application metrics like min, max, average latencies via the Prometheus metrics: **metrics/application**
 
 ```shell
 # TYPE application_ibm_gse_eda_perf_consumer_app_PerfConsumerController_maxLatency_seconds gauge

@@ -45,11 +45,9 @@ public class ServiceReadyHealthCheck implements HealthCheck {
 	public void init(@Observes 
     @Initialized(ApplicationScoped.class) ServletContext context) {
         logger.log(Level.INFO,"App listener, start kafka consumer");
-
-//        // Initialise Kafka Consumer
-//        executor = Executors.newFixedThreadPool(1);
-//        executor.execute(consumerRunnable);
-//        ready=consumerRunnable.isRunning();
+        // Initialise Kafka Consumer
+        consumerRunnable.reStart();
+        ready=consumerRunnable.isRunning();
     }
 
 	

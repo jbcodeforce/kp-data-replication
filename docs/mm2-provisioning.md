@@ -11,7 +11,7 @@ We are using the configuration to deploy from event streams on Cloud to a local 
 
 ## Common configuration
 
-When we need to create Kubernetes secrets to manage APIKEY to access Event Streams, and TLS certificate to access local Kafka brokers, we need to do the following steps:
+When we need to create Kubernetes `Secrets` to manage APIKEY to access Event Streams, and TLS certificate to access local Kafka brokers, we need to do the following steps:
 
 * Create a project in OpenShift to deploy Mirror Maker cluster, for example: `oc new-project <projectname>`.
 * Create a secret for the API KEY of the Event Streams cluster:
@@ -74,17 +74,25 @@ Now with this deployment we can test consumer and producer as described [in the 
 
 ## MM2 topology
 
-In this section we want to address horizontal scalability and organizing the Mirror Maker 2 topology. The simplest approach is to use one mirror maker instance per familly of topics: the classification of familly of topic can be anything, from line of business to application scope. Suppose an application is using 1000 topic - partitions, for data replication it may make sense to have one MM2 instance per application responsible to manage the topic replication.
+In this section we want to address horizontal scalability and how to organize the MirrorMaker 2 topology for multi tenancy. The simplest approach is to use one MirrorMaker instance per familly of topics: the classification of familly of topic can be anything, from line of business, to team, to application. Suppose an application is using 1000 topic - partitions, for data replication it may make sense to have one MM2 instance for this application responsible to manage the topics replication. The configuration will define the groupId to match the application name for example.
 
-The following diagram illustrates this kind of topology by using regular expression on the topic white list selection, there are 3 mm2 instances mirroring the different topics with name starting with `topic-name-A*, topic-name-B*, topic-name-C*,` respectively.
+The following diagram illustrates this kind of topology by using regular expression on the topic white list selection, there are three MirrorMaker 2 instances mirroring the different topics with name starting with `topic-name-A*, topic-name-B*, topic-name-C*,` respectively.
 
 ![](images/mm2-topology.png)
 
-Each instance is part of different consumer group.
+Each connect instance is a JVM workers that replicate the topic/parititions and has different groupID.
+
+For Bi-directional replication for the same topic name, MirrorMaker 2 will use the cluster name as prefix. The following example is showing the configuration for one MM2 connector:
+
+```
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaMirrorMaker2
+
+```
 
 ## Capacity planning
 
-We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters `max.tasks` specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.
+To address capacity planning, we need to review some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters `max.tasks` specifies the max parallel processing we can have per JVM. So for each Topic we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.
 
 The task processing is stateless, consume - produce wait for acknowledge,  commit offet. In this case the CPU and network are key. For platform tuning activity we need to monitor operating system performance metrics. If the CPU becomes the bottleneck, we can allocate more CPU or start to scale horizontally by adding mirror maker 2 instance. If the network at the server level is the bottleneck, then adding more servers will help. Kafka will automatically balance the load among all the tasks running on all the machines. The size of the message impacts also the throughtput as with small message the throughput is CPU bounded. With 100 bytes messages or more we can observe network saturation. 
 
@@ -99,14 +107,16 @@ The parameters to consider for sizing are the following:
 
 ## Version migration
 
-Once the Mirror Maker cluster is up and running, it may be needed to update the underlying code when a new product version is released. As of now the recommendation is to stop the current mirror maker instance and restart it with the new version. As each mirror maker instance is part of the same consumer group, the internal workers will coordinate with the consumer group controller to assign 'consumer' task to partition.
+Once the MirrorMaker cluster is up and running, it may be needed to update the underlying code when a new product version is released. Based on Kafka Connect distributed mode multiple workers JVM coordinate the topic / partition repartition among themselves via Kafka topic.  If a worker process dies, the cluster is rebalanced to distribute the work fairly over the remaining workers.
+If a new worker starts work, a rebalance ensures it takes over some work from the existing workers.
 
-* If the MM2 CRD changes, just reapplying the CRD should be enough.
-* Deploy the new cluster operator with the new code version.
+Using the REST API it is possible to stop and restart a connector. As of now the recommendation is to start a new MirrorMaker instance with the new version and the same groupId as the existing workers you want to migrate. Then stop the existing version. As each MirrorMaker workers are part of the same group, the internal worker controller will coordinate with the other workers the  'consumer' task to partition assignment.
+
+When using Strimzi, if the update applies to the MM2 Custom Resource Definition, just reapplying the CRD should be enough.
 
 Be sure to verify the product documentation as new version may enforce to have new topics. It was the case when Kafka connect added the config topic in a recent version.
 
-## Deploying a custom Mirror Maker docker image
+## Deploying a custom MirrorMaker docker image
 
 We want to use custom docker image when we want to add Prometheus JMX exporter as Java Agent so we can monitor MM2 with Prometheus. The proposed docker file is [in this folder](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile) and may look like:
 

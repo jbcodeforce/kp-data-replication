@@ -30,6 +30,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
+import ibm.gse.eda.perf.consumer.app.dto.Control;
 import ibm.gse.eda.perf.consumer.kafka.ConsumerRunnable;
 
 /**
