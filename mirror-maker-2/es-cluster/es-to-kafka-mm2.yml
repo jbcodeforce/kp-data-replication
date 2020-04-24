@@ -53,7 +53,7 @@ spec:
     checkpointConnector:
       config:
           checkpoints.topic.replication.factor: 1
-    topicsPattern: "kp-*"
+    topicsPattern: "accounts"
     groupsPattern: ".*"
   metrics:
     lowercaseOutputName: true

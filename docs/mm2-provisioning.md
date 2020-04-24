@@ -80,7 +80,7 @@ The following diagram illustrates this kind of topology by using regular express
 
 ![](images/mm2-topology.png)
 
-Each connect instance is a JVM workers that replicate the topic/parititions and has different groupID.
+Each connect instance is a JVM workers that replicate the topic/parititions and has different group.id.
 
 For Bi-directional replication for the same topic name, MirrorMaker 2 will use the cluster name as prefix. The following example is showing the configuration for one MM2 connector:
 
