@@ -72,6 +72,8 @@ The enviroments are summarized in the table below:
 | 4           | Event Streams on Cloud | Strimzi on OCP         | OCP/ Roks |
 | 5           | Event Streams on OCP   | Event Streams on Cloud | OCP / Roks |
 
+The connect column defines where the MirrorMaker 2 connect to.
+
 ### Local Kafka cluster to Event Streams on Cloud
 
 The goal is to demonstrate the replicate data from local Kafka cluster to Event Streams on IBM Cloud, which is running as managed service. The two scenarios and the step-by-step approach are presented in [this note](local-to-es.md).
@@ -94,6 +96,10 @@ Thinking of our goals as Agile user stories, we list our stories and some notes 
 
     * We talk about capacity planning in [this section](mm2-provisioning#capacity-planning) and performance tests [in a separate note](perf-tests).
 
+1. As an SRE I want to understand if Mirroring can run from older Kafka cluster version (1.1 +) to newer kafka cluster version.
+
+    * We do not have an old Kafka 1.1 cluster available to us for testing, but after discussion with development and doing deeper analysis, the Kafka Connect framework was already working with Kafka 1.1 and use the bootstrap server to connect to the cluster. So using an existing topic defined in the Kafka 1.1 cluster as source for mirroring will work.
+    
 *Note that, there is no specific user interface for MirrorMaker 2.*
 
 ### Version-to-Version Migration

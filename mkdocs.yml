@@ -6,6 +6,7 @@ nav:
       - Run local kafka cluster with docker compose: dc-local.md
       - Strimzi Kafka 2.4 Provisioning on Openshift: provisioning.md
       - Mirror Maker 2 Provisioning: mm2-provisioning.md
+      - Cloud Pak for integration provisioning: https://ocp42.cloudpak8s.io/integration/cp4i-install/
   - Replication Scenarios:
     - Replication from local to Event Streams: local-to-es.md
     - Replication from Event Streams to local : es-to-local.md

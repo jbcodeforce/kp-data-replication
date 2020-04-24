@@ -21,6 +21,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
+import ibm.gse.eda.perf.consumer.app.dto.Control;
 import ibm.gse.eda.perf.consumer.kafka.ConsumerRunnable;
 
 /**
@@ -94,13 +95,13 @@ public class PerfConsumerController {
      @APIResponses(value = {
              @APIResponse(responseCode = "400", description = "Unknown order should be STOP or START", content = @Content(mediaType = "text/plain")),
              @APIResponse(responseCode = "200", description = "Processed", content = @Content(mediaType = "text/plain")) })
-     public void stopConsumer(String order){
-         if ("STOP".equals(order)) {
+     public void stopConsumer(Control control){
+         if ("STOP".equals(control.commit)) {
             consumerRunnable.stop();
             Response.status(Status.OK).build();
          }
 
-         if ("START".equals(order)) {
+         if ("START".equals(control.order)) {
             if (! consumerRunnable.isRunning()) {
                 consumerRunnable.reStart();
                 Response.status(Status.OK).build();
