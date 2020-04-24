@@ -5,10 +5,8 @@ public class Control {
     public String offsetPolicy; 
     public boolean commit;
     public String timeStamps;
-
-    public String order;  // START, STOP 
-    public int numberOfConsumers;
-
+    public String order;
+    public int numOfConsumer;
     public Control(){}
 
 }

@@ -32,7 +32,7 @@ public class ConsumerRunnable implements Runnable {
     @Inject
     private KafkaConfiguration kafkaConfiguration;
 
-    private Collection<Message> messages;
+    private CircularLinkedList<Message> messages;
 
     private  long maxLatency = 0;
     private  long minLatency = Integer.MAX_VALUE;
@@ -41,8 +41,11 @@ public class ConsumerRunnable implements Runnable {
     private  long averageLatency = 0;
 
     public ConsumerRunnable() {
-    }
 
+    }
+    public ConsumerRunnable(KafkaConfiguration config) {
+        this.kafkaConfiguration = config;
+    }
     private void init(){
         kafkaConsumer = new KafkaConsumer<>(getConfig().getConsumerProperties());
         kafkaConsumer.subscribe(Collections.singletonList(getConfig().getMainTopicName()),
@@ -134,11 +137,11 @@ public class ConsumerRunnable implements Runnable {
         return running;
     }
 
-    private KafkaConfiguration getConfig(){
+    public KafkaConfiguration getConfig(){
         return kafkaConfiguration;
     }
 
-	public Collection<Message> getMessages() {
+	public CircularLinkedList<Message> getMessages() {
 		return messages;
 	}
 
