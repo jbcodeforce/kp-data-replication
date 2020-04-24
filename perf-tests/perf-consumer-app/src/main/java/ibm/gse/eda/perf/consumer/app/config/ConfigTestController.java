@@ -23,5 +23,5 @@ public class ConfigTestController {
         return config.getPropertiesAsString();
     }
 
-    
+
 }
