@@ -53,8 +53,21 @@ spec:
     checkpointConnector:
       config:
           checkpoints.topic.replication.factor: 1
-    topicsPattern: "kp-*"
-    groupsPattern: ".*"
+    topicsPattern: "accounts,orders"
+  - sourceCluster: "kafka-on-premise-cluster"
+    targetCluster: "event-streams-wdc"
+    sourceConnector:
+      config:
+          replication.factor: 1
+          offset-syncs.topic.replication.factor: 1
+          sync.topic.acls.enabled: "false"
+    heartbeatConnector:
+      config:
+          heartbeats.topic.replication.factor: 1
+    checkpointConnector:
+      config:
+          checkpoints.topic.replication.factor: 1
+    topicsPattern: "accounts"
   metrics:
     lowercaseOutputName: true
     lowercaseOutputLabelNames: true

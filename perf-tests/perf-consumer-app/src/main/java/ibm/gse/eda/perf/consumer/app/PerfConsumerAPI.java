@@ -1,14 +1,11 @@
 package ibm.gse.eda.perf.consumer.app;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -20,8 +17,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import ibm.gse.eda.perf.consumer.app.dto.Control;
-import ibm.gse.eda.perf.consumer.kafka.CircularLinkedList;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Gauge;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -31,21 +28,54 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
 import ibm.gse.eda.perf.consumer.app.dto.Control;
-import ibm.gse.eda.perf.consumer.kafka.ConsumerRunnable;
+import ibm.gse.eda.perf.consumer.kafka.PerfConsumerController;
 
-/**
- *
- */
 @Path("/perf")
 @ApplicationScoped
-public class PerfConsumerController {
-
+public class PerfConsumerAPI {
+    
     @Inject
-    private ConsumerRunnable consumerRunnable;
-    private ExecutorService executor;
-    private ArrayList<ConsumerRunnable> threadList = new ArrayList<>();
+    protected PerfConsumerController perfConsumerController;
+
+    @Inject 
+    @ConfigProperty(name = "app.version", defaultValue = "0.0.1")
+    protected String appVersion;
+
+    public void init(@Observes 
+    @Initialized(ApplicationScoped.class) Object context) {
+        System.out.println("App started event");
+        System.out.println(perfConsumerController.toString()); // triggers instance creation from CDI instead of using proxy
+    }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Retrieve consumer controller configuration",description="Retrieve consumer controller configuration")
+    @APIResponses(
+        value = {
+            @APIResponse(
+                responseCode = "200",
+                description = "Consumer controller configuration",
+                content = @Content(mediaType = "application/json")
+            ) 
+     })
+     public String getConsumerConfig(){ 
+        System.out.println("getConsumerConfig " + perfConsumerController.toString());
+        StringBuffer sb = new StringBuffer();
+        sb.append("{ \"version\": \"");
+        sb.append(appVersion);
+        sb.append("\",\"MaxPoolSize\":");
+        sb.append(perfConsumerController.getMaxConsumers());
+        sb.append(",\"CurrentPoolSize\":");
+        sb.append(perfConsumerController.getNumberOfConsumers());
+        sb.append(",\"RunningConsumers\":");
+        sb.append(perfConsumerController.getNumberOfRunningConsumers());
+        sb.append("}");
+        return sb.toString();
+     }
+
+
+    @GET
+    @Path("messages")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Retrieve last 50 messages",description=" Retrieve the last 50 messages consumed in the kafka consumer")
     @APIResponses(
@@ -54,38 +84,25 @@ public class PerfConsumerController {
                 responseCode = "200",
                 description = "Last 50 messages",
                 content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = Message[].class))) 
+                schema = @Schema(implementation = ConsumerRecord[].class))) 
      })
-     public CircularLinkedList<Message> getMessages(){
-         return consumerRunnable.getMessages();
+     public List<ConsumerRecord<String,String>> getMessages(){
+        return perfConsumerController.getMessages();
      }
 
      @Gauge(name = "averageLatency",unit = MetricUnits.MICROSECONDS)
      public long getAverageLatency(){
-        long averageLatency = 0;
-        for (ConsumerRunnable consumerRunnable : threadList) {
-            averageLatency += consumerRunnable.getAverageLatency();
-        }
-
-        return averageLatency;
+        return perfConsumerController.getAverageLatencyCrossConsumers();
      }
 
      @Gauge(name = "maxLatency",unit = MetricUnits.MICROSECONDS)
      public long getMaxLatency(){
-         long maxLatency = Long.MIN_VALUE;
-         for (ConsumerRunnable consumerRunnable : threadList) {
-            maxLatency = Long.max(maxLatency, consumerRunnable.getMaxLatency());
-         }
-         return maxLatency;
+         return perfConsumerController.getMaxLatencyCrossConsumers();
      }
 
      @Gauge(name = "minLatency",unit = MetricUnits.MICROSECONDS)
      public long getMinLatency(){
-        long minLatency = Long.MAX_VALUE;
-         for (ConsumerRunnable consumerRunnable : threadList) {
-             minLatency = Long.min(minLatency, consumerRunnable.getMinLatency());
-         }
-         return minLatency;
+         return perfConsumerController.getMinLatencyCrossConsumers();
      }
 
      @GET
@@ -111,9 +128,10 @@ public class PerfConsumerController {
         return sb.toString();
      }
 
-//     private void createThread(int count ){
-//     }
-
+    /**
+     * Change the configuration of the consumers.
+     * @param control
+     */
      @PUT
      @Consumes(MediaType.APPLICATION_JSON)
      @Produces(MediaType.TEXT_PLAIN)
@@ -121,34 +139,11 @@ public class PerfConsumerController {
      @APIResponses(value = {
              @APIResponse(responseCode = "400", description = "Unknown order should be STOP or START", content = @Content(mediaType = "text/plain")),
              @APIResponse(responseCode = "200", description = "Processed", content = @Content(mediaType = "text/plain")) })
-     public void stopConsumer(@Observes
-     @Initialized(ApplicationScoped.class) Control control){
-         if ("STOP".equals(control.order)) {
-             for (ConsumerRunnable consumerRunnable : threadList) {
-                 consumerRunnable.stop();
-             }
-
-             executor.shutdownNow();
-             Response.status(Status.OK).build();
-         }
-
-         if ("START".equals(control.order)) {
-            for (ConsumerRunnable consumerRunnable : threadList) {
-                consumerRunnable.stop();
-            }
-
-            threadList = new ArrayList<>();
-            executor = Executors.newFixedThreadPool(control.numOfConsumer);
-            for (int i = 0; i< control.numOfConsumer; i++) {
-                ConsumerRunnable runnable = new ConsumerRunnable(consumerRunnable.getConfig());
-                executor.execute(runnable);
-                threadList.add(runnable);
-            }
-
+     public void controlConsumers( Control control){
+         if (perfConsumerController.controlConsumers(control)) {
             Response.status(Status.OK).build();
-
+         } else {
+            Response.status(Status.BAD_REQUEST).build();
          }
-         Response.status(Status.BAD_REQUEST).build();
-       
      }
 }

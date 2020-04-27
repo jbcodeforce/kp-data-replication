@@ -5,6 +5,7 @@ then
     echo $logged
     exit
 fi
+
 echo "First create source topic on event streams"
 accountTopic=$(ibmcloud es topics | grep accounts)
 if [ -z "$accountTopic" ]  
@@ -15,3 +16,5 @@ else
 fi
 
 echo "Start Consumer"
+cd ./perf-consumer-app/
+mvn liberty:run

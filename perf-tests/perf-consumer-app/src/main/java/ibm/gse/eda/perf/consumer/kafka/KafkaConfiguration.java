@@ -85,10 +85,13 @@ public class KafkaConfiguration {
             properties.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "HTTPS");
         }
         if (env.get("TRUSTSTORE_PATH") != null && env.get("TRUSTSTORE_PATH").length() > 0) {
+            properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
+            properties.setProperty(SslConfigs.SSL_PROTOCOL_CONFIG, "TLSv1.2");
+            properties.setProperty(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, "TLSv1.2");
+            properties.setProperty(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "HTTPS");
             properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, env.get("TRUSTSTORE_PATH"));
             properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, env.get("TRUSTSTORE_PWD"));
         }
-        properties.forEach((k, v) -> logger.log(Level.SEVERE,k + " : " + v));
         return properties;
     }
 
@@ -100,7 +103,7 @@ public class KafkaConfiguration {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.CLIENT_ID_CONFIG, groupID + "-client-" + UUID.randomUUID());
-        properties.forEach((k, v) -> logger.info(k + " : " + v));
+        properties.forEach((k, v) -> logger.warning(k + " : " + v));
         return properties;
     }
 

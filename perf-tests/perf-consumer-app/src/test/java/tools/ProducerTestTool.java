@@ -12,10 +12,13 @@ import java.util.concurrent.Future;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -38,6 +41,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
 public class ProducerTestTool {
     private String api = null;
     private String topic = null;
+    private String tlsPath = null;
+    private String tlsPwd = null;
     private String bootstrapServers = null;
     private int nb_records = 10;
     private KafkaProducer<String, String> producer = null;
@@ -45,11 +50,13 @@ public class ProducerTestTool {
     public ProducerTestTool() {
     }
 
-    public ProducerTestTool(String bss, String api, String topic, int nbr) {
+    public ProducerTestTool(String bss, String api, String topic, int nbr,String tls, String pwd) {
         this.bootstrapServers = bss;
         this.api = api;
         this.topic = topic;
         this.nb_records = nbr;
+        this.tlsPath = tls;
+        this.tlsPwd = pwd;
     }
 
     public Properties loadProperties() {
@@ -67,12 +74,20 @@ public class ProducerTestTool {
             String username = "token";
             String jaasTemplate = "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"%s\" password=\"%s\";";
             String saslJaasConfig = String.format(jaasTemplate, username, api);
-            properties.setProperty("sasl.mechanism", "PLAIN");
-            properties.setProperty("sasl.jaas.config", saslJaasConfig);
-            properties.setProperty("security.protocol", "SASL_SSL");
-            properties.setProperty("ssl.protocol", "TLSv1.2");
-        }
 
+            properties.setProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
+			properties.setProperty(SaslConfigs.SASL_MECHANISM, "PLAIN");
+            properties.setProperty(SaslConfigs.SASL_JAAS_CONFIG, saslJaasConfig);
+
+            properties.setProperty(SslConfigs.SSL_PROTOCOL_CONFIG, "TLSv1.2");
+        }
+        if ( tlsPath != null) {
+            properties.setProperty(SslConfigs.SSL_PROTOCOL_CONFIG, "TLSv1.2");
+			properties.setProperty(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, "TLSv1.2");
+			properties.setProperty(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "HTTPS");
+            properties.setProperty(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, tlsPath);
+            properties.setProperty(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, tlsPwd);
+        }
         producer = new KafkaProducer<String, String>(properties);
     }
 
@@ -108,7 +123,9 @@ public class ProducerTestTool {
                 res.getString("bootstrap"),
                 res.getString("api"),
                 res.getString("topic"),
-                res.getInt("numRecords")
+                res.getInt("numRecords"),
+                res.getString("tlsPath"),
+                res.getString("tlsPwd")
             );
             tool.prepareProducer();
             tool.produce();
@@ -153,6 +170,20 @@ public class ProducerTestTool {
                 .metavar("API")
                 .help("API key to connect to event stream server");
 
+        parser.addArgument("--tls")
+                .action(store())
+                .required(false)
+                .type(String.class)
+                .metavar("TLS_PATH")
+                .dest("tlsPath")
+                .help("TLS_PATH to connect to event stream server");
+        parser.addArgument("--tlsPwd")
+                .action(store())
+                .required(false)
+                .type(String.class)
+                .metavar("TLS_PASSWORD")
+                .dest("tlsPwd")
+                .help("TLS_PASSWORD to open the truststore");
         parser.addArgument("--num-records")
                 .action(store())
                 .required(true)
