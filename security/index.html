@@ -292,6 +292,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ocp42.cloudpak8s.io/integration/cp4i-install/" title="Cloud Pak for integration provisioning" class="md-nav__link">
+      Cloud Pak for integration provisioning
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -530,6 +542,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#event-streams-security-considerations" title="Event streams security considerations" class="md-nav__link">
+    Event streams security considerations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#acl-replications" title="ACL replications" class="md-nav__link">
     ACL replications
   </a>
@@ -612,6 +631,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#event-streams-security-considerations" title="Event streams security considerations" class="md-nav__link">
+    Event streams security considerations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#acl-replications" title="ACL replications" class="md-nav__link">
     ACL replications
   </a>
@@ -669,6 +695,21 @@
 </pre></div>
 
 <p>With Java code, the CA root and client certiticates needs to be in the Truststore.jks file. Host name verification is enabled by default to avoid man in the middle attacks. The clients code will verify the server’s fully qualified domain name (FQDN) against Common Name or Subject Alternative Name.</p>
+<h2 id="event-streams-security-considerations">Event streams security considerations</h2>
+<p>The <a href="https://cloud.ibm.com/docs/services/EventStreams?topic=eventstreams-security">product documentation</a> explains how to control access to Kafka / Event Streams resources like cluster, topic, consumer group and control transaction support.</p>
+<p>The access is controled via roles: reader, writer, manager. Access is done via Identity and access management service, where policies are defined for each potential resources. User and serviceId can be used and assigned to role.</p>
+<p><img alt="" src="../images/sec-serviceid.png" /></p>
+<p>Each service policy defines the level of access that the service ID has to each resource or set of resources. A policy consists of the following information:</p>
+<ul>
+<li>The role assigned to the policy. For example, Viewer, Editor, or Operator.</li>
+<li>The type of service the policy applies to. For example, IBM Event Streams.</li>
+<li>The instance of the service to be secured.</li>
+<li>The type of resource to be secured. The valid values are cluster, topic, group, or txnid. Specifying a type is optional. If you do not specify a type, the policy then applies to all resources in the service instance.</li>
+<li>The identifier of the resource to be secured. Specify for resources of type topic, group and txnid. If you do not specify the resource, the policy then applies to all resources of the type specified in the service instance.</li>
+</ul>
+<p><img alt="" src="../images/sec-policies.png" /></p>
+<p>For each topic it is possible to control the access type, and get a specific API key for accessing one or all the topics.</p>
+<p><img alt="" src="../images/sec-topic-ctl.png" /></p>
 <h2 id="acl-replications">ACL replications</h2>
 <p>The following scenario validates the Mirror Maker 2 ACL replication. The goal is to define the same users between Event Streams on the cloud and local kafka may be deployed and operated with Strimzi. Two users are created (kp-consumer-1,kp-consumer-2) to access two different topics (kp-topic-1, kp-topic-2) respectively.</p>
 <ul>

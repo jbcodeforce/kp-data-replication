@@ -412,6 +412,18 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ocp42.cloudpak8s.io/integration/cp4i-install/" title="Cloud Pak for integration provisioning" class="md-nav__link">
+      Cloud Pak for integration provisioning
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -853,6 +865,7 @@
 </tr>
 </tbody>
 </table>
+<p>The connect column defines where the MirrorMaker 2 connect to.</p>
 <h3 id="local-kafka-cluster-to-event-streams-on-cloud">Local Kafka cluster to Event Streams on Cloud</h3>
 <p>The goal is to demonstrate the replicate data from local Kafka cluster to Event Streams on IBM Cloud, which is running as managed service. The two scenarios and the step-by-step approach are presented in <a href="local-to-es/">this note</a>.</p>
 <p>We have documented the replication from Event Streams on IBM Cloud as a Service to a local Kafka cluster in <a href="es-to-local/">this note</a> with two scenarios depending on where the target Kafka cluster is running, either on OpenShift or on Docker.</p>
@@ -875,6 +888,12 @@
 <p>As an SRE, I want to understand the server sizing for the Mirror Maker environment so that I can understand the leanest resources for minimal needs.</p>
 <ul>
 <li>We talk about capacity planning in <a href="mm2-provisioning#capacity-planning">this section</a> and performance tests <a href="perf-tests">in a separate note</a>.</li>
+</ul>
+</li>
+<li>
+<p>As an SRE I want to understand if Mirroring can run from older Kafka cluster version (1.1 +) to newer kafka cluster version.</p>
+<ul>
+<li>We do not have an old Kafka 1.1 cluster available to us for testing, but after discussion with development and doing deeper analysis, the Kafka Connect framework was already working with Kafka 1.1 and use the bootstrap server to connect to the cluster. So using an existing topic defined in the Kafka 1.1 cluster as source for mirroring will work.</li>
 </ul>
 </li>
 </ol>

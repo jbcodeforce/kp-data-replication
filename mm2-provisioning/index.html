@@ -350,8 +350,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deploying-a-custom-mirror-maker-docker-image" title="Deploying a custom Mirror Maker docker image" class="md-nav__link">
-    Deploying a custom Mirror Maker docker image
+  <a href="#deploying-a-custom-mirrormaker-docker-image" title="Deploying a custom MirrorMaker docker image" class="md-nav__link">
+    Deploying a custom MirrorMaker docker image
   </a>
   
     <nav class="md-nav">
@@ -412,6 +412,18 @@
   
 </nav>
     
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="https://ocp42.cloudpak8s.io/integration/cp4i-install/" title="Cloud Pak for integration provisioning" class="md-nav__link">
+      Cloud Pak for integration provisioning
+    </a>
   </li>
 
         
@@ -692,8 +704,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deploying-a-custom-mirror-maker-docker-image" title="Deploying a custom Mirror Maker docker image" class="md-nav__link">
-    Deploying a custom Mirror Maker docker image
+  <a href="#deploying-a-custom-mirrormaker-docker-image" title="Deploying a custom MirrorMaker docker image" class="md-nav__link">
+    Deploying a custom MirrorMaker docker image
   </a>
   
     <nav class="md-nav">
@@ -774,7 +786,7 @@
 <p>We are using the configuration to deploy from event streams on Cloud to a local Kafka cluster we deployed using Strimzi.</p>
 <p><img alt="ES to local" src="../images/mm2-test1.png" /></p>
 <h2 id="common-configuration">Common configuration</h2>
-<p>When we need to create Kubernetes secrets to manage APIKEY to access Event Streams, and TLS certificate to access local Kafka brokers, we need to do the following steps:</p>
+<p>When we need to create Kubernetes <code>Secrets</code> to manage APIKEY to access Event Streams, and TLS certificate to access local Kafka brokers, we need to do the following steps:</p>
 <ul>
 <li>Create a project in OpenShift to deploy Mirror Maker cluster, for example: <code>oc new-project &lt;projectname&gt;</code>.</li>
 <li>Create a secret for the API KEY of the Event Streams cluster:
@@ -830,12 +842,17 @@ The config part can match the Kafka configuration for consumer or producer, exce
 <p><img alt="Mirror maker deployment" src="../images/mm2-deployment.png" /></p>
 <p>Now with this deployment we can test consumer and producer as described <a href="es-to-local/#scenario-4-from-event-streams-on-cloud-to-strimzi-cluster-on-openshift">in the scenario 4</a>.</p>
 <h2 id="mm2-topology">MM2 topology</h2>
-<p>In this section we want to address horizontal scalability and organizing the Mirror Maker 2 topology. The simplest approach is to use one mirror maker instance per familly of topics: the classification of familly of topic can be anything, from line of business to application scope. Suppose an application is using 1000 topic - partitions, for data replication it may make sense to have one MM2 instance per application responsible to manage the topic replication.</p>
-<p>The following diagram illustrates this kind of topology by using regular expression on the topic white list selection, there are 3 mm2 instances mirroring the different topics with name starting with <code>topic-name-A*, topic-name-B*, topic-name-C*,</code> respectively.</p>
+<p>In this section we want to address horizontal scalability and how to organize the MirrorMaker 2 topology for multi tenancy. The simplest approach is to use one MirrorMaker instance per familly of topics: the classification of familly of topic can be anything, from line of business, to team, to application. Suppose an application is using 1000 topic - partitions, for data replication it may make sense to have one MM2 instance for this application responsible to manage the topics replication. The configuration will define the groupId to match the application name for example.</p>
+<p>The following diagram illustrates this kind of topology by using regular expression on the topic white list selection, there are three MirrorMaker 2 instances mirroring the different topics with name starting with <code>topic-name-A*, topic-name-B*, topic-name-C*,</code> respectively.</p>
 <p><img alt="" src="../images/mm2-topology.png" /></p>
-<p>Each instance is part of different consumer group.</p>
+<p>Each connect instance is a JVM workers that replicate the topic/parititions and has different group.id.</p>
+<p>For Bi-directional replication for the same topic name, MirrorMaker 2 will use the cluster name as prefix. The following example is showing the configuration for one MM2 connector:</p>
+<div class="codehilite"><pre><span></span><span class="n">apiVersion</span><span class="o">:</span> <span class="n">kafka</span><span class="o">.</span><span class="na">strimzi</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">v1alpha1</span>
+<span class="n">kind</span><span class="o">:</span> <span class="n">KafkaMirrorMaker2</span>
+</pre></div>
+
 <h2 id="capacity-planning">Capacity planning</h2>
-<p>We need to address some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters <code>max.tasks</code> specifies the max parallel processing we can have per JVM. So for each JVM we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.</p>
+<p>To address capacity planning, we need to review some characteristic of the Kafka Connect framework: For each topic/partition there will be a task running. We can see in the trace that tasks are mapped to threads inside the JVM. So the parallelism will be bound by the number of CPUs the JVM runs on. The parameters <code>max.tasks</code> specifies the max parallel processing we can have per JVM. So for each Topic we need to assess the number of partitions to be replicated. Each task is using the consumer API and is part of the same consumer group, the partition within a group are balanced by an internal controler. With Kafka connect any changes to the topic topology triggers a partition rebalancing. In MM2 each consumer / task is assigned a partition by the controller. So the rebalancing is done internally. Still adding a broker node into the cluster will generate rebalancing.</p>
 <p>The task processing is stateless, consume - produce wait for acknowledge,  commit offet. In this case the CPU and network are key. For platform tuning activity we need to monitor operating system performance metrics. If the CPU becomes the bottleneck, we can allocate more CPU or start to scale horizontally by adding mirror maker 2 instance. If the network at the server level is the bottleneck, then adding more servers will help. Kafka will automatically balance the load among all the tasks running on all the machines. The size of the message impacts also the throughtput as with small message the throughput is CPU bounded. With 100 bytes messages or more we can observe network saturation. </p>
 <p>The parameters to consider for sizing are the following:</p>
 <table>
@@ -870,13 +887,12 @@ The config part can match the Kafka configuration for consumer or producer, exce
 </tbody>
 </table>
 <h2 id="version-migration">Version migration</h2>
-<p>Once the Mirror Maker cluster is up and running, it may be needed to update the underlying code when a new product version is released. As of now the recommendation is to stop the current mirror maker instance and restart it with the new version. As each mirror maker instance is part of the same consumer group, the internal workers will coordinate with the consumer group controller to assign 'consumer' task to partition.</p>
-<ul>
-<li>If the MM2 CRD changes, just reapplying the CRD should be enough.</li>
-<li>Deploy the new cluster operator with the new code version.</li>
-</ul>
+<p>Once the MirrorMaker cluster is up and running, it may be needed to update the underlying code when a new product version is released. Based on Kafka Connect distributed mode multiple workers JVM coordinate the topic / partition repartition among themselves via Kafka topic.  If a worker process dies, the cluster is rebalanced to distribute the work fairly over the remaining workers.
+If a new worker starts work, a rebalance ensures it takes over some work from the existing workers.</p>
+<p>Using the REST API it is possible to stop and restart a connector. As of now the recommendation is to start a new MirrorMaker instance with the new version and the same groupId as the existing workers you want to migrate. Then stop the existing version. As each MirrorMaker workers are part of the same group, the internal worker controller will coordinate with the other workers the  'consumer' task to partition assignment.</p>
+<p>When using Strimzi, if the update applies to the MM2 Custom Resource Definition, just reapplying the CRD should be enough.</p>
 <p>Be sure to verify the product documentation as new version may enforce to have new topics. It was the case when Kafka connect added the config topic in a recent version.</p>
-<h2 id="deploying-a-custom-mirror-maker-docker-image">Deploying a custom Mirror Maker docker image</h2>
+<h2 id="deploying-a-custom-mirrormaker-docker-image">Deploying a custom MirrorMaker docker image</h2>
 <p>We want to use custom docker image when we want to add Prometheus JMX exporter as Java Agent so we can monitor MM2 with Prometheus. The proposed docker file is <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">in this folder</a> and may look like:</p>
 <div class="codehilite"><pre><span></span><span class="k">FROM</span><span class="s"> strimzi/kafka:latest-kafka-2.4.0</span>
 <span class="c"># ...</span>
