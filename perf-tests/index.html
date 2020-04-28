@@ -604,8 +604,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-approach" title="Test Approach" class="md-nav__link">
-    Test Approach
+  <a href="#python-based-test-approach" title="Python based test approach" class="md-nav__link">
+    Python based test approach
   </a>
   
 </li>
@@ -628,15 +628,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-tests" title="Performance tests" class="md-nav__link">
-    Performance tests
+  <a href="#java-based-performance-tests" title="Java based performance tests" class="md-nav__link">
+    Java based performance tests
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-approach_1" title="Test approach" class="md-nav__link">
+  <a href="#context" title="Context" class="md-nav__link">
+    Context
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-approach" title="Test approach" class="md-nav__link">
     Test approach
   </a>
   
@@ -644,13 +651,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#basic-measurement" title="Basic Measurement" class="md-nav__link">
-    Basic Measurement
-  </a>
   
 </li>
       
@@ -775,8 +775,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-approach" title="Test Approach" class="md-nav__link">
-    Test Approach
+  <a href="#python-based-test-approach" title="Python based test approach" class="md-nav__link">
+    Python based test approach
   </a>
   
 </li>
@@ -799,15 +799,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-tests" title="Performance tests" class="md-nav__link">
-    Performance tests
+  <a href="#java-based-performance-tests" title="Java based performance tests" class="md-nav__link">
+    Java based performance tests
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-approach_1" title="Test approach" class="md-nav__link">
+  <a href="#context" title="Context" class="md-nav__link">
+    Context
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-approach" title="Test approach" class="md-nav__link">
     Test approach
   </a>
   
@@ -815,13 +822,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#basic-measurement" title="Basic Measurement" class="md-nav__link">
-    Basic Measurement
-  </a>
   
 </li>
       
@@ -852,8 +852,8 @@
                 
                 
                 <h1 id="validation-and-performance-tests">Validation and Performance tests</h1>
-<p>The mirroring validation and performance tests are based on the architecture depicted in the following figure, where mirror maker 2 is running close to the on-premise target cluster and the source is Event Streams on Cloud.</p>
-<p><img alt="" src="../images/perf-test-env.png" /></p>
+<p>The mirroring validation and performance tests are based on the architecture depicted in the following figure, where MirrorMaker 2 is running close to the on-premise target cluster and the source is Event Streams on Cloud.</p>
+<p><img alt="Perf test diagram" src="../images/perf-test-env.png" /></p>
 <h2 id="validate-the-topic-replication">Validate the topic replication</h2>
 <h3 id="objective">Objective</h3>
 <p>Determine if MirrorMaker 2 can successfully replicate messages from a topic with n partitions on the source Kakfa cluster to a topic with n-m partitions on the target Kafka cluster.</p>
@@ -909,17 +909,15 @@
 <div class="codehilite"><pre><span></span>./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --describe --topic source.accounts
 
 Topic: source.accounts  PartitionCount: <span class="m">5</span>   ReplicationFactor: <span class="m">3</span>    Configs: message.format.version<span class="o">=</span><span class="m">2</span>.4-IV1
-    Topic: source.accounts  Partition: <span class="m">0</span>    Leader: <span class="m">0</span>   Replicas: <span class="m">0</span>,2,1 Isr: <span class="m">0</span>,2,1
-    Topic: source.accounts  Partition: <span class="m">1</span>    Leader: <span class="m">2</span>   Replicas: <span class="m">2</span>,1,0 Isr: <span class="m">2</span>,1,0
-    Topic: source.accounts  Partition: <span class="m">2</span>    Leader: <span class="m">1</span>   Replicas: <span class="m">1</span>,0,2 Isr: <span class="m">1</span>,0,2
-    Topic: source.accounts  Partition: <span class="m">3</span>    Leader: <span class="m">0</span>   Replicas: <span class="m">0</span>,1,2 Isr: <span class="m">0</span>,1,2
-    Topic: source.accounts  Partition: <span class="m">4</span>    Leader: <span class="m">2</span>   Replicas: <span class="m">2</span>,0,1 Isr: <span class="m">2</span>,0,1
+Topic: source.accounts  Partition: <span class="m">0</span>    Leader: <span class="m">0</span>   Replicas: <span class="m">0</span>,2,1 Isr: <span class="m">0</span>,2,1    Topic: source.accounts    Partition: <span class="m">1</span>    Leader: <span class="m">2</span>   Replicas: <span class="m">2</span>,1,0 Isr: <span class="m">2</span>,1,0    Topic: source.accounts    Partition: <span class="m">2</span>    Leader: <span class="m">1</span>   Replicas: <span class="m">1</span>,0,2 Isr: <span class="m">1</span>,0,2
+Topic: source.accounts  Partition: <span class="m">3</span>    Leader: <span class="m">0</span>   Replicas: <span class="m">0</span>,1,2 Isr: <span class="m">0</span>,1,2
+Topic: source.accounts  Partition: <span class="m">4</span>    Leader: <span class="m">2</span>   Replicas: <span class="m">2</span>,0,1 Isr: <span class="m">2</span>,0,1
 </pre></div>
 
 <ul>
-<li>Create a mirror maker 2 configuration to replicate the topic</li>
+<li>Create a MirrorMaker 2 configuration to replicate the topic</li>
 </ul>
-<h4 id="test-approach">Test Approach</h4>
+<h4 id="python-based-test-approach">Python based test approach</h4>
 <p>This test is in the <code>perf-tests/ValidateTopicReplication</code> folder, and aims to validate the 10 partition topic to 5 partition topic replication.</p>
 <ul>
 <li>Send 500 records to the source topic using the producer code: <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/perf-tests/ProducerPerformance.py">ProducerPerformance.py</a></li>
@@ -940,13 +938,13 @@ Topic: source.accounts  PartitionCount: <span class="m">5</span>   ReplicationFa
 
 </li>
 <li>
-<p>Start consumer: </p>
+<p>Start consumer:</p>
 <p>Start the consumer to run locally but remote connected to the kafka cluster:</p>
 <div class="codehilite"><pre><span></span>docker run -ti -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_TGT_BROKERS</span> -e <span class="nv">KAFKA_CERT</span><span class="o">=</span><span class="nv">$KAFKA_TGT_CERT</span> ibmcase/python37  bash -c <span class="s2">&quot;python /home/PerfConsumer.py --topic source.accounts&quot;</span>
 </pre></div>
 
 <p>Or run the consumer inside openshift</p>
-<div class="codehilite"><pre><span></span>oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TGT_BROKERS --topic source.accounts -from-beginning
+<div class="codehilite"><pre><span></span>oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TGT_BROKERS --topic source.accounts --from-beginning
 </pre></div>
 
 </li>
@@ -960,8 +958,14 @@ Topic: source.accounts  PartitionCount: <span class="m">5</span>   ReplicationFa
 <p>The number of records on the consumer side should match the number send (e.g. 500), but this time read from 5 partitions.</p>
 <h4 id="conclusion-method-1">Conclusion Method 1</h4>
 <p>Hypothesis proven - MirrorMaker 2 can replicate from a local topic with 10 partitions to a remote topic with 5 partitions.</p>
-<h2 id="performance-tests">Performance tests</h2>
-<p>For the performance test producer code, we use the IBM Event Stream tool which is itself based on the Apache <a href="https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java">Kafka producer performance tool</a>. This tool can read data from a file and generates n records to the source topic. <a href="https://ibm.github.io/event-streams/getting-started/testing-loads/">This article</a> explains how to use the tool. We have cloned this tool under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">perf-test/event-streams-sample-producer</a> folder.</p>
+<h2 id="java-based-performance-tests">Java based performance tests</h2>
+<p>The performance testing in java is based on two tools: the IBM Event Stream tool which is itself based on the Apache <a href="https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java">Kafka producer performance tool</a> and a custom consumer app, deployable on kubernetes cluster and that support latency reporting.</p>
+<h3 id="context">Context</h3>
+<p>The following diagram illustrates the performance test app context, with the two kafka clusters and the MirrorMaker tool:</p>
+<p><img alt="System context" src="../images/test-app-syst-ctx.png" /></p>
+<p>Zooming into the system, we define the producer and consumer apps and we may add metrics reporting consumable by using dashboard.</p>
+<p><img alt="" src="../images/test-app-container.png" /></p>
+<p>For the app producer, we have cloned this tool under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">perf-test/event-streams-sample-producer</a> folder.</p>
 <p>The tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.</p>
 <p>The arguments supported are:</p>
 <table>
@@ -1014,7 +1018,7 @@ Topic: source.accounts  PartitionCount: <span class="m">5</span>   ReplicationFa
 </tr>
 </tbody>
 </table>
-<p>To completement this tool, we need a consumer that will be responsible to measure some of the latency between given timestamps. The following diagram presents the interesting time stamps we can assess with some tooling:</p>
+<p>To completement this tool, the consumer app is responsible to measure some of the latency between given timestamps. The following diagram presents the interesting time stamps we can assess with some tooling:</p>
 <p><img alt="" src="../images/mm2-ts-test.png" /></p>
 <ul>
 <li>ts-1: timestamp when creating the record object before sending</li>
@@ -1022,13 +1026,14 @@ Topic: source.accounts  PartitionCount: <span class="m">5</span>   ReplicationFa
 <li>ts-3: record timestamp when broker write to topic-partition: target topic</li>
 <li>ts-4: timestamp when polling the record</li>
 </ul>
+<p>To get timestamp at the topic level, we need to add the <code>message.timestamp.type: LogAppendTime</code> property when creating the topic.</p>
 <p>The consumer needs to be deployable on OpenShift to scale horizontally. The metrics can be exposed as metrics for Prometheus. The metrics are: average latency, min and max latencies.</p>
-<p>The performance test consumer webapp is under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/perf-consumer-app">perf-tests/perf-consumer-app folder</a>. The readme explains how to build and deploy it.</p>
-<h3 id="test-approach_1">Test approach</h3>
+<p>The performance test consumer webapp is under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/perf-consumer-app">perf-tests/perf-consumer-app folder</a>. The readme, in this folder, explains how to build and deploy it.</p>
+<h3 id="test-approach">Test approach</h3>
 <p>Using IBM event streams producer tool we can run 3 different workload size, the payload is generated with random bytes or with records read from a data file.</p>
-<div class="codehilite"><pre><span></span>java -jar target/es-producer.jar -t <span class="nb">test</span> -s small
-java -jar target/es-producer.jar -t <span class="nb">test</span> -s medium
-java -jar target/es-producer.jar -t <span class="nb">test</span> -s large
+<div class="codehilite"><pre><span></span>java -jar target/es-producer.jar -t accounts -s small -c 
+java -jar target/es-producer.jar -t accounts -s medium
+java -jar target/es-producer.jar -t accounts -s large
 </pre></div>
 
 <p>To build the jar,run <code>mvn package</code> in the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">event-streams-sample-producer-1.1.0</a> folder.</p>
@@ -1044,8 +1049,7 @@ java -jar target/es-producer.jar -t <span class="nb">test</span> -s large
 <span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required username=&quot;token&quot; password=&quot;&lt;replace with APIKAY&gt;&quot;;</span>
 </pre></div>
 
-<h2 id="basic-measurement">Basic Measurement</h2>
-<p>This is the type of traces reported.</p>
+<p>The tool reports the following measures:</p>
 <div class="codehilite"><pre><span></span><span class="m">1261</span> records sent, <span class="m">251</span>.8 records/sec <span class="o">(</span><span class="m">0</span>.97 MB/sec<span class="o">)</span>, <span class="m">2233</span>.3 ms avg latency, <span class="m">3320</span>.0 max latency.
 <span class="m">2848</span> records sent, <span class="m">569</span>.5 records/sec <span class="o">(</span><span class="m">2</span>.19 MB/sec<span class="o">)</span>, <span class="m">5797</span>.0 ms avg latency, <span class="m">8294</span>.0 max latency.
 <span class="m">2840</span> records sent, <span class="m">567</span>.8 records/sec <span class="o">(</span><span class="m">2</span>.19 MB/sec<span class="o">)</span>, <span class="m">10760</span>.9 ms avg latency, <span class="m">13288</span>.0 max latency.
@@ -1055,13 +1059,30 @@ java -jar target/es-producer.jar -t <span class="nb">test</span> -s large
 <span class="m">60000</span> records sent, <span class="m">490</span>.869821 records/sec <span class="o">(</span><span class="m">1</span>.89 MB/sec<span class="o">)</span>, <span class="m">14698</span>.93 ms avg latency, <span class="m">24949</span>.00 ms max latency, <span class="m">14490</span> ms 50th, <span class="m">22298</span> ms 95th, <span class="m">23413</span> ms 99th, <span class="m">24805</span> ms <span class="m">99</span>.9th.
 </pre></div>
 
-<p>Adding a consumer is simple, start a python environment using docker image, and launch the PerfConsumer code.</p>
-<div class="codehilite"><pre><span></span><span class="nb">source</span> ./scripts/setenv.sh
-docker run -e <span class="nv">KAFKA_BROKERS</span><span class="o">=</span><span class="nv">$KAFKA_BROKERS</span> --rm -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home -it  ibmcase/python37 bash
-$ python consumer/PerfConsumer.py
+<h2 id="measuring-with-consumer-app">Measuring with consumer app</h2>
+<p>The consumer app offers an API to get performance metrics via HTTP or via metrics. </p>
+<p><img alt="" src="../images/test-perf-api.png" /></p>
+<p>The ones interesting are: <code>/perf/config</code> to get the cluster configuration, it should return a json document like</p>
+<div class="codehilite"><pre><span></span><span class="o">{</span> 
+<span class="s2">&quot;ssl.protocol&quot;</span>: <span class="s2">&quot;TLSv1.2&quot;</span>,
+<span class="s2">&quot;sasl.mechanism&quot;</span>: <span class="s2">&quot;PLAIN&quot;</span>,
+<span class="s2">&quot;key.deserializer&quot;</span>: <span class="s2">&quot;org.apache.kafka.common.serialization.StringDeserializer&quot;</span>,
+<span class="s2">&quot;client.id&quot;</span>: <span class="s2">&quot;test-cons-group-client-a425be84-801b-42b5-af2f-340386f98896&quot;</span>,
+<span class="s2">&quot;ssl.truststore.password&quot;</span>: <span class="s2">&quot;password&quot;</span>,
+<span class="s2">&quot;ssl.endpoint.identification.algorithm&quot;</span>: <span class="s2">&quot;HTTPS&quot;</span>,
+<span class="s2">&quot;ssl.enabled.protocols&quot;</span>: <span class="s2">&quot;TLSv1.2&quot;</span>,
+<span class="s2">&quot;ssl.truststore.location&quot;</span>: <span class="s2">&quot;/home/truststore.jks&quot;</span>,
+<span class="s2">&quot;bootstrap.servers&quot;</span>: <span class="s2">&quot;eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443&quot;</span>,
+<span class="s2">&quot;auto.offset.reset&quot;</span>: <span class="s2">&quot;earliest&quot;</span>,
+<span class="s2">&quot;value.deserializer&quot;</span>: <span class="s2">&quot;org.apache.kafka.common.serialization.StringDeserializer&quot;</span>,
+<span class="s2">&quot;group.id&quot;</span>: <span class="s2">&quot;test-cons-group&quot;</span>,
+<span class="s2">&quot;enable.auto.commit&quot;</span>: <span class="s2">&quot;false&quot;</span>,
+<span class="s2">&quot;security.protocol&quot;</span>: <span class="s2">&quot;SSL&quot;</span>
+<span class="o">}</span>
 </pre></div>
 
-<h2 id="measuring-with-consumer-app">Measuring with consumer app</h2>
+<p><code>/perf/current</code> for getting the current metrics vias HTTP. Here is an example of output</p>
+<p><img alt="" src="../images/test-perf-out.png" /></p>
                 
                   
                 

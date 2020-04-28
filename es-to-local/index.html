@@ -739,29 +739,7 @@ If you don<span class="err">&#39;</span>t see a <span class="nb">command</span> 
 </pre></div>
 
 <h2 id="considerations">Considerations</h2>
-<p>When the source or target cluster is deployed on Openshift, the exposed route to access the brokers is using TLS connection. So we need the certificate and create a truststore to be used by the consumer or producer Java programs. All kafka tools are done in java or scala so running in a JVM, which needs truststore for keep trusted TLS certificates.</p>
-<p>To get the certificate do the following steps:</p>
-<ol>
-<li>
-<p>Get the host ip address from the Route resource</p>
-<div class="codehilite"><pre><span></span>oc get routes my-cluster-kafka-bootstrap -o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.ingress[0].host}{&quot;\n&quot;}&#39;</span>
-</pre></div>
-
-</li>
-<li>
-<p>Get the TLS CA root certificate from the broker</p>
-<div class="codehilite"><pre><span></span>oc get secrets
-oc extract secret/my-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
-</pre></div>
-
-</li>
-<li>
-<p>Transform the certificate for java truststore</p>
-<div class="codehilite"><pre><span></span>keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
-</pre></div>
-
-</li>
-</ol>
+<p>When the source or target cluster is deployed on Openshift, the exposed route to access the brokers is using TLS connection. So we need the certificate and create a truststore to be used by the consumer or producer Java programs. All kafka tools are done in java or scala so running in a JVM, which needs truststore for keep trusted TLS certificates. See <a href="https://jbcodeforce.github.io/kp-data-replication/mm2-provisioning/#common-configuration">this section</a> for the steps to build the truststore.</p>
                 
                   
                 

@@ -791,24 +791,36 @@
 <li>Create a project in OpenShift to deploy Mirror Maker cluster, for example: <code>oc new-project &lt;projectname&gt;</code>.</li>
 <li>Create a secret for the API KEY of the Event Streams cluster:
 <code>oc create secret generic es-api-secret --from-literal=password=&lt;replace-with-event-streams-apikey&gt;</code></li>
-<li>As your vanilla Kafka source cluster may use TLS to communicate between clients and brokers, you need to use the k8s secret defined when deploying Kafka which includes the CAroot and generic client certificates. These secrets are : <code>eda-demo-24-cluster-clients-ca-cert</code> and  <code>eda-demo-24-cluster-cluster-ca-cert</code>.</li>
-</ul>
-<div class="codehilite"><pre><span></span><span class="c1"># build a local client CA crt file from the secret:</span>
-oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
-<span class="c1"># Verify the certificate:</span>
-openssl x509 -in ca.crt -text
-<span class="c1"># transform it for java truststore.jks:</span>
-keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
-<span class="c1"># create a secret from file the truststore so it can be mounted as needed</span>
-oc create secret generic kafka-truststore --from-file<span class="o">=</span>./truststore.jks
-<span class="c1"># Verify the created secret</span>
-oc describe secret kafka-truststore
+<li>
+<p>As your vanilla Kafka source cluster may use TLS to communicate between clients and brokers, you need to use the k8s secret defined when deploying Kafka which includes the CAroot and generic client certificates. These secrets are : <code>eda-demo-24-cluster-clients-ca-cert</code> and  <code>eda-demo-24-cluster-cluster-ca-cert</code>.</p>
+</li>
+<li>
+<p>Get the host ip address from the Route resource</p>
+<div class="codehilite"><pre><span></span>oc get routes my-cluster-kafka-bootstrap -o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.ingress[0].host}{&quot;\n&quot;}&#39;</span>
 </pre></div>
 
-<div class="admonition attention">
-<p class="admonition-title">Attention</p>
-<p>At this step, we have two options to deploy mirror maker, one using the Mirror Maker Operator and configure it via a yaml file, or use properties file and a special docker image that is deployed to Openshift, see this approach as <a href="#deploying-a-customer-mirror-maker-docker-image">documented this section</a>.</p>
-</div>
+</li>
+<li>
+<p>Get the TLS CA root certificate from the broker</p>
+<div class="codehilite"><pre><span></span>oc get secrets
+oc extract secret/eda-demo-24-cluster-cluster-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt; ca.crt
+oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys<span class="o">=</span>ca.crt --to<span class="o">=</span>- &gt;&gt; ca.crt
+</pre></div>
+
+</li>
+<li>
+<p>Transform the certificates for java truststore</p>
+<div class="codehilite"><pre><span></span>keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
+</pre></div>
+
+</li>
+<li>
+<p>Create a secret from truststore file so it can be mounted as needed into consumer or producer running in the same OpenShift cluster. </p>
+</li>
+</ul>
+<div class="codehilite"><pre><span></span>oc create secret generic kafka-truststore --from-file<span class="o">=</span>./truststore.jks
+</pre></div>
+
 <h2 id="deploying-using-strimzi-mirror-maker-operator">Deploying using Strimzi Mirror Maker operator</h2>
 <p>We assume you have an existing namespace or project to deploy Mirror Maker. You also need to get the latest (0.17-rc4 at least) Strimzi configuration from the <a href="https://github.com/strimzi/strimzi-kafka-operator/releases/tag/0.17.0-rc4">download page</a>.</p>
 <p>If you have already installed Strimzi Operators, Cluster Roles, and CRDs, you do not need to do it again as those resources are defined at the kubernetes cluster level. See the <a href="../provisioning/">provisioning note.</a></p>
