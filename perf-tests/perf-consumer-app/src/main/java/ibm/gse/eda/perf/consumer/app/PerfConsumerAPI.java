@@ -43,7 +43,7 @@ public class PerfConsumerAPI {
 
     public void init(@Observes 
     @Initialized(ApplicationScoped.class) Object context) {
-        System.out.println("App started event");
+        System.out.println("Performance Consunmer App started. Version:" + appVersion);
         System.out.println(perfConsumerController.toString()); // triggers instance creation from CDI instead of using proxy
     }
 
@@ -82,7 +82,7 @@ public class PerfConsumerAPI {
         value = {
             @APIResponse(
                 responseCode = "200",
-                description = "Last 50 messages",
+                description = "Last x messages",
                 content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = ConsumerRecord[].class))) 
      })
@@ -137,7 +137,7 @@ public class PerfConsumerAPI {
      @Produces(MediaType.TEXT_PLAIN)
      @Operation(summary = "Stop or restart consumer", description = "")
      @APIResponses(value = {
-             @APIResponse(responseCode = "400", description = "Unknown order should be STOP or START", content = @Content(mediaType = "text/plain")),
+             @APIResponse(responseCode = "400", description = "Unknown order should be STOP, RESTART, UPDATE", content = @Content(mediaType = "text/plain")),
              @APIResponse(responseCode = "200", description = "Processed", content = @Content(mediaType = "text/plain")) })
      public void controlConsumers( Control control){
          if (perfConsumerController.controlConsumers(control)) {

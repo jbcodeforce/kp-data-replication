@@ -140,6 +140,10 @@ public class KafkaConfiguration {
         return this.offsetPolicy;
     }
 
+    public void setOffsetPolicy(String p) {
+        this.offsetPolicy = p;
+    }
+
     public String getBrokers(){
         return this.brokers;
     }
@@ -158,9 +162,12 @@ public class KafkaConfiguration {
     public String getPropertiesAsString(){
         StringBuffer sb = new StringBuffer();
         sb.append("{ \n");
-        properties.forEach((k, v) -> sb.append("\"" + k + "\": \"" + v +"\","));
-        sb.replace(sb.length()-1, sb.length(), "\n");
-        sb.append("}");
+        properties.forEach((k, v) -> {
+            if (! k.equals(SaslConfigs.SASL_JAAS_CONFIG)) {sb.append("\"" + k + "\": \"" + v +"\",");}
+            });
+        sb.append("\"topic\": \"");
+        sb.append(this.getMainTopicName());
+        sb.append("\"}");
         return sb.toString();
     }
 }

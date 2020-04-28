@@ -77,7 +77,7 @@ public class ConsumerRunnable implements Runnable {
 
     @Override
     public void run() {
-        logger.log(Level.SEVERE,"Start runnable");
+        logger.log(Level.WARNING,"Start runnable");
         init();
         loop();
     }
@@ -108,7 +108,7 @@ public class ConsumerRunnable implements Runnable {
                     messages.insertData(record);
                     logger.log(Level.WARNING,Long.toString(averageLatency) + " " + Long.toString(minLatency));
                 }
-                logger.log(Level.WARNING, "in consumer: " + id + " listen to topic " + getConfig().getMainTopicName());
+                logger.log(Level.INFO, "in consumer: " + id + " listen to topic " + getConfig().getMainTopicName());
             } catch (final Exception e) {
                 logger.log(Level.SEVERE, "Consumer loop has been unexpectedly interrupted");
                 stop();

@@ -1,8 +1,8 @@
 # Validation and Performance tests
 
-The mirroring validation and performance tests are based on the architecture depicted in the following figure, where mirror maker 2 is running close to the on-premise target cluster and the source is Event Streams on Cloud.
+The mirroring validation and performance tests are based on the architecture depicted in the following figure, where MirrorMaker 2 is running close to the on-premise target cluster and the source is Event Streams on Cloud.
 
-![](images/perf-test-env.png)
+![Perf test diagram](images/perf-test-env.png)
 
 ## Validate the topic replication
 
@@ -24,7 +24,7 @@ Data will replicate successfully.
 
 The MirrorMaker 2 architecture uses Kafka Connect, and so simply acts as a 3rd party consumer of topic data on the source side and writes to the topic on the target side as any other producer would.  Given sufficient partitions on each of the source and target topics for MirrorMaker 2 to act as a consumer (on the source side) and a producer (on the target side), how many total partitions each side has should not be a factor.
 
-### Method 2 
+### Method 2
 
 Create new Credential on IES on Cloud with Write permission, but not Manager permissions.  Reconfigure MirrorMaker 2 with the new Credential.  Create a new topic on IES on Cloud with 10 partitions that corresponds to a new topic on local Kafka with 5 partitions.  Test replication from the local Kafka topic to the topic on IES on IBM Cloud.  Observe any errors in MirrorMaker 2 log, and validate data replicates as expected.
 
@@ -77,16 +77,14 @@ If you need to look at the topic information using the shell command use somethi
 ./kafka-topics.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --describe --topic source.accounts
 
 Topic: source.accounts	PartitionCount: 5	ReplicationFactor: 3	Configs: message.format.version=2.4-IV1
-    Topic: source.accounts	Partition: 0	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1
-    Topic: source.accounts	Partition: 1	Leader: 2	Replicas: 2,1,0	Isr: 2,1,0
-    Topic: source.accounts	Partition: 2	Leader: 1	Replicas: 1,0,2	Isr: 1,0,2
-    Topic: source.accounts	Partition: 3	Leader: 0	Replicas: 0,1,2	Isr: 0,1,2
-    Topic: source.accounts	Partition: 4	Leader: 2	Replicas: 2,0,1	Isr: 2,0,1
+Topic: source.accounts	Partition: 0	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1    Topic: source.accounts	Partition: 1	Leader: 2	Replicas: 2,1,0	Isr: 2,1,0    Topic: source.accounts	Partition: 2	Leader: 1	Replicas: 1,0,2	Isr: 1,0,2
+Topic: source.accounts	Partition: 3	Leader: 0	Replicas: 0,1,2	Isr: 0,1,2
+Topic: source.accounts	Partition: 4	Leader: 2	Replicas: 2,0,1	Isr: 2,0,1
 ```
 
-* Create a mirror maker 2 configuration to replicate the topic
+* Create a MirrorMaker 2 configuration to replicate the topic
  
-#### Test Approach
+#### Python based test approach
 
 This test is in the `perf-tests/ValidateTopicReplication` folder, and aims to validate the 10 partition topic to 5 partition topic replication.
 
@@ -110,8 +108,7 @@ The procedure is:
     export KAFKA_SRC_BROKERS=eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud
     ```
 
-
-1. Start consumer: 
+1. Start consumer:
 
     Start the consumer to run locally but remote connected to the kafka cluster:
 
@@ -122,7 +119,7 @@ The procedure is:
     Or run the consumer inside openshift
 
     ```
-    oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TGT_BROKERS --topic source.accounts -from-beginning
+    oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server $KAFKA_TGT_BROKERS --topic source.accounts --from-beginning
     ```
 
 1. Start producer
@@ -137,9 +134,21 @@ The number of records on the consumer side should match the number send (e.g. 50
 
 Hypothesis proven - MirrorMaker 2 can replicate from a local topic with 10 partitions to a remote topic with 5 partitions.
 
-## Performance tests
+## Java based performance tests
 
-For the performance test producer code, we use the IBM Event Stream tool which is itself based on the Apache [Kafka producer performance tool](https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java). This tool can read data from a file and generates n records to the source topic. [This article](https://ibm.github.io/event-streams/getting-started/testing-loads/) explains how to use the tool. We have cloned this tool under the [perf-test/event-streams-sample-producer](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0) folder.
+The performance testing in java is based on two tools: the IBM Event Stream tool which is itself based on the Apache [Kafka producer performance tool](https://github.com/apache/kafka/blob/trunk/tools/src/main/java/org/apache/kafka/tools/ProducerPerformance.java) and a custom consumer app, deployable on kubernetes cluster and that support latency reporting.
+
+### Context
+
+The following diagram illustrates the performance test app context, with the two kafka clusters and the MirrorMaker tool:
+
+![System context](images/test-app-syst-ctx.png)
+
+Zooming into the system, we define the producer and consumer apps and we may add metrics reporting consumable by using dashboard.
+
+![](images/test-app-container.png)
+
+For the app producer, we have cloned this tool under the [perf-test/event-streams-sample-producer](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0) folder.
 
 The tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.
 
@@ -158,7 +167,7 @@ The arguments supported are:
 | --transactional-id `value` | Test with transaction |
 | --transaction-duration-ms `value`| The max age of each transaction. Test with transaction if v>0 |
 
-To completement this tool, we need a consumer that will be responsible to measure some of the latency between given timestamps. The following diagram presents the interesting time stamps we can assess with some tooling:
+To completement this tool, the consumer app is responsible to measure some of the latency between given timestamps. The following diagram presents the interesting time stamps we can assess with some tooling:
 
 
 ![](images/mm2-ts-test.png)
@@ -168,18 +177,20 @@ To completement this tool, we need a consumer that will be responsible to measur
 * ts-3: record timestamp when broker write to topic-partition: target topic
 * ts-4: timestamp when polling the record
 
+To get timestamp at the topic level, we need to add the `message.timestamp.type: LogAppendTime` property when creating the topic.
+
 The consumer needs to be deployable on OpenShift to scale horizontally. The metrics can be exposed as metrics for Prometheus. The metrics are: average latency, min and max latencies.
 
-The performance test consumer webapp is under the [perf-tests/perf-consumer-app folder](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/perf-consumer-app). The readme explains how to build and deploy it.
+The performance test consumer webapp is under the [perf-tests/perf-consumer-app folder](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/perf-consumer-app). The readme, in this folder, explains how to build and deploy it.
 
 ### Test approach
 
 Using IBM event streams producer tool we can run 3 different workload size, the payload is generated with random bytes or with records read from a data file.
 
 ```shell
-java -jar target/es-producer.jar -t test -s small
-java -jar target/es-producer.jar -t test -s medium
-java -jar target/es-producer.jar -t test -s large
+java -jar target/es-producer.jar -t accounts -s small -c 
+java -jar target/es-producer.jar -t accounts -s medium
+java -jar target/es-producer.jar -t accounts -s large
 ```
 
 To build the jar,run `mvn package` in the [event-streams-sample-producer-1.1.0](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0) folder.
@@ -200,9 +211,7 @@ sasl.mechanism=PLAIN
 sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="token" password="<replace with APIKAY>";
 ```
 
-## Basic Measurement
-
-This is the type of traces reported.
+The tool reports the following measures:
 
 ```shell
 1261 records sent, 251.8 records/sec (0.97 MB/sec), 2233.3 ms avg latency, 3320.0 max latency.
@@ -214,15 +223,33 @@ This is the type of traces reported.
 60000 records sent, 490.869821 records/sec (1.89 MB/sec), 14698.93 ms avg latency, 24949.00 ms max latency, 14490 ms 50th, 22298 ms 95th, 23413 ms 99th, 24805 ms 99.9th.
 ```
 
-Adding a consumer is simple, start a python environment using docker image, and launch the PerfConsumer code.
-
-```shell
-source ./scripts/setenv.sh
-docker run -e KAFKA_BROKERS=$KAFKA_BROKERS --rm -v $(pwd):/home -it  ibmcase/python37 bash
-$ python consumer/PerfConsumer.py
-```
-
 ## Measuring with consumer app
 
+The consumer app offers an API to get performance metrics via HTTP or via metrics. 
 
+![](images/test-perf-api.png)
 
+The ones interesting are: `/perf/config` to get the cluster configuration, it should return a json document like
+
+```shell
+{ 
+"ssl.protocol": "TLSv1.2",
+"sasl.mechanism": "PLAIN",
+"key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+"client.id": "test-cons-group-client-a425be84-801b-42b5-af2f-340386f98896",
+"ssl.truststore.password": "password",
+"ssl.endpoint.identification.algorithm": "HTTPS",
+"ssl.enabled.protocols": "TLSv1.2",
+"ssl.truststore.location": "/home/truststore.jks",
+"bootstrap.servers": "eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443",
+"auto.offset.reset": "earliest",
+"value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+"group.id": "test-cons-group",
+"enable.auto.commit": "false",
+"security.protocol": "SSL"
+}
+```
+
+`/perf/current` for getting the current metrics vias HTTP. Here is an example of output
+
+![](images/test-perf-out.png)

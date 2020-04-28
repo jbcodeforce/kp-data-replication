@@ -112,27 +112,4 @@ We are reusing the Event Streams on Cloud cluster on Washington DC data center a
 
 ## Considerations
 
-When the source or target cluster is deployed on Openshift, the exposed route to access the brokers is using TLS connection. So we need the certificate and create a truststore to be used by the consumer or producer Java programs. All kafka tools are done in java or scala so running in a JVM, which needs truststore for keep trusted TLS certificates.
-
-To get the certificate do the following steps:
-
-1. Get the host ip address from the Route resource
-
-    ```shell
-    oc get routes my-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{"\n"}'
-    ```
-
-1. Get the TLS CA root certificate from the broker
-
-    ```shell
-    oc get secrets
-    oc extract secret/my-cluster-cluster-ca-cert --keys=ca.crt --to=- > ca.crt
-    ```
-
-1. Transform the certificate for java truststore
-
-    ```shell
-    keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
-    ```
-
-
+When the source or target cluster is deployed on Openshift, the exposed route to access the brokers is using TLS connection. So we need the certificate and create a truststore to be used by the consumer or producer Java programs. All kafka tools are done in java or scala so running in a JVM, which needs truststore for keep trusted TLS certificates. See [this section](https://jbcodeforce.github.io/kp-data-replication/mm2-provisioning/#common-configuration) for the steps to build the truststore.

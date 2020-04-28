@@ -13,36 +13,27 @@ The approach is to implement producer and consumer to get the different timestam
 
 The consumer needs to be deployable on OpenShift to scale horizontally. The metrics can be exposed as metrics for Prometheus. The metrics are: average latency, min and max latencies.
 
-The producer tool is just an simple java class and is not yet deployable as webapp.
-
 ## Building the consumer
 
-To build the `PerfConsumerApp.war` we use maven.
+To build the `PerfConsumerApp.war` we use maven with a JDK 8. You could use the following docker maven image to have a maven environment:
 
 ```shell
-mvn install
+docker run -ti -v $(pwd):/home maven:3.6-jdk-11-slim bash
 ```
 
-## Building the docker image
+or use the docker staged build as below:
 
-To build your image, make sure that your Docker daemon is running and execute the Docker `build` command
-from the command line. If you execute your build from the same directory as your Dockerfile, you can
-use the period character (`.`) notation to specify the location for the build context. Otherwise, use
-the `-f` flag to point to your Dockerfile:
-
-```shell
-docker build -t ibmcase/perfconsumerapp .
+```
+docker build -f Dockerfile.multistage -t ibmcase/perfconsumerapp:v0.0.1 .
 ```
 
-The first build usually takes much longer to complete than subsequent builds because Docker needs to
-download all dependencies that your image requires, including the parent image.
 
 ## Running your application in Docker container
 
 Now that your image is built, execute the Docker `run` command should start the application with the properties as defined in the microprofile-config.properties:
 
 ```shell
-docker run -d --name perfconsumerapp -p 9080:9080 -p 9443:9443 ibmcase/perfconsumerapp
+docker run -d --name perfconsumerapp -e KAFKA_BROKERS=$KAFKA_BROKERS -p 9080:9080 -p 9443:9443 ibmcase/perfconsumerapp:v0.0.1
 ```
 
 To over write the default properties we can use environment variables. For example to connect to an on-premise cluster using TLS for authentication and authorization:

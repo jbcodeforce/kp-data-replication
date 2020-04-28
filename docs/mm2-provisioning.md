@@ -18,21 +18,31 @@ When we need to create Kubernetes `Secrets` to manage APIKEY to access Event Str
 `oc create secret generic es-api-secret --from-literal=password=<replace-with-event-streams-apikey>`
 * As your vanilla Kafka source cluster may use TLS to communicate between clients and brokers, you need to use the k8s secret defined when deploying Kafka which includes the CAroot and generic client certificates. These secrets are : `eda-demo-24-cluster-clients-ca-cert` and  `eda-demo-24-cluster-cluster-ca-cert`.
 
-```shell
-# build a local client CA crt file from the secret:
-oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys=ca.crt --to=- > ca.crt
-# Verify the certificate:
-openssl x509 -in ca.crt -text
-# transform it for java truststore.jks:
-keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
-# create a secret from file the truststore so it can be mounted as needed
-oc create secret generic kafka-truststore --from-file=./truststore.jks
-# Verify the created secret
-oc describe secret kafka-truststore
-```
+1. Get the host ip address from the Route resource
 
-!!! Attention
-    At this step, we have two options to deploy mirror maker, one using the Mirror Maker Operator and configure it via a yaml file, or use properties file and a special docker image that is deployed to Openshift, see this approach as [documented this section](#deploying-a-customer-mirror-maker-docker-image).
+    ```shell
+    oc get routes my-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{"\n"}'
+    ```
+
+1. Get the TLS CA root certificate from the broker
+
+    ```shell
+    oc get secrets
+    oc extract secret/eda-demo-24-cluster-cluster-ca-cert --keys=ca.crt --to=- > ca.crt
+    oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys=ca.crt --to=- >> ca.crt
+    ```
+
+1. Transform the certificates for java truststore
+
+    ```shell
+    keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
+    ```
+
+1. Create a secret from truststore file so it can be mounted as needed into consumer or producer running in the same OpenShift cluster. 
+
+  ```shell
+  oc create secret generic kafka-truststore --from-file=./truststore.jks
+  ```
 
 ## Deploying using Strimzi Mirror Maker operator
 

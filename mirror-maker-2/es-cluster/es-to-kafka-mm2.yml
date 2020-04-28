@@ -13,7 +13,7 @@ spec:
       connect.root.logger.level: "INFO"
   clusters:
   - alias: "kafka-on-premise-cluster"
-    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:9404
+    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443
     config:
       config.storage.replication.factor: 3
       offset.storage.replication.factor: 3
@@ -35,7 +35,7 @@ spec:
     tls: {}
     authentication:
       passwordSecret:
-          secretName: es-api-secret  
+          secretName: es-api-secretmgr   
           password: password 
       username: token
       type: plain

@@ -19,6 +19,6 @@ mirror-maker-2/es-cluster/mm2.properties
 mirror-maker-2/ca.crt
 mirror-maker-2/str.crt
 mirror-maker-2/ca.pem
-mirror-maker-2/setenv.sh
+scripts/setenv.sh
 mirror-maker-2/truststore.jks
 perf-tests/kafka/__pycache__/

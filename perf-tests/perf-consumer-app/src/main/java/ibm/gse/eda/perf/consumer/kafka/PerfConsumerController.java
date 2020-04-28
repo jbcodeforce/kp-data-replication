@@ -39,7 +39,6 @@ public class PerfConsumerController {
     protected int numberOfPartitions;
 
 
-    
     public PerfConsumerController() {  
         logger.warning("Controller constructor " + this.toString());
     }
@@ -81,6 +80,9 @@ public class PerfConsumerController {
         for (ConsumerRunnable consumerRunnable : consumers) {
           l.addAll(consumerRunnable.getMessages().getElements());
         }
+        for (ConsumerRecord<String,String> c : l) {
+            System.out.println(c.toString());
+        }
         return l;
     }
 
@@ -114,13 +116,14 @@ public class PerfConsumerController {
      */
      public boolean controlConsumers(Control control){
          if ("STOP".equals(control.order)) {
-             stopConsumers();
-             executor.shutdownNow();
+            stopConsumers();
             return true;
          }
 
-         if ("START".equals(control.order)) {
+         if ("RESTART".equals(control.order)) {
             stopConsumers();
+            cleanConsumers();
+            redefineConfiguration(control);
             prepareAndStartConsumers();
            return true;
          }
@@ -132,17 +135,28 @@ public class PerfConsumerController {
      }
 
     public void stopConsumers(){
+        for (ConsumerRunnable consumerRunnable : consumers) {
+            if (consumerRunnable.isRunning()) {
+                consumerRunnable.stop();
+            }   
+        }
         executor.shutdownNow();
         try {
             executor.awaitTermination(KafkaConfiguration.TERMINATION_TIMEOUT_SEC, TimeUnit.SECONDS);
         } catch (InterruptedException ie) {
             logger.warning("await Termination( interrupted " + ie.getLocalizedMessage());
         }
-        for (ConsumerRunnable consumerRunnable : consumers) {
-            if (consumerRunnable.isRunning()) {
-                consumerRunnable.stop();
-            }   
-        }
+    }
+
+    private void cleanConsumers(){
+        consumers = new ArrayList<ConsumerRunnable>();
+    }
+
+    private void redefineConfiguration(Control ctl) {
+        this.kafkaConfiguration.setMainTopicName(ctl.topic);
+        this.kafkaConfiguration.setCommit(ctl.commit);
+        this.kafkaConfiguration.setOffsetPolicy(ctl.offsetPolicy);
+        this.numberOfPartitions = ctl.numberOfPartitions;
     }
 
 	public int getNumberOfConsumers() {
