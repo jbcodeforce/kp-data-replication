@@ -22,3 +22,4 @@ mirror-maker-2/ca.pem
 scripts/setenv.sh
 mirror-maker-2/truststore.jks
 perf-tests/kafka/__pycache__/
+.DS_Store
