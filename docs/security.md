@@ -44,6 +44,28 @@ properties.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, "TLSv1.2");
 
 With Java code, the CA root and client certiticates needs to be in the Truststore.jks file. Host name verification is enabled by default to avoid man in the middle attacks. The clients code will verify the server’s fully qualified domain name (FQDN) against Common Name or Subject Alternative Name.
 
+## Event streams security considerations
+
+The [product documentation](https://cloud.ibm.com/docs/services/EventStreams?topic=eventstreams-security) explains how to control access to Kafka / Event Streams resources like cluster, topic, consumer group and control transaction support.
+
+The access is controled via roles: reader, writer, manager. Access is done via Identity and access management service, where policies are defined for each potential resources. User and serviceId can be used and assigned to role.
+
+![](images/sec-serviceid.png)
+
+Each service policy defines the level of access that the service ID has to each resource or set of resources. A policy consists of the following information:
+
+* The role assigned to the policy. For example, Viewer, Editor, or Operator.
+* The type of service the policy applies to. For example, IBM Event Streams.
+* The instance of the service to be secured.
+* The type of resource to be secured. The valid values are cluster, topic, group, or txnid. Specifying a type is optional. If you do not specify a type, the policy then applies to all resources in the service instance.
+* The identifier of the resource to be secured. Specify for resources of type topic, group and txnid. If you do not specify the resource, the policy then applies to all resources of the type specified in the service instance.
+
+![](images/sec-policies.png)
+
+For each topic it is possible to control the access type, and get a specific API key for accessing one or all the topics.
+
+![](images/sec-topic-ctl.png)
+
 ## ACL replications
 
 The following scenario validates the Mirror Maker 2 ACL replication. The goal is to define the same users between Event Streams on the cloud and local kafka may be deployed and operated with Strimzi. Two users are created (kp-consumer-1,kp-consumer-2) to access two different topics (kp-topic-1, kp-topic-2) respectively.

@@ -43,8 +43,8 @@ public class KafkaConfiguration {
     private boolean commit;
 
     @Inject
-    @ConfigProperty(name = "kafka.consumer.offset", defaultValue = "earliest")
-    private String offset;
+    @ConfigProperty(name = "kafka.consumer.offsetPolicy", defaultValue = "earliest")
+    private String offsetPolicy;
 
     @Inject
     @ConfigProperty(name = "kafka.brokers", defaultValue = "localhost:9092")
@@ -85,10 +85,13 @@ public class KafkaConfiguration {
             properties.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "HTTPS");
         }
         if (env.get("TRUSTSTORE_PATH") != null && env.get("TRUSTSTORE_PATH").length() > 0) {
+            properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
+            properties.setProperty(SslConfigs.SSL_PROTOCOL_CONFIG, "TLSv1.2");
+            properties.setProperty(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, "TLSv1.2");
+            properties.setProperty(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "HTTPS");
             properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, env.get("TRUSTSTORE_PATH"));
             properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, env.get("TRUSTSTORE_PWD"));
         }
-        properties.forEach((k, v) -> logger.log(Level.SEVERE,k + " : " + v));
         return properties;
     }
 
@@ -100,12 +103,12 @@ public class KafkaConfiguration {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.CLIENT_ID_CONFIG, groupID + "-client-" + UUID.randomUUID());
-        properties.forEach((k, v) -> logger.info(k + " : " + v));
+        properties.forEach((k, v) -> logger.warning(k + " : " + v));
         return properties;
     }
 
     public Properties getConsumerProperties() {
-       return  getConsumerProperties(getGroupId(),getCommit(),getOffset());
+       return  getConsumerProperties(getGroupId(),getCommit(),getOffsetPolicy());
     }
 
 
@@ -129,8 +132,16 @@ public class KafkaConfiguration {
         return this.commit;
     }
 
-    public String getOffset(){
-        return this.offset;
+    public void setCommit(boolean b) {
+        this.commit = b;
+    }
+
+    public String getOffsetPolicy(){
+        return this.offsetPolicy;
+    }
+
+    public void setOffsetPolicy(String p) {
+        this.offsetPolicy = p;
     }
 
     public String getBrokers(){
@@ -151,8 +162,12 @@ public class KafkaConfiguration {
     public String getPropertiesAsString(){
         StringBuffer sb = new StringBuffer();
         sb.append("{ \n");
-        properties.forEach((k, v) -> sb.append("\"" + k + "\": \"" + v +"\",\n"));
-        sb.append("}");
+        properties.forEach((k, v) -> {
+            if (! k.equals(SaslConfigs.SASL_JAAS_CONFIG)) {sb.append("\"" + k + "\": \"" + v +"\",");}
+            });
+        sb.append("\"topic\": \"");
+        sb.append(this.getMainTopicName());
+        sb.append("\"}");
         return sb.toString();
     }
 }

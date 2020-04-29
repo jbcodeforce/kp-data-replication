@@ -13,21 +13,29 @@ spec:
       connect.root.logger.level: "INFO"
   clusters:
   - alias: "kafka-on-premise-cluster"
-    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:9092
+    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:9404
     config:
       config.storage.replication.factor: 3
       offset.storage.replication.factor: 3
       status.storage.replication.factor: 3
+      ssl.endpoint.identification.algorithm: https
+    tls: 
+      trustedCertificates:
+        - secretName: eda-demo-24-cluster-clients-ca-cert
+          certificate: ca.crt
+        - secretName: eda-demo-24-cluster-cluster-ca-cert
+          certificate: ca.crt
   - alias: "event-streams-wdc"
-    bootstrapServers: 'broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093'
+    bootstrapServers: broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093
     config:
       config.storage.replication.factor: 3
       offset.storage.replication.factor: 3
       status.storage.replication.factor: 3
+      ssl.endpoint.identification.algorithm: https
     tls: {}
     authentication:
       passwordSecret:
-          secretName: es-api-secretmgr
+          secretName: es-api-secret  
           password: password 
       username: token
       type: plain
@@ -45,8 +53,21 @@ spec:
     checkpointConnector:
       config:
           checkpoints.topic.replication.factor: 1
+    topicsPattern: "accounts,orders"
+  - sourceCluster: "kafka-on-premise-cluster"
+    targetCluster: "event-streams-wdc"
+    sourceConnector:
+      config:
+          replication.factor: 1
+          offset-syncs.topic.replication.factor: 1
+          sync.topic.acls.enabled: "false"
+    heartbeatConnector:
+      config:
+          heartbeats.topic.replication.factor: 1
+    checkpointConnector:
+      config:
+          checkpoints.topic.replication.factor: 1
     topicsPattern: "accounts"
-    groupsPattern: ".*"
   metrics:
     lowercaseOutputName: true
     lowercaseOutputLabelNames: true

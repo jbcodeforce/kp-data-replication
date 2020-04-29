@@ -21,24 +21,22 @@ oc get kafka
 oc get kafkatopics
 ```
 
-Example of topic can be seen in [section below](#create-a-topic).
-
-Kafka User are not saved part of kafka cluster but they are managed in kubernetes. For example the user credentials are saved as secret.
+We address how to create topic using the operator in the [section below](#create-a-topic).
 
 CRDs act as configuration instructions to describe the custom resources in a Kubernetes cluster, and are provided with Strimzi for each Kafka component used in a deployment.
 
 ## Strimzi Operators Deployment
 
-The deployment is done in two phases:
+The Strimzi operator deployment is done in two phases:
 
-* Deploy the Custom Resource Definitions (CRDs), which act as specifications of the custom resource to deploy.
-* Deploy one to many instance of those CRDs
+* Deploy the Custom Resource Definitions (CRDs), which act as specifications of the custom resources to deploy.
+* Deploy one to many instances of those CRDs
 
-In CR yaml file the `kind` attribute specifies the CRD to conform to.
+In CRD yaml file the `kind` attribute specifies the CRD to conform to.
 
 Each CRD has a common configuration like bootstrap servers, CPU resources, logging, healthchecks...
 
-The next steps are defining how to deploy a Kafka Cluster.
+If you want to deploy a Kafka Cluster using Strimzi on an OpenShift cluster use the steps in next sections.
 
 ### Create a namespace or openshift project
 
@@ -104,10 +102,10 @@ Then assign the strimzi-admin ClusterRole to one or more existing users in the K
 
 The CRD for kafka cluster resource is [here](https://github.com/strimzi/strimzi-kafka-operator/blob/2d35bfcd99295bef8ee98de9d8b3c86cb33e5842/install/cluster-operator/040-Crd-kafka.yaml) and we recommend to study it before defining your own cluster.
 
-Change the name of the cluster in one the yaml in the `examples/kafka` folder or use our `openshift-strimzi/kafka-cluster.yml` file in this project as a starting point. This file defines the default replication factor of 3 and in-synch replicas of 2. For development purpose we will accept plain (unencrypted) listener on port 9092 without TLS authentication.
-For external to the kubernetes cluster access we need to have external listeners. For Openshift, as we use routes, we need to add the `external.type = route`. When exposing Kafka using OpenShift Routes and the HAProxy router, a dedicated Route is created for every Kafka broker pod. An additional Route is created to serve as a Kafka bootstrap address. Kafka clients can use these Routes to connect to Kafka on port 443.
+Change the name of the cluster in one the yaml in the `examples/kafka` folder or use our `openshift-strimzi/kafka-cluster.yml` file in this project as a starting point. This file defines the default replication factor of 3 and in-synch replicas of 2. For development purpose we have set a plain (unencrypted) listener on port 9092 without TLS authentication.
+For external access to the kubernetes cluster, we need to have external listeners. As Openshift uses routes for external access, we need to add the `external.type = route` stanza in the yaml file. When exposing Kafka using OpenShift Routes and the HAProxy router, a dedicated Route is created for every Kafka broker pod. An additional Route is created to serve as a Kafka bootstrap address. Kafka clients can use the bootstrap route to connect to Kafka on port 443.
 
-Even for development we added the metrics rules in the `metrics` stamza within `kafka-cluster.yml` file to expose kafka and zookeeper metrics for tool like Prometheus.
+Even for development we added the metrics rules in the `metrics` stamza within `kafka-cluster.yml` file to expose kafka and zookeeper metrics for Prometheus.
 
 For production we need to use persistence for the kafka log, ingress or load balancer external listener and rack awareness policies. It has to use Mutual TLS authentication, and with Strimzi we can use the User Operator to manage cluster users. Mutual authentication or two-way authentication is when both the server and the client present certificates.
 
@@ -157,11 +155,11 @@ env:
               value: eda-demo-24-cluster-zookeeper-client:2181
 ```
 
-and then deploy the topic-operator. This operation will fail if there is no Kafka Boker and Zookeeper available:
+and then deploy the `topic-operator`. This operation will fail if there is no Kafka Broker and Zookeeper available:
 
 ```shell
 oc apply -f openshift-strimzi/install/topic-operator
-oc adm policy add-cluster-role-to-user strimzi-topic-operator --serviceaccount strimzi-cluster-operator -n eda-strimzi-kafka24 
+oc adm policy add-cluster-role-to-user strimzi-topic-operator --serviceaccount strimzi-cluster-operator -n eda-strimzi-kafka24
 ```
 
 This will add the following resources:
@@ -180,7 +178,7 @@ Edit a yaml file like the following:
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaTopic
 metadata:
-  name: test
+  name: accounts
   labels:
     strimzi.io/cluster: eda-demo-24-cluster
 spec:
@@ -189,6 +187,7 @@ spec:
   config:
     retention.ms: 7200000
     segment.bytes: 1073741824
+    message.timestamp.type: LogAppendTime
 ```
 
 ```shell
@@ -214,9 +213,9 @@ Use kafka-consumer and producer tools from Kafka distribution. Verify within Doc
 ```shell
 # Start a consumer on test topic
 
-oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic test --from-beginning
+oc run kafka-consumer -ti --image=strimzi/kafka:latest-kafka-2.4.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server eda-demo-24-cluster-kafka-bootstrap:9092 --topic test --from-beginning
 # Start a text producer
-oc run kafka-producer -ti --image=strimzi/kafka:latest-kafka-2.4.0  --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap:9092 --topic test
+oc run kafka-producer -ti --image=strimzi/kafka:latest-kafka-2.4.0  --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list eda-demo-24-cluster-kafka-bootstrap:9092 --topic test
 # enter text
 ```
 
@@ -239,7 +238,7 @@ spec:
 * Get the host ip address from the Route resource
 
 ```shell
-oc get routes my-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{"\n"}'
+oc get routes eda-demo-24-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{"\n"}'
 ```
 
 * Get the TLS certificate from the broker
@@ -247,6 +246,7 @@ oc get routes my-cluster-kafka-bootstrap -o=jsonpath='{.status.ingress[0].host}{
 ```shell
 oc get secrets
 oc extract secret/eda-demo-24-cluster-cluster-ca-cert --keys=ca.crt --to=- > ca.crt
+oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys=ca.crt --to=- >> ca.crt
 # transform it fo java truststore
 keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks -storepass password -noprompt
 ```
@@ -259,13 +259,13 @@ keytool -import -trustcacerts -alias root -file ca.crt -keystore truststore.jks 
 docker run -ti -v $(pwd):/home strimzi/kafka:latest-kafka-2.4.0  bash
 # inside the container uses the consumer tool
 bash-4.2$ cd /opt/kafka/bin
-bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --consumer-property security.protocol=SSL --consumer-property ssl.truststore.password=password --consumer-property ssl.truststore.location=/home/truststore.jks --topic test --from-beginning
+bash-4.2$ ./kafka-console-consumer.sh --bootstrap-server  eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443 --consumer-property security.protocol=SSL --consumer-property ssl.truststore.password=password --consumer-property ssl.truststore.location=/home/truststore.jks --topic test --from-beginning
 ```
 
 * For a producer the approach is the same but using the producer properties:
 
 ```shell
-./kafka-console-producer.sh --broker-list  my-cluster-kafka-bootstrap-eda-strimzi-kafka24 .gse-eda-demos-fa9ee67c9ab6a7791435450358e564cc-0001.us-east.containers.appdomain.cloud:443 --producer-property security.protocol=SSL --producer-property ssl.truststore.password=password --producer-property ssl.truststore.location=/home/truststore.jks --topic test
+./kafka-console-producer.sh --broker-list  eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443 --producer-property security.protocol=SSL --producer-property ssl.truststore.password=password --producer-property ssl.truststore.location=/home/truststore.jks --topic test
 ```
 
 Those properties can be in file

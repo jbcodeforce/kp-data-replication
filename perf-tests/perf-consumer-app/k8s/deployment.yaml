@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: perf-consumer-config
+  namespace: eda-strimzi-kafka24
+  labels:
+    app: perfconsumerapp
+data:
+  brokers: eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443
+  truststorepath: /home/truststore.jks
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perfconsumerapp-deployment
+  labels:
+    app: perfconsumerapp
+spec:
+  selector:
+    matchLabels:
+      app: perfconsumerapp
+  template:
+    metadata:
+      labels:
+        app: perfconsumerapp
+    spec:
+      containers:
+      - name: perfconsumerapp
+        image: ibmcase/perfconsumerapp:v0.0.1
+        ports:
+        - containerPort: 9080
+        env:
+        - name: KAFKA_BROKERS
+          valueFrom:
+            configMapKeyRef:
+              name: perf-consumer-config
+              key: brokers
+        - name: KAFKA_APIKEY
+          valueFrom:
+            secretKeyRef:
+              name: es-api-secret
+              key: password
+        - name: TRUSTSTORE_PWD
+          valueFrom:
+            secretKeyRef:
+              name: perf-config-secret
+              key: password
+        - name: TRUSTSTORE_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: perf-consumer-config
+              key: truststorepath
+            
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: perfconsumerapp-service
+spec:
+  selector:
+    app: perfconsumerapp
+  ports:
+  - protocol: TCP
+    port: 9080
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: perfconsumerapp-route
+spec:
+  to:
+    kind: Service
+    name: perfconsumerapp-service
