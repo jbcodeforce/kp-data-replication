@@ -649,15 +649,22 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#measuring-with-consumer-app" title="Measuring with consumer app" class="md-nav__link">
     Measuring with consumer app
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#putting-all-together" title="Putting all together" class="md-nav__link">
+    Putting all together
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -820,15 +827,22 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#measuring-with-consumer-app" title="Measuring with consumer app" class="md-nav__link">
     Measuring with consumer app
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#putting-all-together" title="Putting all together" class="md-nav__link">
+    Putting all together
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -965,8 +979,12 @@ Topic: source.accounts  Partition: <span class="m">4</span>    Leader: <span cla
 <p><img alt="System context" src="../images/test-app-syst-ctx.png" /></p>
 <p>Zooming into the system, we define the producer and consumer apps and we may add metrics reporting consumable by using dashboard.</p>
 <p><img alt="" src="../images/test-app-container.png" /></p>
-<p>For the app producer, we have cloned this tool under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">perf-test/event-streams-sample-producer</a> folder.</p>
-<p>The tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.</p>
+<p>For the app producer, we have two options:</p>
+<ul>
+<li>One using the Event Streams sample producer that is a wrapper on top of Kafka producer performance tool that we cloned in the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">perf-test/event-streams-sample-producer</a> folder. </li>
+<li>Use a simple java producer that can play a basic String payload and set timestamp in records. The code is under <code>perf-producer-app</code> folder.</li>
+</ul>
+<p>The Event Stream sample producer tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.</p>
 <p>The arguments supported are:</p>
 <table>
 <thead>
@@ -1030,15 +1048,18 @@ Topic: source.accounts  Partition: <span class="m">4</span>    Leader: <span cla
 <p>The consumer needs to be deployable on OpenShift to scale horizontally. The metrics can be exposed as metrics for Prometheus. The metrics are: average latency, min and max latencies.</p>
 <p>The performance test consumer webapp is under the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/perf-consumer-app">perf-tests/perf-consumer-app folder</a>. The readme, in this folder, explains how to build and deploy it.</p>
 <h3 id="test-approach">Test approach</h3>
+<ul>
+<li>Using Event Stream sample producer:</li>
+</ul>
 <p>Using IBM event streams producer tool we can run 3 different workload size, the payload is generated with random bytes or with records read from a data file.</p>
-<div class="codehilite"><pre><span></span>java -jar target/es-producer.jar -t accounts -s small -c 
+<div class="codehilite"><pre><span></span>java -jar target/es-producer.jar -t accounts -s small 
 java -jar target/es-producer.jar -t accounts -s medium
 java -jar target/es-producer.jar -t accounts -s large
 </pre></div>
 
 <p>To build the jar,run <code>mvn package</code> in the <a href="https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0">event-streams-sample-producer-1.1.0</a> folder.</p>
 <p>Here is an example of call to this performance producer</p>
-<div class="codehilite"><pre><span></span> java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
+<div class="codehilite"><pre><span></span> java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./data/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
 </pre></div>
 
 <p>The <code>eventstream.properties</code> file define the bootstrap.servers, sasl configuration using Event Streams credentials and URLs. Something like:</p>
@@ -1059,7 +1080,13 @@ java -jar target/es-producer.jar -t accounts -s large
 <span class="m">60000</span> records sent, <span class="m">490</span>.869821 records/sec <span class="o">(</span><span class="m">1</span>.89 MB/sec<span class="o">)</span>, <span class="m">14698</span>.93 ms avg latency, <span class="m">24949</span>.00 ms max latency, <span class="m">14490</span> ms 50th, <span class="m">22298</span> ms 95th, <span class="m">23413</span> ms 99th, <span class="m">24805</span> ms <span class="m">99</span>.9th.
 </pre></div>
 
-<h2 id="measuring-with-consumer-app">Measuring with consumer app</h2>
+<ul>
+<li>Using the producer coder under the <code>perf-producer-app</code> folder:</li>
+</ul>
+<div class="codehilite"><pre><span></span>java -jar ... tools.ProducerTestTool --num-records <span class="m">500</span> --topic accounts --bootstrap &lt;eventstream-broker-list&gt; --apiKey &lt;eventstream-apikey&gt; 
+</pre></div>
+
+<h3 id="measuring-with-consumer-app">Measuring with consumer app</h3>
 <p>The consumer app offers an API to get performance metrics via HTTP or via metrics. </p>
 <p><img alt="" src="../images/test-perf-api.png" /></p>
 <p>The ones interesting are: <code>/perf/config</code> to get the cluster configuration, it should return a json document like</p>
@@ -1083,6 +1110,17 @@ java -jar target/es-producer.jar -t accounts -s large
 
 <p><code>/perf/current</code> for getting the current metrics vias HTTP. Here is an example of output</p>
 <p><img alt="" src="../images/test-perf-out.png" /></p>
+<p>Finally the application can be restarted to process from another topic using a PUT on <code>/perf</code>:</p>
+<p><img alt="" src="../images/test-put-config.png" /></p>
+<p>The parameters are the topic name, the number of partition on this topic, and to commit the offset or not, and what is the offset policy to be used (<code>earliest, latest</code>). The timestamp is to specify from which timestamp to measure the latency from (TS1, TS2, TS3 in the time figure above, default is TS2).</p>
+<h3 id="putting-all-together">Putting all together</h3>
+<p>So with those tools we can have a performance testing framework that works like this:</p>
+<ul>
+<li>Deploy MirrorMaker2 instance</li>
+<li>Deploy a performance consumer application on a cluster and connected to the target topic, define the number of partitions of the topic as parameter</li>
+<li>Start the producer</li>
+<li>Look at the REST API or Prometheus metrics.</li>
+</ul>
                 
                   
                 

@@ -561,8 +561,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mirror-maker-20-monitoring" title="Mirror maker 2.0 monitoring" class="md-nav__link">
-    Mirror maker 2.0 monitoring
+  <a href="#mirrormaker-2-monitoring" title="MirrorMaker 2 monitoring" class="md-nav__link">
+    MirrorMaker 2 monitoring
   </a>
   
 </li>
@@ -729,8 +729,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mirror-maker-20-monitoring" title="Mirror maker 2.0 monitoring" class="md-nav__link">
-    Mirror maker 2.0 monitoring
+  <a href="#mirrormaker-2-monitoring" title="MirrorMaker 2 monitoring" class="md-nav__link">
+    MirrorMaker 2 monitoring
   </a>
   
 </li>
@@ -803,6 +803,8 @@
 <li>Package the mirror maker 2 to use <a href="https://github.com/prometheus/jmx_exporter">JMX Exporter</a> as Java agent so it exposes JMX MBeans as metrics accessibles via HTTP.</li>
 <li>Deploy Prometheus using Operator</li>
 <li>Optionally deploy Prometheus Alertmanager</li>
+<li>Expose MirrorMaker 2 API as external route</li>
+<li>Configure Prometheus to access MirrorMaker metrics</li>
 <li>Deploy Grafana and configure dashboard</li>
 </ol>
 <h2 id="installation-and-configuration">Installation and configuration</h2>
@@ -930,18 +932,22 @@ prometheus             <span class="m">1</span>          52s
   <span class="nt">sessionAffinity</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ClientIP</span>
 </pre></div>
 
-<p>Once define the url will be something like:</p>
+<p>Using the OpenShift console, we can add a route to this service and then access it:</p>
 <p>http://prometheus-route-eda-strimzi-kafka24.gse-eda-demo-43-f......us-east.containers.appdomain.cloud/graph</p>
 <h2 id="configure-monitoring">Configure monitoring</h2>
 <p>To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitor. An example of such file can be found <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/strimzi-service-monitor.yaml">here</a></p>
 <div class="codehilite"><pre><span></span>oc apply -f strimzi-service-monitor.yaml
 oc describe servicemonitor
+
+<span class="c1"># the results will look as a list of ServiceMonitor configurations</span>
+Name:         kafka-service-monitor
+Namespace:    eda-strimzi-kafka24
+Labels:       <span class="nv">app</span><span class="o">=</span>strimzi
+...
 </pre></div>
 
-<h2 id="mirror-maker-20-monitoring">Mirror maker 2.0 monitoring</h2>
-<p>To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be <a href="https://github.com/prometheus/jmx_exporter">found here</a>. We copied a version in the folder <code>mirror-maker-2/libs</code>. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile">Dockerfile</a> in this <a href="../mm2-provisioning/">separate note</a>.</p>
-<p>The next step is to define a service monitor 
-Once the Mirror Maker 2.0 is connected...</p>
+<h2 id="mirrormaker-2-monitoring">MirrorMaker 2 monitoring</h2>
+<p>To monitor MirrorMaker 2 we need to add a Service Monitor.</p>
 <h2 id="install-grafana">Install Grafana</h2>
 <p><a href="https://grafana.com/">Grafana</a> provides visualizations of Prometheus metrics. Again we will use the Strimzi dashboard definition as starting point to monitor Kafka cluster but also mirror maker.</p>
 <ul>
