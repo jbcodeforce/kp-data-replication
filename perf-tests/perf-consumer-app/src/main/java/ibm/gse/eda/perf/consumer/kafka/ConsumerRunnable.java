@@ -87,7 +87,7 @@ public class ConsumerRunnable implements Runnable {
             try {
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(kafkaConfiguration.getPollTimeOut());
                 for (ConsumerRecord<String, String> record : records) {
-                    logger.log(Level.SEVERE, "Consumer Record - key: " 
+                    logger.log(Level.WARNING, "Consumer Record - key: " 
                             + record.key() 
                             + " timestamp: "
                             + record.timestamp()
@@ -108,15 +108,16 @@ public class ConsumerRunnable implements Runnable {
                     messages.insertData(record);
                     logger.log(Level.WARNING,Long.toString(averageLatency) + " " + Long.toString(minLatency));
                 }
+                if (getConfig().getCommit()) {
+                    logger.log(Level.INFO, "Consumer auto commit");
+                    kafkaConsumer.commitSync();
+                }
                 logger.log(Level.INFO, "in consumer: " + id + " listen to topic " + getConfig().getMainTopicName());
             } catch (final Exception e) {
                 logger.log(Level.SEVERE, "Consumer loop has been unexpectedly interrupted");
                 stop();
             }
-            if (getConfig().getCommit()) {
-                logger.log(Level.SEVERE, "Consumer auto commit");
-                kafkaConsumer.commitSync();
-            }
+     
         } //loop
     }
 
@@ -143,18 +144,20 @@ public class ConsumerRunnable implements Runnable {
 		return messages;
 	}
 
-    public long getAverageLatency() {
+    public synchronized long getAverageLatency() {
 		return this.averageLatency;
     }
     
-    public long getMinLatency() {
+    public synchronized long getMinLatency() {
 		return this.minLatency;
 	}
 
-    public long getMaxLatency() {
+    public synchronized long getMaxLatency() {
 		return this.maxLatency;
 	}
 
-
+    public synchronized long getCount(){
+        return this.count;
+    }
 
 }

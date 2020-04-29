@@ -148,9 +148,12 @@ Zooming into the system, we define the producer and consumer apps and we may add
 
 ![](images/test-app-container.png)
 
-For the app producer, we have cloned this tool under the [perf-test/event-streams-sample-producer](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0) folder.
+For the app producer, we have two options:
 
-The tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.
+* One using the Event Streams sample producer that is a wrapper on top of Kafka producer performance tool that we cloned in the [perf-test/event-streams-sample-producer](https://github.com/jbcodeforce/kp-data-replication/tree/master/perf-tests/event-streams-sample-producer-1.1.0) folder. 
+* Use a simple java producer that can play a basic String payload and set timestamp in records. The code is under `perf-producer-app` folder.
+
+The Event Stream sample producer tool reports test metrics like records per second, number of records sent, the megabytes per second, the average and maximum latencies,  from the producer.metrics() and other stats from the tools.
 
 The arguments supported are:
 
@@ -185,10 +188,12 @@ The performance test consumer webapp is under the [perf-tests/perf-consumer-app 
 
 ### Test approach
 
+* Using Event Stream sample producer:
+
 Using IBM event streams producer tool we can run 3 different workload size, the payload is generated with random bytes or with records read from a data file.
 
 ```shell
-java -jar target/es-producer.jar -t accounts -s small -c 
+java -jar target/es-producer.jar -t accounts -s small 
 java -jar target/es-producer.jar -t accounts -s medium
 java -jar target/es-producer.jar -t accounts -s large
 ```
@@ -198,7 +203,7 @@ To build the jar,run `mvn package` in the [event-streams-sample-producer-1.1.0](
 Here is an example of call to this performance producer
 
 ```shell
- java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./da/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
+ java -jar event-streams-sample-producer-1.1.0/target/es-producer.jar --payload-file ./data/records.json -t topic --producer-config ../mirror-maker-2/eventstream.properties
 ```
 
 The `eventstream.properties` file define the bootstrap.servers, sasl configuration using Event Streams credentials and URLs. Something like:
@@ -223,7 +228,13 @@ The tool reports the following measures:
 60000 records sent, 490.869821 records/sec (1.89 MB/sec), 14698.93 ms avg latency, 24949.00 ms max latency, 14490 ms 50th, 22298 ms 95th, 23413 ms 99th, 24805 ms 99.9th.
 ```
 
-## Measuring with consumer app
+* Using the producer coder under the `perf-producer-app` folder:
+
+```shell
+java -jar ... tools.ProducerTestTool --num-records 500 --topic accounts --bootstrap <eventstream-broker-list> --apiKey <eventstream-apikey> 
+```
+
+### Measuring with consumer app
 
 The consumer app offers an API to get performance metrics via HTTP or via metrics. 
 
@@ -253,3 +264,18 @@ The ones interesting are: `/perf/config` to get the cluster configuration, it sh
 `/perf/current` for getting the current metrics vias HTTP. Here is an example of output
 
 ![](images/test-perf-out.png)
+
+Finally the application can be restarted to process from another topic using a PUT on `/perf`:
+
+![](images/test-put-config.png)
+
+The parameters are the topic name, the number of partition on this topic, and to commit the offset or not, and what is the offset policy to be used (`earliest, latest`). The timestamp is to specify from which timestamp to measure the latency from (TS1, TS2, TS3 in the time figure above, default is TS2).
+
+### Putting all together
+
+So with those tools we can have a performance testing framework that works like this:
+
+* Deploy MirrorMaker2 instance
+* Deploy a performance consumer application on a cluster and connected to the target topic, define the number of partitions of the topic as parameter
+* Start the producer
+* Look at the REST API or Prometheus metrics.

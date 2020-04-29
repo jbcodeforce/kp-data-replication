@@ -110,6 +110,13 @@ public class PerfConsumerController {
          return minLatency;
      }
      
+     public long getCountCrossConsumers(){
+        long count = Long.MIN_VALUE;
+        for (ConsumerRunnable consumerRunnable : consumers) {
+            count += consumerRunnable.getCount();
+        }
+        return count;
+     }
     /**
      * Change the configuration of the consumers.
      * @param control

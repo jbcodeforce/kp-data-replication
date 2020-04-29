@@ -163,7 +163,7 @@ public class ProducerTestTool {
                 .metavar("BOOTSTRAP")
                 .help("bootstrap server. comma separated value");
 
-        parser.addArgument("--api")
+        parser.addArgument("--apikey")
                 .action(store())
                 .required(false)
                 .type(String.class)

@@ -23,7 +23,7 @@
             "name": "Run Producer Tool",
             "request": "launch",
             "mainClass": "${file}",
-            "args": "--num-records 5 --topic accounts --tls ../../mirror-maker-2/truststore.jks -tlsPwd changeit --bootstrap eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443" 
+            "args": "--num-records 5 --topic accounts --tls ../../mirror-maker-2/truststore.jks -tlsPwd password --bootstrap eda-demo-24-cluster-kafka-bootstrap-eda-strimzi-kafka24.gse-eda-demo-43-fa9ee67c9ab6a7791435450358e564cc-0000.us-east.containers.appdomain.cloud:443" 
         }
     ]
 }

@@ -20,6 +20,8 @@ To support this monitoring we need to do the following steps:
 1. Package the mirror maker 2 to use [JMX Exporter](https://github.com/prometheus/jmx_exporter) as Java agent so it exposes JMX MBeans as metrics accessibles via HTTP.
 1. Deploy Prometheus using Operator
 1. Optionally deploy Prometheus Alertmanager
+1. Expose MirrorMaker 2 API as external route
+1. Configure Prometheus to access MirrorMaker metrics
 1. Deploy Grafana and configure dashboard
 
 ## Installation and configuration
@@ -140,7 +142,7 @@ spec:
   sessionAffinity: ClientIP
 ```
 
-Once define the url will be something like:
+Using the OpenShift console, we can add a route to this service and then access it:
 
 http://prometheus-route-eda-strimzi-kafka24.gse-eda-demo-43-f......us-east.containers.appdomain.cloud/graph
 
@@ -149,17 +151,20 @@ http://prometheus-route-eda-strimzi-kafka24.gse-eda-demo-43-f......us-east.conta
 
 To start monitoring our Kafka 2.4 cluster we need to add some monitoring prometheus scrapper definitions, named service monitor. An example of such file can be found [here](https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/strimzi-service-monitor.yaml)
 
-```
+```shell
 oc apply -f strimzi-service-monitor.yaml
 oc describe servicemonitor
+
+# the results will look as a list of ServiceMonitor configurations
+Name:         kafka-service-monitor
+Namespace:    eda-strimzi-kafka24
+Labels:       app=strimzi
+...
 ```
 
-## Mirror maker 2.0 monitoring
+## MirrorMaker 2 monitoring
 
-To monitor MM2 with Prometheus we need to add JMX Exporter and run it as Java agent.The jar file for JMX exporter agent can be [found here](https://github.com/prometheus/jmx_exporter). We copied a version in the folder `mirror-maker-2/libs`. We have adopted a custom mirror maker 2.0 docker imaged based on Kafka 2.4. We are detailing how to build this image using this [Dockerfile](https://github.com/jbcodeforce/kp-data-replication/blob/master/mirror-maker-2/Dockerfile) in this [separate note](mm2-provisioning.md).
-
-The next step is to define a service monitor 
-Once the Mirror Maker 2.0 is connected...
+To monitor MirrorMaker 2 we need to add a Service Monitor.
 
 ## Install Grafana
 

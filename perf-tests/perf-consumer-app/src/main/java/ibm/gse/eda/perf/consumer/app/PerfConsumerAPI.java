@@ -1,11 +1,9 @@
 package ibm.gse.eda.perf.consumer.app;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -20,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.MetricUnits;
+import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Gauge;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -90,19 +89,24 @@ public class PerfConsumerAPI {
         return perfConsumerController.getMessages();
      }
 
-     @Gauge(name = "averageLatency",unit = MetricUnits.MICROSECONDS)
+     @Gauge(name = "averageLatency",unit = MetricUnits.MICROSECONDS, description = "Average latency cross partition")
      public long getAverageLatency(){
         return perfConsumerController.getAverageLatencyCrossConsumers();
      }
 
-     @Gauge(name = "maxLatency",unit = MetricUnits.MICROSECONDS)
+     @Gauge(name = "maxLatency",unit = MetricUnits.MICROSECONDS, description = "Maximum latency cross partition")
      public long getMaxLatency(){
          return perfConsumerController.getMaxLatencyCrossConsumers();
      }
 
-     @Gauge(name = "minLatency",unit = MetricUnits.MICROSECONDS)
+     @Gauge(name = "minLatency",unit = MetricUnits.MICROSECONDS, description = "Minimum latency cross partition")
      public long getMinLatency(){
          return perfConsumerController.getMinLatencyCrossConsumers();
+     }
+
+     @Gauge(name = "recordCount", absolute = true, unit = MetricUnits.NONE, description = "Number of records processed")
+     public long getCount(){
+         return perfConsumerController.getCountCrossConsumers();
      }
 
      @GET
