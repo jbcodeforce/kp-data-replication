@@ -18,7 +18,7 @@ The environment we’re using is as follows:
 
 First, start the producer to start sending data to the remote Event Streams cluster.  On the Producer VM, start streaming data to Event Streams:
 
-![](images/term 1.png)
+![](images/term1.png)
 
 Note the specific brokers and the authentication token used have been blacked-out.  We’ll let this producer run in the background producing one message per second.
 
@@ -26,7 +26,7 @@ Next we’ll set up the first MirrorMaker 2 node.  To install MirrorMaker, we’
 
 We’ll untar the archive into /opt and create a symlink.  Also, set the PATH to include the new Kafka package.
 
-![](images/term 2.png)
+![](images/term2.png)
 
 Now we will create a MirrorMaker 2 configuration file based on the sample provided in /opt/kafka/config/connect-mirror-maker.properties and add some options.  The full configuration is below:
 
@@ -122,22 +122,22 @@ Now we will create a MirrorMaker 2 configuration file based on the sample provid
 
 Note that passwords and API keys have been obscured as well as hostnames.  This configuration file, along with the trust store for connecting to our local Kafka cluster, is all that is needed to replicate topics from the remote EventStreams cluster to the local Kafka cluster.  We start the MirrorMaker 2 cluster and wait for it to finish initializing:
 
-![](images/term 3.png)
+![](images/term3.png)
 
 …
 …
 
 Once it finishes initializing, we should see messages like the following:
 
-![](images/term 4.png)
+![](images/term4.png)
 
 To show that replication is occurring, we will create a consumer on the Consumer VM.  Install Kafka as shown above and use the built-in console consumer to view the replicated messages from the local Kafka cluster.   To run the consumer, we use the same PKCS 12 certificate file to authenticate to the local cluster, and a local-consumer.properties file that is shown below:
 
-![](images/term 5.png)
+![](images/term5.png)
 
 Run the consumer command:
 
-![](images/term 6.png)
+![](images/term6.png)
 
 Notice that the topic name in this case is kp-remote.kp-topic-1 instead of just kp-topic-1.  This is because we’re monitoring the replicated version of kp-topic-1 from the remote EventStreams cluster.  MirrorMaker 2 automatically prepends the alias of the remote cluster as it is labeled in the MirrorMaker 2 configuration file.  In this case, the alias was kp-remote, so the replicated topic kp-topic-1 is named kp-remote.kp-topic-1.
 
@@ -145,29 +145,29 @@ We can see the test messages from the producer that is writing to EventStreams a
 
 Now that replication is running successfully and we have both a producer and consumer running to view the traffic in real time, we can set up a second MirrorMaker 2 node.  The process is exactly the same as the first MirrorMaker 2 node, and the configuration file is also exactly the same.
 
-![](images/term 7.png)
+![](images/term7.png)
 
 Now that both instances of MirrorMaker 2 are running, we can verify that both instances are able to assume the load by stopping the first MirrorMaker 2 instance we created, verifying that replication is still occurring, restarting it, and finally stopping the second instance.  This will show that as long as at least one instance of MirrorMaker 2 is running we have successful replication.
 
 From the Consumer:
 
-![](images/term 8.png)
+![](images/term8.png)
 
 Now we stop the first MirrorMaker 2:
 
-![](images/term 9.png)
+![](images/term9.png)
 
 And verify that replication is still occurring via the Consumer VM:
 
-![](images/term 10.png)
+![](images/term10.png)
 
 Replication continued as expected.  Now we restart MirrorMaker 2 on Node 1, and stop it on Node 2:
 
-![](images/term 11.png)
+![](images/term11.png)
 
 And check the consumer:
 
-![](images/term 12.png)
+![](images/term12.png)
 
 Replication continued as expected.  We can alternatively stop and start the two instances of MirrorMaker 2 but replication continues.
 
@@ -177,39 +177,39 @@ We can perform rolling upgrades of MirrorMaker 2 similarly to how we tested that
 
 To upgrade MirrorMaker 2 we will simply download the latest version of Kafka and change the symbolic link we created.
 
-![](images/term 13.png)
+![](images/term13.png)
 
 We’ve now upgraded to Kafka 2.5 including the latest MirrorMaker 2.  Meanwhile, replication was uninterrupted due to the second instance of MirrorMaker 2:
 
-![](images/term 14.png)
+![](images/term14.png)
 
 Now we’ll restart the Node 1 instance of MirrorMaker 2:
 
-![](images/term 15.png)
+![](images/term15.png)
 
 And stop the Node 2 instance:
 
-![](images/term 16.png)
+![](images/term16.png)
 
 Replication is still occurring:
 
-![](images/term 17.png)
+![](images/term17.png)
 
 So, replication is now occurring on the upgraded Node 1 instance of MirrorMaker 2.  We upgrade Node 2’s instance of MirrorMaker 2 exactly as on Node 1, and start it again:
 
-![](images/term 18.png)
+![](images/term18.png)
 
 Once again, replication is still going:
 
-![](images/term 19.png)
+![](images/term19.png)
 
 And for our final test, we will stop the Node 1 instance of MirrorMaker 2 to show that replication continues working on the newly upgraded Node 2 instance of MirrorMaker 2:
 
-![](images/term 20.png)
+![](images/term20.png)
 
 Again, replication continues:
 
-![](images/term 21.png)
+![](images/term21.png)
 
 So we have shown the the rolling upgrade of two MirrorMaker 2 nodes has been successful.
 
