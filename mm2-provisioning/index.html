@@ -36,7 +36,7 @@
     
     
       
-        <title>Mirror Maker 2 Provisioning - Data Replication in context of Kafka and Event Streams</title>
+        <title>MirrorMaker 2 Provisioning - Data Replication in context of Kafka and Event Streams</title>
       
     
     
@@ -121,7 +121,7 @@
               Data Replication in context of Kafka and Event Streams
             </span>
             <span class="md-header-nav__topic">
-              Mirror Maker 2 Provisioning
+              MirrorMaker 2 Provisioning
             </span>
           
         </div>
@@ -297,11 +297,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Mirror Maker 2 Provisioning
+        MirrorMaker 2 Provisioning
       </label>
     
-    <a href="./" title="Mirror Maker 2 Provisioning" class="md-nav__link md-nav__link--active">
-      Mirror Maker 2 Provisioning
+    <a href="./" title="MirrorMaker 2 Provisioning" class="md-nav__link md-nav__link--active">
+      MirrorMaker 2 Provisioning
     </a>
     
       
@@ -412,6 +412,18 @@
   
 </nav>
     
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../vm-provisioning/" title="VM MirrorMaker 2 provisioning" class="md-nav__link">
+      VM MirrorMaker 2 provisioning
+    </a>
   </li>
 
         
@@ -912,6 +924,14 @@ The config part can match the Kafka configuration for consumer or producer, exce
 <p>Once the MirrorMaker cluster is up and running, it may be needed to update the underlying code when a new product version is released. Based on Kafka Connect distributed mode multiple workers JVM coordinate the topic / partition repartition among themselves via Kafka topic.  If a worker process dies, the cluster is rebalanced to distribute the work fairly over the remaining workers.
 If a new worker starts work, a rebalance ensures it takes over some work from the existing workers.</p>
 <p>Using the REST API it is possible to stop and restart a connector. As of now the recommendation is to start a new MirrorMaker instance with the new version and the same groupId as the existing workers you want to migrate. Then stop the existing version. As each MirrorMaker workers are part of the same group, the internal worker controller will coordinate with the other workers the  'consumer' task to partition assignment.</p>
+<p>We have presentate a similar approach in <a href="vm-provisioning/#restarting-mirrormaker-2">this section</a>, where we tested that each instance of MirrorMaker 2 could assume the replication.  First we will stop the Node 1 instance, upgrade it to the latest version, then start it again.  Then we’ll repeat the same procedure on Node 2.  We’ll continue to watch the Consumer VM window to note that replication should not stop at any point.</p>
+<p><img alt="" src="../images/mm2-v2v-1.png" /></p>
+<p>We’ve now upgraded to Kafka 2.5 including the latest MirrorMaker 2.  Meanwhile, replication was uninterrupted due to the second instance of MirrorMaker 2:</p>
+<p><img alt="" src="../images/mm2-v2v-2.png" /></p>
+<p>Now we’ll restart the Node 1 instance of MirrorMaker 2, stop the Node 2 instance, we can still see replication occurring on the upgraded Node 1 instance of MirrorMaker 2. </p>
+<p><img alt="" src="../images/mm2-v2v-3.png" /></p>
+<p>We upgrade Node 2’s instance of MirrorMaker 2 exactly as on Node 1, and start it again, and once again, replication is still going.</p>
+<p><img alt="" src="../images/mm2-v2v-4.png" /></p>
 <p>When using Strimzi, if the update applies to the MM2 Custom Resource Definition, just reapplying the CRD should be enough.</p>
 <p>Be sure to verify the product documentation as new version may enforce to have new topics. It was the case when Kafka connect added the config topic in a recent version.</p>
 <h2 id="deploying-a-custom-mirrormaker-docker-image">Deploying a custom MirrorMaker docker image</h2>
@@ -1025,8 +1045,8 @@ mm2-cluster   <span class="m">1</span>
 </pre></div>
 
 <h2 id="deploying-on-vm">Deploying on VM</h2>
-<p>On virtual machine, it is possible to deploy the Apache Kafka 2.4+ binary file and then use the command <code>/opt/kafka/bin/connect-mirror-maker.sh</code> with the good properties file as argument.</p>
-<p>Within a VM we can run multiple mirror maker instances. When needed we can add more VMs to scale horizontally. Each mirror makers workers are part of the same consumer groups, so it is possible to scale at the limit of the topic partition number.</p>
+<p>On virtual machine, it is possible to deploy the Apache Kafka 2.4+ binary file and then use the command <code>/opt/kafka/bin/connect-mirror-maker.sh</code> with the good properties file as argument. We are documenting the VM installation process in <a href="vm-provisioning">this article</a>.</p>
+<p>Within a VM we can run multiple mirror maker instances. When needed we can add more VMs to scale horizontally.</p>
 <h2 id="deploying-mirror-maker-2-on-its-own-project">Deploying Mirror Maker 2 on its own project</h2>
 <p>In this section we address another approach to, deploy a Kafka Connect cluster with Mirror Maker 2.0 connectors but without any local Kafka Cluster. The approach may be used with Event Streams on Cloud as backend Kafka cluster and Mirror Maker 2 for replication.</p>
 <p>Using the Strimzi operator we need to define a Yaml file for the connector and white and black lists for the topics to replicate. Here is an <a href="">example of such descriptor</a>.</p>
@@ -1123,13 +1143,13 @@ mm2-cluster   <span class="m">1</span>
           </a>
         
         
-          <a href="../local-to-es/" title="Replication from local to Event Streams" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../vm-provisioning/" title="VM MirrorMaker 2 provisioning" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Replication from local to Event Streams
+                VM MirrorMaker 2 provisioning
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
