@@ -568,23 +568,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install-grafana" title="Install Grafana" class="md-nav__link">
-    Install Grafana
+  <a href="#grafana" title="Grafana" class="md-nav__link">
+    Grafana
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kafka-explorer" title="Kafka Explorer" class="md-nav__link">
-    Kafka Explorer
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#configure-grafana-dashboard" title="Configure Grafana dashboard" class="md-nav__link">
     Configure Grafana dashboard
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -736,23 +735,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install-grafana" title="Install Grafana" class="md-nav__link">
-    Install Grafana
+  <a href="#grafana" title="Grafana" class="md-nav__link">
+    Grafana
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kafka-explorer" title="Kafka Explorer" class="md-nav__link">
-    Kafka Explorer
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#configure-grafana-dashboard" title="Configure Grafana dashboard" class="md-nav__link">
     Configure Grafana dashboard
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -807,6 +805,7 @@
 <li>Configure Prometheus to access MirrorMaker metrics</li>
 <li>Deploy Grafana and configure dashboard</li>
 </ol>
+<p>For Kafka monitoring study we recommend reading <a href="https://ibm-cloud-architecture.github.io/refarch-eda/kafka/monitoring">this article</a> from Ana Giordano.</p>
 <h2 id="installation-and-configuration">Installation and configuration</h2>
 <p>Prometheus deployment inside Kubernetes uses operator as defined in <a href="https://github.com/coreos/prometheus-operator">the coreos github</a>. The CRDs define a set of resources: the ServiceMonitor, PodMonitor, and PrometheusRule.</p>
 <p>Inside the <a href="https://github.com/strimzi/strimzi-kafka-operator">Strimzi github repository</a>, we can get a <a href="https://github.com/strimzi/strimzi-kafka-operator/blob/master/examples/metrics/prometheus-install/prometheus.yaml">prometheus.yml</a> file to deploy prometheus server using the <a href="https://github.com/coreos/prometheus-operator">Prometheus operator</a>. This configuration defines, ClusterRole, ServiceAccount, ClusterRoleBinding, and the Prometheus resource instance. We have defined our own configuration in <a href="https://github.com/jbcodeforce/kp-data-replication/blob/master/monitoring/prometheus.yml">this file</a>.</p>
@@ -906,7 +905,8 @@ prometheus             <span class="m">1</span>          52s
 <div class="codehilite"><pre><span></span>  <span class="nt">serviceMonitorSelector</span><span class="p">:</span> <span class="p p-Indicator">{}</span>
 </pre></div>
 
-<p>Monitoring rules can be added via config map that is referenced in the <code>prometheus.yaml</code> file:</p>
+<p>Monitoring rules can be added via config map that is referenced in the <code>prometheus.yaml</code> file as :
+additional-scrape-configs.</p>
 <div class="codehilite"><pre><span></span>  <span class="nt">additionalScrapeConfigs</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">additional-scrape-configs</span>
     <span class="nt">key</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">prometheus-additional.yaml</span>
@@ -947,18 +947,33 @@ Labels:       <span class="nv">app</span><span class="o">=</span>strimzi
 </pre></div>
 
 <h2 id="mirrormaker-2-monitoring">MirrorMaker 2 monitoring</h2>
-<p>To monitor MirrorMaker 2 we need to add a Service Monitor.</p>
-<h2 id="install-grafana">Install Grafana</h2>
+<p>To monitor MirrorMaker 2 we need to:</p>
+<ul>
+<li>expose the MirrorMaker with an external route so we can validate <code>/metrics</code> are available.</li>
+<li>define the following yaml file which defines a new Prometheus scrapper job with the URL of the exposed MirrorMaker instance on the prometheus port.</li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">job_name</span><span class="p">:</span> <span class="s">&#39;MirrorMaker2&#39;</span>
+  <span class="nt">static_configs</span><span class="p">:</span>
+   <span class="p p-Indicator">-</span> <span class="nt">targets</span><span class="p">:</span>
+     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">mm2-cluster-mirrormaker2-api.eda-strimzi-kafka24.svc.cluster.local:9404</span>
+</pre></div>
+
+<p>and then configure the secret:</p>
+<div class="codehilite"><pre><span></span>oc create secret generic additional-scrape-configs --from-file<span class="o">=</span>prometheus-additional.yaml
+</pre></div>
+
+<p>Prometheus should display the mirror maker metrics:</p>
+<p><img alt="" src="../images/mm2-metrics.png" /></p>
+<h2 id="grafana">Grafana</h2>
 <p><a href="https://grafana.com/">Grafana</a> provides visualizations of Prometheus metrics. Again we will use the Strimzi dashboard definition as starting point to monitor Kafka cluster but also mirror maker.</p>
 <ul>
-<li>Deploy Grafan to OpenShift and expose it via a service:</li>
+<li>Deploy Grafana to OpenShift and expose it via a service:</li>
 </ul>
 <div class="codehilite"><pre><span></span>oc apply -f grafana.yaml
 </pre></div>
 
 <p>In case you want to test grafana locally run: <code>docker run -d -p 3000:3000 grafana/grafana</code></p>
-<h2 id="kafka-explorer">Kafka Explorer</h2>
-<h2 id="configure-grafana-dashboard">Configure Grafana dashboard</h2>
+<h3 id="configure-grafana-dashboard">Configure Grafana dashboard</h3>
 <p>To access the Grafana portal you can use port forwarding like below or expose a route on top of the grafana service.</p>
 <ul>
 <li>Use port forwarding:</li>

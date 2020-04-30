@@ -832,9 +832,9 @@ oc extract secret/eda-demo-24-cluster-clients-ca-cert --keys<span class="o">=</s
 <p><code>connectCluster</code> attribute defines the cluster alias used for Kafka Connect, it must match a cluster in the list at <code>spec.clusters</code>.
 The config part can match the Kafka configuration for consumer or producer, except properties starting by ssl, sasl, security, listeners, rest, bootstarp.servers which are declared at the cluster definition level. </p>
 </div>
-<div class="codehilite"><pre><span></span>  <span class="nt">alias</span><span class="p">:</span> <span class="s">&quot;event-streams-wdc-as-target&quot;</span>
-    <span class="nt">bootstrapServers</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">broker-3...</span>
-    <span class="nt">tls</span><span class="p">:</span> <span class="p p-Indicator">{}</span>
+<div class="codehilite"><pre><span></span>  <span class="nt">alias</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">event-streams-wdc-as-target</span>
+    <span class="l l-Scalar l-Scalar-Plain">bootstrapServers</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">broker-3...</span>
+    <span class="l l-Scalar l-Scalar-Plain">tls</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{}</span>
     <span class="nt">authentication</span><span class="p">:</span>
       <span class="nt">passwordSecret</span><span class="p">:</span>
           <span class="nt">secretName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">es-api-secret</span>  
@@ -858,9 +858,19 @@ The config part can match the Kafka configuration for consumer or producer, exce
 <p>The following diagram illustrates this kind of topology by using regular expression on the topic white list selection, there are three MirrorMaker 2 instances mirroring the different topics with name starting with <code>topic-name-A*, topic-name-B*, topic-name-C*,</code> respectively.</p>
 <p><img alt="" src="../images/mm2-topology.png" /></p>
 <p>Each connect instance is a JVM workers that replicate the topic/parititions and has different group.id.</p>
-<p>For Bi-directional replication for the same topic name, MirrorMaker 2 will use the cluster name as prefix. The following example is showing the configuration for one MM2 connector:</p>
+<p>For Bi-directional replication for the same topic name, MirrorMaker 2 will use the cluster name as prefix. With MM2 we do not need to have 2 clusters but only one and bidirectional definitions. The following example is showing the configuration for a MM2 bidirectional settings, with <code>accounts</code> topic to be replicated on both cluster:</p>
 <div class="codehilite"><pre><span></span><span class="n">apiVersion</span><span class="o">:</span> <span class="n">kafka</span><span class="o">.</span><span class="na">strimzi</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">v1alpha1</span>
 <span class="n">kind</span><span class="o">:</span> <span class="n">KafkaMirrorMaker2</span>
+<span class="o">...</span>
+ <span class="n">mirrors</span><span class="o">:</span>
+  <span class="o">-</span> <span class="n">sourceCluster</span><span class="o">:</span> <span class="s2">&quot;event-streams-wdc&quot;</span>
+    <span class="n">targetCluster</span><span class="o">:</span> <span class="s2">&quot;kafka-on-premise&quot;</span>
+    <span class="o">...</span>
+    <span class="n">topicsPattern</span><span class="o">:</span> <span class="s2">&quot;accounts,orders&quot;</span>
+  <span class="o">-</span> <span class="n">sourceCluster</span><span class="o">:</span> <span class="s2">&quot;kafka-on-premise&quot;</span>
+    <span class="n">targetCluster</span><span class="o">:</span> <span class="s2">&quot;event-streams-wdc&quot;</span>
+    <span class="o">...</span>
+    <span class="n">topicsPattern</span><span class="o">:</span> <span class="s2">&quot;accounts,customers&quot;</span>
 </pre></div>
 
 <h2 id="capacity-planning">Capacity planning</h2>
