@@ -31,7 +31,6 @@ spec:
       config.storage.replication.factor: 3
       offset.storage.replication.factor: 3
       status.storage.replication.factor: 3
-      ssl.endpoint.identification.algorithm: https
     tls: {}
     authentication:
       passwordSecret:

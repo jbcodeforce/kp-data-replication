@@ -24,6 +24,8 @@ To support this monitoring we need to do the following steps:
 1. Configure Prometheus to access MirrorMaker metrics
 1. Deploy Grafana and configure dashboard
 
+For Kafka monitoring study we recommend reading [this article](https://ibm-cloud-architecture.github.io/refarch-eda/kafka/monitoring) from Ana Giordano.
+
 ## Installation and configuration
 
 Prometheus deployment inside Kubernetes uses operator as defined in [the coreos github](https://github.com/coreos/prometheus-operator). The CRDs define a set of resources: the ServiceMonitor, PodMonitor, and PrometheusRule.
@@ -111,7 +113,8 @@ or use a monitor all approach:
   serviceMonitorSelector: {}
 ```
 
-Monitoring rules can be added via config map that is referenced in the `prometheus.yaml` file:
+Monitoring rules can be added via config map that is referenced in the `prometheus.yaml` file as :
+additional-scrape-configs.
 
 ```yaml
   additionalScrapeConfigs:
@@ -164,13 +167,34 @@ Labels:       app=strimzi
 
 ## MirrorMaker 2 monitoring
 
-To monitor MirrorMaker 2 we need to add a Service Monitor.
+To monitor MirrorMaker 2 we need to:
 
-## Install Grafana
+* expose the MirrorMaker with an external route so we can validate `/metrics` are available.
+* define the following yaml file which defines a new Prometheus scrapper job with the URL of the exposed MirrorMaker instance on the prometheus port.
+
+```yaml
+- job_name: 'MirrorMaker2'
+  static_configs:
+   - targets:
+     - mm2-cluster-mirrormaker2-api.eda-strimzi-kafka24.svc.cluster.local:9404
+```
+
+and then configure the secret:
+
+```shell
+oc create secret generic additional-scrape-configs --from-file=prometheus-additional.yaml
+```
+
+Prometheus should display the mirror maker metrics:
+
+![](images/mm2-metrics.png)
+
+
+## Grafana
 
 [Grafana](https://grafana.com/) provides visualizations of Prometheus metrics. Again we will use the Strimzi dashboard definition as starting point to monitor Kafka cluster but also mirror maker.
 
-* Deploy Grafan to OpenShift and expose it via a service:
+* Deploy Grafana to OpenShift and expose it via a service:
 
 ```shell
 oc apply -f grafana.yaml
@@ -178,9 +202,7 @@ oc apply -f grafana.yaml
 
 In case you want to test grafana locally run: `docker run -d -p 3000:3000 grafana/grafana`
 
-## Kafka Explorer
-
-## Configure Grafana dashboard
+### Configure Grafana dashboard
 
 To access the Grafana portal you can use port forwarding like below or expose a route on top of the grafana service.
 
@@ -196,6 +218,7 @@ Point your browser to [http://localhost:3000](http://localhost:3000).
 * Expose the route via cli
 
 Add the Prometheus data source with the URL of the exposed routes. [http://prometheus-operated:9090](http://prometheus-operated:9090)
+
 
 ## Alert Manager
 

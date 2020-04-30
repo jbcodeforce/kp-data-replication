@@ -57,7 +57,7 @@ If you have already installed Strimzi Operators, Cluster Roles, and CRDs, you do
     The config part can match the Kafka configuration for consumer or producer, except properties starting by ssl, sasl, security, listeners, rest, bootstarp.servers which are declared at the cluster definition level. 
 
 ```yaml
-  alias: "event-streams-wdc-as-target"
+  alias: event-streams-wdc-as-target
     bootstrapServers: broker-3...
     tls: {}
     authentication:
@@ -92,12 +92,21 @@ The following diagram illustrates this kind of topology by using regular express
 
 Each connect instance is a JVM workers that replicate the topic/parititions and has different group.id.
 
-For Bi-directional replication for the same topic name, MirrorMaker 2 will use the cluster name as prefix. The following example is showing the configuration for one MM2 connector:
+For Bi-directional replication for the same topic name, MirrorMaker 2 will use the cluster name as prefix. With MM2 we do not need to have 2 clusters but only one and bidirectional definitions. The following example is showing the configuration for a MM2 bidirectional settings, with `accounts` topic to be replicated on both cluster:
 
 ```
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaMirrorMaker2
-
+...
+ mirrors:
+  - sourceCluster: "event-streams-wdc"
+    targetCluster: "kafka-on-premise"
+    ...
+    topicsPattern: "accounts,orders"
+  - sourceCluster: "kafka-on-premise"
+    targetCluster: "event-streams-wdc"
+    ...
+    topicsPattern: "accounts,customers"
 ```
 
 ## Capacity planning

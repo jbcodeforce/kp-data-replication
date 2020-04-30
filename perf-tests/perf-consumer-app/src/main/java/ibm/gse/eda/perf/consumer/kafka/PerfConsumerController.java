@@ -75,13 +75,13 @@ public class PerfConsumerController {
 
     }
 
-    public List<ConsumerRecord<String,String>> getMessages(){
-        ArrayList<ConsumerRecord<String,String>> l = new ArrayList<ConsumerRecord<String,String>>(maxMessages);
+    public List<String> getMessages(){
+        ArrayList<String> l = new ArrayList<String>(maxMessages);
         for (ConsumerRunnable consumerRunnable : consumers) {
           l.addAll(consumerRunnable.getMessages().getElements());
         }
-        for (ConsumerRecord<String,String> c : l) {
-            System.out.println(c.toString());
+        for (String c : l) {
+            System.out.println(c);
         }
         return l;
     }

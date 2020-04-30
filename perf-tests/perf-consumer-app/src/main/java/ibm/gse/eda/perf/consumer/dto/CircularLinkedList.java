@@ -3,8 +3,6 @@ package ibm.gse.eda.perf.consumer.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.kafka.common.metrics.stats.CumulativeCount;
-
 public class CircularLinkedList<T> {
     private ListNode<T> head;
     private int numberOfElements = 0;

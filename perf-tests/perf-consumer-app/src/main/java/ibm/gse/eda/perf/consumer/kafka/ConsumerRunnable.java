@@ -4,6 +4,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -27,7 +28,7 @@ public class ConsumerRunnable implements Runnable {
     private boolean running = true;
     private KafkaConfiguration kafkaConfiguration;
     protected int maxMessages;
-    private CircularLinkedList<ConsumerRecord<String,String>> messages;
+    private CircularLinkedList<String> messages;
     private  long maxLatency = 0;
     private  long minLatency = Integer.MAX_VALUE;
     private  long lagSum = 0;
@@ -40,7 +41,7 @@ public class ConsumerRunnable implements Runnable {
         this.kafkaConfiguration = config;
         this.maxMessages = maxMessages;
         this.id = id;
-        messages = new CircularLinkedList<ConsumerRecord<String,String>>(this.maxMessages);
+        messages = new CircularLinkedList<String>(this.maxMessages);
     }
 
     private void init(){
@@ -77,7 +78,7 @@ public class ConsumerRunnable implements Runnable {
 
     @Override
     public void run() {
-        logger.log(Level.WARNING,"Start runnable");
+        logger.log(Level.WARNING,"Start consumer performance app listening on topic: " + getConfig().getMainTopicName());
         init();
         loop();
     }
@@ -92,7 +93,7 @@ public class ConsumerRunnable implements Runnable {
                             + " timestamp: "
                             + record.timestamp()
                             + " value: " 
-                            + record.value() 
+                            + record.value()
                             + " partition: " 
                             + record.partition() 
                             + " offset: " + record.offset() + "\n");
@@ -105,16 +106,16 @@ public class ConsumerRunnable implements Runnable {
                     lagSum += difference;
                     count = count +1;
                     averageLatency = lagSum / count;
-                    messages.insertData(record);
-                    logger.log(Level.WARNING,Long.toString(averageLatency) + " " + Long.toString(minLatency));
+                    messages.insertData((String)record.value());
+                    logger.log(Level.WARNING,"latency: " + Long.toString(difference) + " average:" + Long.toString(averageLatency));
                 }
-                if (getConfig().getCommit()) {
-                    logger.log(Level.INFO, "Consumer auto commit");
+                if (! records.isEmpty() && getConfig().getCommit()) {
+                    logger.log(Level.WARNING, "Consumer auto commit");
                     kafkaConsumer.commitSync();
                 }
                 logger.log(Level.INFO, "in consumer: " + id + " listen to topic " + getConfig().getMainTopicName());
             } catch (final Exception e) {
-                logger.log(Level.SEVERE, "Consumer loop has been unexpectedly interrupted");
+                logger.log(Level.SEVERE, "Consumer loop has been unexpectedly interrupted " + e.getMessage());
                 stop();
             }
      
@@ -140,7 +141,7 @@ public class ConsumerRunnable implements Runnable {
         return kafkaConfiguration;
     }
 
-	public CircularLinkedList<ConsumerRecord<String,String>> getMessages() {
+	public CircularLinkedList<String> getMessages() {
 		return messages;
 	}
 

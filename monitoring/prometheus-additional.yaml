@@ -2,4 +2,4 @@
 - job_name: 'MirrorMaker2'
   static_configs:
    - targets:
-     - mm2ocp.eda-strimzi-kafka24.svc.cluster.local:9400
+     - mm2-cluster-mirrormaker2-api.eda-strimzi-kafka24.svc.cluster.local:9404

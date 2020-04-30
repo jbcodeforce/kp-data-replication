@@ -6,47 +6,47 @@ metadata:
 spec:
   version: 2.4.0
   replicas: 1
-  connectCluster: "kafka-on-premise-cluster"
+  connectCluster: strimzi
   logging:
     type: inline
     loggers:
       connect.root.logger.level: "INFO"
   clusters:
-  - alias: "kafka-on-premise-cluster"
-    bootstrapServers: eda-demo-24-cluster-kafka-bootstrap:9092
-    config:
-      config.storage.replication.factor: 3
-      offset.storage.replication.factor: 3
-      status.storage.replication.factor: 3
-  - alias: "event-streams-wdc"
-    bootstrapServers: 'broker-3-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-1-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-h6s2xk6b2t77g4p1.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093'
-    config:
-      config.storage.replication.factor: 3
-      offset.storage.replication.factor: 3
-      status.storage.replication.factor: 3
-    tls: {}
-    authentication:
-      passwordSecret:
-          secretName: es-api-secretmgr
-          password: password 
-      username: token
-      type: plain
+    - alias: strimzi
+      bootstrapServers: 'eda-demo-24-cluster-kafka-bootstrap:9092'
+      config:
+        config.storage.replication.factor: 3
+        offset.storage.replication.factor: 3
+        status.storage.replication.factor: 3
+    - alias: event-streams-wdc
+      bootstrapServers: 'broker-1-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-4-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-2-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-3-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-5-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093,broker-0-qnprtqnp7hnkssdz.kafka.svc01.us-east.eventstreams.cloud.ibm.com:9093'      
+      config:
+        config.storage.replication.factor: 3
+        offset.storage.replication.factor: 3
+        status.storage.replication.factor: 3
+      tls: {}
+      authentication:
+        passwordSecret:
+            secretName: es-eda-api-secret
+            password: password 
+        username: token
+        type: plain
   mirrors:
-  - sourceCluster: "event-streams-wdc"
-    targetCluster: "kafka-on-premise-cluster"
+  - sourceCluster: event-streams-wdc
+    targetCluster: strimzi
     sourceConnector:
       config:
           replication.factor: 1
           offset-syncs.topic.replication.factor: 1
-          sync.topic.acls.enabled: "false"
+          sync.topic.acls.enabled: false
     heartbeatConnector:
       config:
           heartbeats.topic.replication.factor: 1
     checkpointConnector:
       config:
           checkpoints.topic.replication.factor: 1
-    topicsPattern: "accounts"
-    groupsPattern: ".*"
+    topicsPattern: accounts
+    groupsPattern: .*
   metrics:
     lowercaseOutputName: true
     lowercaseOutputLabelNames: true

@@ -42,7 +42,7 @@ public class PerfConsumerAPI {
 
     public void init(@Observes 
     @Initialized(ApplicationScoped.class) Object context) {
-        System.out.println("Performance Consunmer App started. Version:" + appVersion);
+        System.out.println("Performance Consumer App started. Version:" + appVersion);
         System.out.println(perfConsumerController.toString()); // triggers instance creation from CDI instead of using proxy
     }
 
@@ -83,9 +83,9 @@ public class PerfConsumerAPI {
                 responseCode = "200",
                 description = "Last x messages",
                 content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = ConsumerRecord[].class))) 
+                schema = @Schema(implementation = String[].class))) 
      })
-     public List<ConsumerRecord<String,String>> getMessages(){
+     public List<String> getMessages(){
         return perfConsumerController.getMessages();
      }
 

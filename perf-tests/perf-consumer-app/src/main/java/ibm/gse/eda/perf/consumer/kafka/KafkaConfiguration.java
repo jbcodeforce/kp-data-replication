@@ -54,6 +54,18 @@ public class KafkaConfiguration {
     @ConfigProperty(name = "kafka.poll.timeout")
     private String pollTimeout = null;
 
+    @Inject
+    @ConfigProperty(name = "kafka.poll.records")
+    private String pollRecords = null;
+
+    @Inject
+    @ConfigProperty(name="kafka.key.deserializer", defaultValue="org.apache.kafka.common.serialization.ByteArrayDeserializer")
+    private String keyDeserializer;
+
+    @Inject
+    @ConfigProperty(name="kafka.value.deserializer", defaultValue="org.apache.kafka.common.serialization.ByteArrayDeserializer")
+    private String valueDeserializer;
+
     public KafkaConfiguration() {
     }
 
@@ -100,8 +112,8 @@ public class KafkaConfiguration {
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupID);
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.toString(commit));
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offset);
-        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer);
         properties.put(ConsumerConfig.CLIENT_ID_CONFIG, groupID + "-client-" + UUID.randomUUID());
         properties.forEach((k, v) -> logger.warning(k + " : " + v));
         return properties;
