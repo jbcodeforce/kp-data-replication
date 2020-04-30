@@ -131,6 +131,23 @@ If a new worker starts work, a rebalance ensures it takes over some work from th
 
 Using the REST API it is possible to stop and restart a connector. As of now the recommendation is to start a new MirrorMaker instance with the new version and the same groupId as the existing workers you want to migrate. Then stop the existing version. As each MirrorMaker workers are part of the same group, the internal worker controller will coordinate with the other workers the  'consumer' task to partition assignment.
 
+We have presentate a similar approach in [this section](vm-provisioning/#restarting-mirrormaker-2), where we tested that each instance of MirrorMaker 2 could assume the replication.  First we will stop the Node 1 instance, upgrade it to the latest version, then start it again.  Then we’ll repeat the same procedure on Node 2.  We’ll continue to watch the Consumer VM window to note that replication should not stop at any point.
+
+![](images/mm2-v2v-1.png)
+
+We’ve now upgraded to Kafka 2.5 including the latest MirrorMaker 2.  Meanwhile, replication was uninterrupted due to the second instance of MirrorMaker 2:
+
+![](images/mm2-v2v-2.png)
+
+Now we’ll restart the Node 1 instance of MirrorMaker 2, stop the Node 2 instance, we can still see replication occurring on the upgraded Node 1 instance of MirrorMaker 2. 
+
+![](images/mm2-v2v-3.png)
+
+We upgrade Node 2’s instance of MirrorMaker 2 exactly as on Node 1, and start it again, and once again, replication is still going.
+
+
+![](images/mm2-v2v-4.png)
+
 When using Strimzi, if the update applies to the MM2 Custom Resource Definition, just reapplying the CRD should be enough.
 
 Be sure to verify the product documentation as new version may enforce to have new topics. It was the case when Kafka connect added the config topic in a recent version.
@@ -268,10 +285,9 @@ oc create secret generic mm2-jmx-exporter --from-file=./mm2-jmx-exporter.yaml
 
 ## Deploying on VM
 
-On virtual machine, it is possible to deploy the Apache Kafka 2.4+ binary file and then use the command `/opt/kafka/bin/connect-mirror-maker.sh` with the good properties file as argument.
+On virtual machine, it is possible to deploy the Apache Kafka 2.4+ binary file and then use the command `/opt/kafka/bin/connect-mirror-maker.sh` with the good properties file as argument. We are documenting the VM installation process in [this article](vm-provisioning.md).
 
-Within a VM we can run multiple mirror maker instances. When needed we can add more VMs to scale horizontally. Each mirror makers workers are part of the same consumer groups, so it is possible to scale at the limit of the topic partition number.
-
+Within a VM we can run multiple mirror maker instances. When needed we can add more VMs to scale horizontally.
 
 ## Deploying Mirror Maker 2 on its own project
 
