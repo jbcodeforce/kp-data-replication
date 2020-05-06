@@ -1,8 +1,8 @@
-# KP Data Replication
+# EDA - Data Consistency and Replication
 
-This repository includes a set of documents for best practices around data replication between two Kafka clusters.
+This repository includes a set of documents for best practices around data replication between two Kafka clusters and data consistency practices.
 
-Better to read in [BOOK format](https://jbcodeforce.github.io/kp-data-replication).
+Better to read in [BOOK format](https://ibm-cloud-architecture.github.io/refarch-eda-data-consistency).
 
 ## Requirements
 
