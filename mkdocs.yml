@@ -1,5 +1,5 @@
 site_name: Data Replication in context of Kafka and Event Streams
-repo_url: https://github.com/jbcodeforce/kp-data-replication.git
+repo_url: https://github.com/ibm-cloud-architecture/refarch-eda-data-consistency.git
 nav:
   - Introduction: index.md
   - Environment provisioning:
