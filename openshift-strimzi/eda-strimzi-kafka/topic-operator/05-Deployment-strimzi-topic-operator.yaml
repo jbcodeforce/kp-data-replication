@@ -17,16 +17,16 @@ spec:
       serviceAccountName: strimzi-topic-operator
       containers:
         - name: strimzi-topic-operator
-          image: strimzi/operator:0.17.0
+          image: strimzi/operator:latest
           args:
           - /opt/strimzi/bin/topic_operator_run.sh
           env:
             - name: STRIMZI_RESOURCE_LABELS
-              value: "strimzi.io/cluster=eda-demo-24-cluster"
+              value: "strimzi.io/cluster=my-cluster"
             - name: STRIMZI_KAFKA_BOOTSTRAP_SERVERS
-              value: eda-demo-24-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9092
             - name: STRIMZI_ZOOKEEPER_CONNECT
-              value: eda-demo-24-cluster-zookeeper:2181
+              value: my-cluster-zookeeper-client:2181
             - name: STRIMZI_ZOOKEEPER_SESSION_TIMEOUT_MS
               value: "20000"
             - name: STRIMZI_FULL_RECONCILIATION_INTERVAL_MS
@@ -62,26 +62,3 @@ spec:
               cpu: 100m
   strategy:
     type: Recreate
-
----
-
-  apiVersion: extensions/v1beta1
-  kind: NetworkPolicy
-  metadata:
-    labels:
-      app: strimzi-topic-operator
-    name: strimzi-topic-operator
-  spec:
-    ingress:
-    - from:
-      - podSelector:
-          matchLabels:
-            app: strimzi-topic-operator
-      ports:
-      - port: 2181
-        protocol: TCP
-    podSelector:
-      matchLabels:
-        strimzi.io/name: eda-demo-24-cluster-zookeeper
-    policyTypes:
-    - Ingress

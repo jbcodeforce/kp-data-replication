@@ -20,9 +20,7 @@ class KafkaProducer:
                 'bootstrap.servers':  self.kafka_brokers,
                 'group.id': groupID,
                 'acks': 0,
-                'batch_size': 5,
-                'connections_max_idle_ms': 15000,
-                'request_timeout_ms': 10000,
+                'request.timeout.ms': 10000
         }
         if (self.kafka_apikey != ''):
             options['security.protocol'] = 'SASL_SSL'
@@ -48,7 +46,7 @@ class KafkaProducer:
         self.producer.produce(self.topic_name,
                             key=str(eventToSend[keyName]).encode('utf-8'),
                             value=dataStr.encode('utf-8'), 
-                            timestamp_ms=time.time(),
+                            timestamp= int(time.time()),
                             callback=self.delivery_report)
         self.producer.flush()
 
