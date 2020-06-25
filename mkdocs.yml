@@ -15,8 +15,8 @@ nav:
     - From Event Streams on OpenShift to Event Streams on Cloud : es-prem-to-es.md
   - Best practices:
     - Kafka Summary: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/readme
-    - Consumer practices: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/consumers
-    - Producer practices: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/producers
+    - Consumer practices: https://ibm-cloud-architecture.github.io/refarch-eda/technology/kafka-producers-consumers/#kafka-consumers
+    - Producer practices: https://ibm-cloud-architecture.github.io/refarch-eda/technology/kafka-producers-consumers/#kafka-producers
     - Kafka Connect: https://ibm-cloud-architecture.github.io/refarch-eda/kafka/connect
     - Replicaton considerations: consideration.md
   - Operations: 
