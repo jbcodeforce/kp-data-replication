@@ -2,7 +2,7 @@
 
 This repository includes a set of documents for best practices around data replication between two Kafka clusters and data consistency practices.
 
-Better to read in [BOOK format](https://ibm-cloud-architecture.github.io/refarch-eda-data-consistency).
+Better to read in [BOOK format](https://jbcodeforce.github.io/refarch-eda-data-consistency).
 
 ## Requirements
 
