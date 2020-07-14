@@ -22,3 +22,4 @@ mirror-maker-2/truststore.jks
 perf-tests/perf-consumer-app/target/
 perf-tests/event-streams-sample-producer-1.1.0/target/
 perf-tests/kafka/__pycache__/
+.DS_Store
